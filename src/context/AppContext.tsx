@@ -177,7 +177,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Workout stopwatch ticker
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
+    let interval: ReturnType<typeof setInterval> | null = null;
     if (isWorkoutActive) {
       interval = setInterval(() => {
         setWorkoutElapsedTime((prev) => prev + 1);
@@ -190,7 +190,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Rest countdown timer
   useEffect(() => {
-    let restInterval: NodeJS.Timeout | null = null;
+    let restInterval: ReturnType<typeof setInterval> | null = null;
     if (isRestTimerActive && restTimerSeconds > 0) {
       restInterval = setInterval(() => {
         setRestTimerSeconds((prev) => {
