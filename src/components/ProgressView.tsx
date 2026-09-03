@@ -450,7 +450,7 @@ export const ProgressView: React.FC = () => {
                           className="w-2 h-2 rounded-full"
                           style={{ backgroundColor: z.color }}
                         />
-                        <span className="text-white/80 font-medium">{z.zoneName.split(':')[0]}</span>
+                        <span className="text-white/80 font-medium">{z.name.split(':')[0]}</span>
                       </div>
                       <span className="font-mono text-white/60">
                         {z.minBpm}-{z.maxBpm} bpm
@@ -497,7 +497,7 @@ export const ProgressView: React.FC = () => {
                 <div className="bg-black/50 p-3 rounded-xl border border-white/5 flex justify-between items-center">
                   <span className="text-xs text-white/70">Fórmula Lineal Convencional:</span>
                   <span className="text-base font-black text-white/60 font-mono">
-                    {allometricProfile.standardBmrLinearKcal}{' '}
+                    {allometricProfile.linearBmrComparisonKcal}{' '}
                     <span className="text-[11px] text-white/40">kcal</span>
                   </span>
                 </div>

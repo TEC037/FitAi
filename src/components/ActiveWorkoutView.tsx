@@ -24,7 +24,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { WorkoutSessionLog } from '../types';
+import { Exercise, WorkoutSessionLog } from '../types';
 import { getExerciseGifUrl } from '../services/exerciseDatabaseService';
 import {
   computeDynamicHeartRate,
@@ -55,7 +55,7 @@ export const ActiveWorkoutView: React.FC = () => {
   } = useApp();
 
   // Current exercise fallback
-  const currentExercise = activeRoutine?.exercises[activeExerciseIndex] || {
+  const currentExercise: Exercise = activeRoutine?.exercises[activeExerciseIndex] || {
     id: 'ex_demo',
     name: 'Press de Banca con Barra',
     primaryMuscle: 'Pecho',
@@ -66,6 +66,10 @@ export const ActiveWorkoutView: React.FC = () => {
     restSeconds: 90,
     rpe: 8,
     technicalCue: 'Retrae las escápulas y mantén los pies plantados con fuerza en el suelo.',
+    fullInstructions: [],
+    commonMistakes: [],
+    equipment: 'Barra',
+    iconType: 'barbell',
     difficulty: 'intermedio' as const,
   };
 
@@ -286,12 +290,12 @@ export const ActiveWorkoutView: React.FC = () => {
             <div className="text-right">
               <span
                 className="inline-block px-2 py-0.5 rounded text-[10px] font-bold text-black uppercase"
-                style={{ backgroundColor: dynamicTelemetry.currentZone.color }}
+                style={{ backgroundColor: dynamicTelemetry.zone.color }}
               >
-                {dynamicTelemetry.currentZone.zoneName.split(':')[0]}
+                {dynamicTelemetry.zone.name.split(':')[0]}
               </span>
               <p className="text-[10px] text-white/50 mt-1">
-                {dynamicTelemetry.percentHrr}% HRR
+                {Math.round(((dynamicTelemetry.currentBpm - allometricProfile.allometricRestingHr) / allometricProfile.heartRateReserve) * 100)}% HRR
               </p>
             </div>
           </div>
