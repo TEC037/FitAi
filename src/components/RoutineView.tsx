@@ -21,6 +21,7 @@ import {
 } from '../services/exerciseDatabaseService';
 import { ExerciseDatabaseView } from './ExerciseDatabaseView';
 import { useModalAccessibility } from '../hooks/useModalAccessibility';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 interface RoutineExerciseRowProps {
   exercise: Exercise;
@@ -396,12 +397,65 @@ export const RoutineView: React.FC = () => {
 
   const currentRoutine = routines.find((r) => r.dayNumber === selectedDay) || routines[0];
 
+  const isMobile = useIsMobile();
+
   if (!currentRoutine) {
     return (
       <div className="flex-1 p-4 sm:p-8 flex flex-col gap-8 max-w-[1600px] mx-auto w-full">
         <div className="bg-[#0A0A0A] border border-white/10 rounded-[32px] p-12 text-center text-white/60">
           Aún no tienes rutinas generadas. Completa tu onboarding para personalizar tu plan.
         </div>
+      </div>
+    );
+  }
+
+  if (isMobile) {
+    const todayRoutine = routines.find((r) => r.dayNumber === 1) || currentRoutine;
+
+    return (
+      <div className="flex-1 px-4 pt-5 pb-6 flex flex-col gap-4 max-w-md mx-auto w-full">
+        <div className="relative z-10">
+          <p className="text-[10px] text-white/40 uppercase tracking-wider font-bold">
+            Mi Rutina • Día {todayRoutine.dayNumber} • {todayRoutine.focus.toUpperCase()}
+          </p>
+          <h1 className="text-2xl font-black tracking-tight text-white">{todayRoutine.name}</h1>
+          <p className="text-xs text-white/50 mt-0.5">
+            {todayRoutine.exercises.length} ejercicios • {todayRoutine.estimatedMinutes} min
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-2 relative z-10">
+          {todayRoutine.exercises.map((ex, idx) => (
+            <div
+              key={ex.id}
+              className="flex items-center gap-3 bg-[#0A0A0A] border border-white/10 rounded-2xl px-4 py-3"
+            >
+              <span className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center font-black text-xs text-[#C0FF00] shrink-0">
+                {idx + 1}
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-white capitalize truncate">{ex.name}</p>
+                <p className="text-[11px] text-white/50">
+                  {ex.sets} × {ex.reps} • {ex.suggestedWeightKg} kg • descanso {ex.restSeconds}s
+                </p>
+              </div>
+              <span className="px-2 py-0.5 rounded bg-white/5 text-[10px] uppercase font-bold text-white/50 shrink-0">
+                {ex.primaryMuscle}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex-1" />
+
+        <button
+          id="btn-mobile-routine-start"
+          onClick={() => startWorkout(todayRoutine.dayNumber)}
+          className="w-full py-6 rounded-3xl font-black text-lg text-black bg-[#C0FF00] shadow-[0_0_40px_rgba(192,255,0,0.35)] active:scale-[0.98] transition-transform flex items-center justify-center gap-3"
+        >
+          <Play className="w-6 h-6 fill-current" />
+          ENTRENAR
+        </button>
       </div>
     );
   }

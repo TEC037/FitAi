@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { AppProvider } from '../context/AppContext';
+import { useApp } from '../context/useApp';
 import { RoutineView } from './RoutineView';
 
 function renderRoutine() {
@@ -8,6 +9,16 @@ function renderRoutine() {
     <AppProvider>
       <RoutineView />
     </AppProvider>
+  );
+}
+
+function Harness() {
+  const { isWorkoutActive } = useApp();
+  return (
+    <>
+      <RoutineView />
+      <span data-testid="harness-workout">{String(isWorkoutActive)}</span>
+    </>
   );
 }
 
@@ -60,5 +71,60 @@ describe('RoutineView', () => {
           /día 2/i.test(accessName ?? '') && /ejercicios/.test(accessName ?? ''),
       }).className
     ).toContain('bg-[#C0FF00]');
+  });
+});
+
+describe('RoutineView (variante móvil)', () => {
+  const originalMatchMedia = window.matchMedia;
+
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  afterEach(() => {
+    if (originalMatchMedia === undefined) {
+      delete (window as unknown as { matchMedia?: unknown }).matchMedia;
+    } else {
+      window.matchMedia = originalMatchMedia;
+    }
+  });
+
+  function mockMobileViewport() {
+    window.matchMedia = vi.fn(() => ({
+      matches: true,
+      media: '(max-width: 768px)',
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })) as unknown as typeof matchMedia;
+  }
+
+  it('muestra solo la sesión de hoy con lista compacta y UN botón ENTRENAR', () => {
+    mockMobileViewport();
+    render(
+      <AppProvider>
+        <Harness />
+      </AppProvider>
+    );
+
+    expect(screen.queryByText('Mi Rutina Personalizada')).not.toBeInTheDocument();
+    expect(screen.queryByText('Día 1')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /entrenar/i })).toBeInTheDocument();
+    expect(screen.getByText('Press de Banca con Barra')).toBeInTheDocument();
+  });
+
+  it('inicia la sesión de hoy con el botón único', () => {
+    mockMobileViewport();
+    render(
+      <AppProvider>
+        <Harness />
+      </AppProvider>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /entrenar/i }));
+    expect(screen.getByTestId('harness-workout')).toHaveTextContent('true');
   });
 });
