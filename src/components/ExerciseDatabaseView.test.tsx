@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ExerciseDatabaseView } from './ExerciseDatabaseView';
 import { DatasetExercise } from '../types';
@@ -249,5 +249,53 @@ describe('ExerciseDatabaseView (DOM)', () => {
       1,
       expect.objectContaining({ name: 'Squat' })
     );
+  });
+});
+
+describe('ExerciseDatabaseView (variante móvil)', () => {
+  const originalMatchMedia = window.matchMedia;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    window.scrollTo = vi.fn();
+  });
+
+  afterEach(() => {
+    if (originalMatchMedia === undefined) {
+      delete (window as unknown as { matchMedia?: unknown }).matchMedia;
+    } else {
+      window.matchMedia = originalMatchMedia;
+    }
+  });
+
+  function mockMobileViewport() {
+    window.matchMedia = vi.fn(() => ({
+      matches: true,
+      media: '(max-width: 768px)',
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })) as unknown as typeof matchMedia;
+  }
+
+  it('muestra solo buscador y lista sencilla, sin filtros densos', () => {
+    mockMobileViewport();
+    renderView();
+
+    expect(screen.queryByText('Biblioteca de Ejercicios')).not.toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Buscar ejercicio o músculo...')).toBeInTheDocument();
+    expect(screen.getByText('Bench Press')).toBeInTheDocument();
+    expect(screen.queryByText('Grupo Muscular / Región')).not.toBeInTheDocument();
+  });
+
+  it('abre la ficha del ejercicio al tocar una fila', () => {
+    mockMobileViewport();
+    renderView();
+
+    fireEvent.click(screen.getByRole('button', { name: /Squat/i }));
+    expect(screen.getByText(/Flexiona las rodillas/)).toBeInTheDocument();
   });
 });
