@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import {
   EXERCISE_DATABASE,
-  setExerciseDatabase,
+  loadExerciseDatabase,
   getAvailableCategories,
   getAvailableEquipment,
   getAvailableTargets,
@@ -68,12 +68,8 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
 
   useEffect(() => {
     if (EXERCISE_DATABASE.length === 0) {
-      fetch('/exercisesDatabase.json')
-        .then((res) => res.json())
-        .then((data) => {
-          setExerciseDatabase(data);
-          setIsLoadingDB(false);
-        })
+      loadExerciseDatabase()
+        .then(() => setIsLoadingDB(false))
         .catch((err) => {
           console.error('Failed to load database:', err);
           setIsLoadingDB(false);
@@ -85,18 +81,28 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
   const equipmentList = useMemo(() => (isLoadingDB ? [] : getAvailableEquipment()), [isLoadingDB]);
   const targets = useMemo(() => (isLoadingDB ? [] : getAvailableTargets()), [isLoadingDB]);
 
-  // Búsqueda + filtros delegados al servicio (fuente única de verdad)
-  const { items: visibleExercises, total: filteredCount } = useMemo(
-    () =>
-      searchExercises({
-        query: debouncedSearchQuery,
-        category: selectedCategory,
-        equipment: selectedEquipment,
-        target: selectedTarget,
-        limit: displayCount,
-      }),
-    [debouncedSearchQuery, selectedCategory, selectedEquipment, selectedTarget, displayCount]
-  );
+  // Búsqueda + filtros delegados al servicio (fuente única de verdad).
+  // isLoadingDB se lee en el cuerpo para forzar la re-evaluación cuando
+  // termina la carga asíncrona del dataset (el módulo se muta fuera de React).
+  const { items: visibleExercises, total: filteredCount } = useMemo(() => {
+    if (isLoadingDB) {
+      return { items: [] as DatasetExercise[], total: 0 };
+    }
+    return searchExercises({
+      query: debouncedSearchQuery,
+      category: selectedCategory,
+      equipment: selectedEquipment,
+      target: selectedTarget,
+      limit: displayCount,
+    });
+  }, [
+    debouncedSearchQuery,
+    selectedCategory,
+    selectedEquipment,
+    selectedTarget,
+    displayCount,
+    isLoadingDB,
+  ]);
 
   const handleSearchChange = (q: string) => {
     setSearchQuery(q);

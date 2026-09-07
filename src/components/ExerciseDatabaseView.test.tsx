@@ -107,6 +107,7 @@ const {
 vi.mock('../services/exerciseDatabaseService', async () => ({
   DATASET_GITHUB_REPO: repository,
   EXERCISE_DATABASE: exercises,
+  loadExerciseDatabase: vi.fn(),
   getAvailableCategories: () => categories,
   getAvailableEquipment: () => equipment,
   getAvailableTargets: () => targets,

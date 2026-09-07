@@ -4,7 +4,7 @@ import { useApp } from '../context/useApp';
 import {
   getExerciseImageUrl,
   EXERCISE_DATABASE,
-  setExerciseDatabase,
+  loadExerciseDatabase,
 } from '../services/exerciseDatabaseService';
 import { computeDashboardStats, stripReps } from '../utils/dashboardStats';
 import { formatVolumeKg, formatNumber } from '../utils/format';
@@ -17,12 +17,8 @@ export const DashboardView: React.FC = () => {
 
   useEffect(() => {
     if (EXERCISE_DATABASE.length === 0) {
-      fetch('/exercisesDatabase.json')
-        .then((res) => res.json())
-        .then((data) => {
-          setExerciseDatabase(data);
-          setIsLoadingDB(false);
-        })
+      loadExerciseDatabase()
+        .then(() => setIsLoadingDB(false))
         .catch((err) => {
           console.error('Failed to load database:', err);
           setIsLoadingDB(false);
