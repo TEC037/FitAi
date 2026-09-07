@@ -397,6 +397,8 @@ export const FinishWorkoutModal: React.FC<FinishWorkoutModalProps> = ({
                     key={val}
                     type="button"
                     onClick={() => onSessionRpeChange(val)}
+                    aria-pressed={sessionRpe === val}
+                    aria-label={`RPE ${val}`}
                     className={`flex-1 py-2.5 rounded-xl text-xs font-bold border transition-all ${
                       sessionRpe === val
                         ? 'bg-[#C0FF00] text-black border-[#C0FF00]'
@@ -1780,6 +1782,8 @@ export const ActiveWorkoutView: React.FC = () => {
                         key={val}
                         type="button"
                         onClick={() => setSessionRpe(val)}
+                        aria-pressed={sessionRpe === val}
+                        aria-label={`RPE ${val}`}
                         className={`flex-1 py-2.5 rounded-xl text-xs font-bold border transition-all ${
                           sessionRpe === val
                             ? 'bg-[#C0FF00] text-black border-[#C0FF00]'

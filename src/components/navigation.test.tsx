@@ -11,6 +11,7 @@ vi.mock('../context/useApp', () => ({
 
 const navigateTo = vi.fn();
 const logout = vi.fn();
+const startWorkout = vi.fn();
 
 function mockApp(overrides: Partial<Record<string, unknown>> = {}) {
   useApp.mockReturnValue({
@@ -19,6 +20,8 @@ function mockApp(overrides: Partial<Record<string, unknown>> = {}) {
     logout,
     isWorkoutActive: false,
     user: { name: 'Carlos Test', experience: 'intermedio' },
+    routines: [],
+    startWorkout,
     ...overrides,
   });
 }
@@ -126,20 +129,17 @@ describe('MobileNav (navegación con 1 botón)', () => {
     expect(screen.getByText('Rutina')).toBeInTheDocument();
     expect(screen.getByText('Entrenar')).toBeInTheDocument();
     expect(screen.getByText('Biblioteca')).toBeInTheDocument();
-    expect(screen.queryByText('Progreso')).not.toBeInTheDocument();
-    expect(screen.queryByText('Coach IA')).not.toBeInTheDocument();
-    expect(screen.queryByText('Historial')).not.toBeInTheDocument();
-    expect(screen.queryByText('Perfil')).not.toBeInTheDocument();
   });
 
-  it('mantiene los destinos secundarios fuera del menú y solo los accede por Inicio', () => {
+  it('acerca absolutamente todo desde el único botón central', () => {
     render(<MobileNav />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Abrir menú' }));
-    expect(screen.getAllByRole('button')).toHaveLength(5);
-    expect(screen.queryByText('Progreso')).not.toBeInTheDocument();
-    expect(screen.queryByText('Historial')).not.toBeInTheDocument();
-    expect(screen.queryByText('Perfil')).not.toBeInTheDocument();
+    expect(screen.getAllByRole('button')).toHaveLength(9);
+    expect(screen.getByText('Progreso')).toBeInTheDocument();
+    expect(screen.getByText('Coach IA')).toBeInTheDocument();
+    expect(screen.getByText('Historial')).toBeInTheDocument();
+    expect(screen.getByText('Perfil')).toBeInTheDocument();
   });
 
   it('navega al hacer clic en un enlace y cierra el menú', () => {
@@ -153,6 +153,48 @@ describe('MobileNav (navegación con 1 botón)', () => {
     fireEvent.click(screen.getByText('Biblioteca'));
     expect(navigateTo).toHaveBeenCalledWith('exercises');
     expect(screen.queryByText('Biblioteca')).not.toBeInTheDocument();
+  });
+
+  it('Entrenar abre las sub-selecciones de los días y arranca la sesión', () => {
+    mockApp({
+      routines: [
+        { dayNumber: 1, focus: 'Empuje' },
+        { dayNumber: 2, focus: 'Tirón' },
+      ],
+    });
+    render(<MobileNav />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir menú' }));
+    expect(screen.queryByText('Empuje')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Entrenar' }));
+    expect(screen.getByText('Empuje')).toBeInTheDocument();
+    expect(screen.getByText('Tirón')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Empuje' }));
+    expect(startWorkout).toHaveBeenCalledWith(1);
+    expect(screen.queryByText('Empuje')).not.toBeInTheDocument();
+  });
+
+  it('alterna las sub-selecciones al tocar Entrenar de nuevo', () => {
+    mockApp({ routines: [{ dayNumber: 1, focus: 'Empuje' }] });
+    render(<MobileNav />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir menú' }));
+    const entrenar = screen.getByRole('button', { name: 'Entrenar' });
+    fireEvent.click(entrenar);
+    expect(screen.getByText('Empuje')).toBeInTheDocument();
+
+    fireEvent.click(entrenar);
+    expect(screen.queryByText('Empuje')).not.toBeInTheDocument();
+  });
+
+  it('Entrenar navega directo cuando aún no hay días de rutina', () => {
+    render(<MobileNav />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir menú' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Entrenar' }));
+    expect(navigateTo).toHaveBeenCalledWith('workout');
   });
 
   it('marca con aria-current el enlace activo', () => {
@@ -172,14 +214,6 @@ describe('MobileNav (navegación con 1 botón)', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Abrir menú' }));
     expect(screen.getByText('En vivo')).toBeInTheDocument();
-  });
-
-  it('el botón flotante navega a Entrenar como acción principal del menú', () => {
-    render(<MobileNav />);
-
-    fireEvent.click(screen.getByRole('button', { name: 'Abrir menú' }));
-    fireEvent.click(screen.getByText('Entrenar').closest('button')!);
-    expect(navigateTo).toHaveBeenCalledWith('workout');
   });
 
   it('navega a Biblioteca desde el menú', () => {

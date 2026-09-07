@@ -11,8 +11,13 @@ import {
   Info,
   Check,
   RotateCcw,
+  SlidersHorizontal,
   ChevronDown,
+  ArrowUpDown,
 } from 'lucide-react';
+import { IllustratedFilterRow } from './IllustratedFilter';
+import { FilterDrillDownSheet } from './FilterDrillDownSheet';
+import { Highlight } from './Highlight';
 import {
   EXERCISE_DATABASE,
   loadExerciseDatabase,
@@ -44,6 +49,42 @@ interface ExerciseDatabaseViewProps {
   initialCategory?: string;
 }
 
+const FILTERS_STORAGE_KEY = 'fitai.exerciseFilters';
+const SORT_STORAGE_KEY = 'fitai.exerciseSort';
+
+// Filtros activos que sobreviven la navegación dentro de la sesión (no el texto
+// de búsqueda), para que volver a la biblioteca no pierda la selección actual.
+function readStoredFilters(): { category: string; equipment: string; target: string } {
+  const fallback = { category: 'all', equipment: 'all', target: 'all' };
+  if (typeof window === 'undefined' || typeof window.sessionStorage === 'undefined') {
+    return fallback;
+  }
+  try {
+    const raw = window.sessionStorage.getItem(FILTERS_STORAGE_KEY);
+    if (!raw) return fallback;
+    const parsed = JSON.parse(raw) as Partial<{ category?: string; equipment?: string; target?: string }>;
+    return {
+      category: typeof parsed.category === 'string' ? parsed.category : 'all',
+      equipment: typeof parsed.equipment === 'string' ? parsed.equipment : 'all',
+      target: typeof parsed.target === 'string' ? parsed.target : 'all',
+    };
+  } catch {
+    return fallback;
+  }
+}
+
+function readStoredSort(): ResultSortOrder {
+  if (typeof window === 'undefined' || typeof window.sessionStorage === 'undefined') {
+    return 'relevance';
+  }
+  try {
+    const raw = window.sessionStorage.getItem(SORT_STORAGE_KEY);
+    return raw === 'name' || raw === 'name-desc' ? raw : 'relevance';
+  } catch {
+    return 'relevance';
+  }
+}
+
 export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
   onSelectForRoutine,
   isModalMode = false,
@@ -55,11 +96,34 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
   const isMobile = useIsMobile();
 
   // Filters state
+  const storedFilters = useMemo(() => readStoredFilters(), []);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory || 'all');
-  const [selectedEquipment, setSelectedEquipment] = useState<string>('all');
-  const [selectedTarget, setSelectedTarget] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>(
+    initialCategory && initialCategory !== 'all' ? initialCategory : storedFilters.category
+  );
+  const [selectedEquipment, setSelectedEquipment] = useState<string>(storedFilters.equipment);
+  const [selectedTarget, setSelectedTarget] = useState<string>(storedFilters.target);
   const [displayCount, setDisplayCount] = useState<number>(PAGE_SIZE);
+  const storedSort = useMemo(() => readStoredSort(), []);
+  const [sortOrder, setSortOrder] = useState<'relevance' | 'name' | 'name-desc'>(storedSort);
+  const [showFilterSheet, setShowFilterSheet] = useState(false);
+
+  // Persiste los filtros al cambiar para rehidratarlos al volver a la vista.
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.sessionStorage === 'undefined') return;
+    try {
+      window.sessionStorage.setItem(
+        FILTERS_STORAGE_KEY,
+        JSON.stringify({
+          category: selectedCategory,
+          equipment: selectedEquipment,
+          target: selectedTarget,
+        })
+      );
+    } catch {
+      // Almacenamiento no disponible: se ignora y se sigue sin persistencia.
+    }
+  }, [selectedCategory, selectedEquipment, selectedTarget]);
 
   // Debounced search: filtra 1,324 ejercicios tras pausa de tipeo
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 250);
@@ -80,6 +144,16 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
     }
   }, []);
 
+  // Persiste el orden preferido para rehidratarlo al volver a la vista.
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.sessionStorage === 'undefined') return;
+    try {
+      window.sessionStorage.setItem(SORT_STORAGE_KEY, sortOrder);
+    } catch {
+      // Almacenamiento no disponible: se ignora y se sigue sin persistencia.
+    }
+  }, [sortOrder]);
+
   const categories = useMemo(() => (isLoadingDB ? [] : getAvailableCategories()), [isLoadingDB]);
   const equipmentList = useMemo(() => (isLoadingDB ? [] : getAvailableEquipment()), [isLoadingDB]);
   const targets = useMemo(() => (isLoadingDB ? [] : getAvailableTargets()), [isLoadingDB]);
@@ -96,6 +170,7 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
       category: selectedCategory,
       equipment: selectedEquipment,
       target: selectedTarget,
+      sort: sortOrder === 'relevance' ? undefined : sortOrder,
       limit: displayCount,
     });
   }, [
@@ -103,6 +178,7 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
     selectedCategory,
     selectedEquipment,
     selectedTarget,
+    sortOrder,
     displayCount,
     isLoadingDB,
   ]);
@@ -125,6 +201,10 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
   const handleTargetChange = (target: string) => {
     setSelectedTarget(target);
     setDisplayCount(PAGE_SIZE);
+  };
+
+  const handleSortChange = (sort: 'relevance' | 'name' | 'name-desc') => {
+    setSortOrder(sort);
   };
 
   const handleResetFilters = () => {
@@ -162,9 +242,19 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
         <div>
           <p className="text-[10px] text-white/40 uppercase tracking-wider font-bold">Biblioteca</p>
           <h1 className="text-2xl font-black tracking-tight text-white">Ejercicios</h1>
-          <p className="text-xs text-white/50 mt-0.5">
-            {isLoadingDB ? 'Cargando...' : `${formatNumber(EXERCISE_DATABASE.length)} ejercicios`}
+          <div className="flex items-center justify-between gap-3 mt-0.5">
+          <p className="text-xs text-white/50" aria-live="polite" aria-atomic="true">
+            {isLoadingDB
+              ? 'Cargando...'
+              : searchQuery ||
+                  selectedCategory !== 'all' ||
+                  selectedEquipment !== 'all' ||
+                  selectedTarget !== 'all'
+                ? `${formatNumber(filteredCount)} resultados`
+                : `${formatNumber(EXERCISE_DATABASE.length)} ejercicios`}
           </p>
+          <SortSelect sortOrder={sortOrder} onSortChange={handleSortChange} compact />
+        </div>
         </div>
 
         <div className="relative">
@@ -175,6 +265,7 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
             placeholder="Buscar ejercicio o músculo..."
+            aria-label="Buscar ejercicio o músculo"
             className="w-full pl-12 pr-10 py-3.5 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/40 text-sm focus:outline-none focus:border-[#C0FF00] focus:ring-1 focus:ring-[#C0FF00] transition-all"
           />
           {searchQuery && (
@@ -192,23 +283,93 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
           <div className="flex justify-center items-center py-20">
             <Loader2 className="w-12 h-12 text-[#C0FF00] animate-spin" />
           </div>
-        ) : visibleExercises.length === 0 ? (
-          <div className="bg-[#0A0A0A] border border-white/10 rounded-3xl p-12 text-center flex flex-col items-center justify-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-white/40">
-              <Search className="w-7 h-7" />
-            </div>
-            <h3 className="text-lg font-bold text-white">No se encontraron ejercicios</h3>
-            <button
-              onClick={handleResetFilters}
-              className="px-5 py-2.5 bg-[#C0FF00] text-black text-xs font-black rounded-xl hover:bg-[#aee600] transition-colors"
-            >
-              Ver Todos los Ejercicios
-            </button>
-          </div>
         ) : (
           <>
-            <div className="flex flex-col gap-2">
-              {visibleExercises.map((exercise) => (
+            {/* Botón que abre el drill-down de filtros ilustrados (1 tap por renglón) */}
+            <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setShowFilterSheet(true)}
+                aria-haspopup="dialog"
+                aria-expanded={showFilterSheet}
+                className="w-full flex items-center justify-between px-4 py-3"
+              >
+                <span className="flex items-center gap-2 text-xs font-bold text-[#C0FF00]">
+                  <SlidersHorizontal className="w-4 h-4" />
+                  Filtros
+                  {(selectedCategory !== 'all' ||
+                    selectedEquipment !== 'all' ||
+                    selectedTarget !== 'all') && (
+                    <span className="w-5 h-5 rounded-full bg-[#C0FF00] text-black text-[10px] font-black flex items-center justify-center">
+                      {(selectedCategory !== 'all' ? 1 : 0) +
+                        (selectedEquipment !== 'all' ? 1 : 0) +
+                        (selectedTarget !== 'all' ? 1 : 0)}
+                    </span>
+                  )}
+                </span>
+                <ChevronDown className="w-4 h-4 text-white/50" />
+              </button>
+
+              {/* Mini-chips de la selección activa para lectura rápida */}
+              {(selectedCategory !== 'all' ||
+                selectedEquipment !== 'all' ||
+                selectedTarget !== 'all' ||
+                !!searchQuery) && (
+                <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none px-4 pb-3 border-t border-white/5 pt-2">
+                  {!!searchQuery && (
+                    <Chip label={`"${searchQuery}"`} onRemove={() => handleSearchChange('')} />
+                  )}
+                  {selectedCategory !== 'all' && (
+                    <Chip
+                      label={translateCategory(selectedCategory)}
+                      onRemove={() => handleCategoryChange('all')}
+                    />
+                  )}
+                  {selectedEquipment !== 'all' && (
+                    <Chip
+                      label={translateEquipment(selectedEquipment)}
+                      onRemove={() => handleEquipmentChange('all')}
+                    />
+                  )}
+                  {selectedTarget !== 'all' && (
+                    <Chip
+                      label={translateTarget(selectedTarget)}
+                      onRemove={() => handleTargetChange('all')}
+                    />
+                  )}
+                  <button
+                    onClick={handleResetFilters}
+                    className="shrink-0 text-[10px] font-bold px-2 py-1 rounded-full text-white/40 hover:text-white"
+                  >
+                    Limpiar
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {visibleExercises.length === 0 ? (
+              <div className="bg-[#0A0A0A] border border-white/10 rounded-3xl p-12 text-center flex flex-col items-center justify-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-white/40">
+                  <Search className="w-7 h-7" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">No se encontraron ejercicios</h3>
+                  <p className="text-xs text-white/50 mt-1 max-w-xs">
+                    Quita algún filtro o busca términos como "press", "curl", "sentadilla" o
+                    "deltoides".
+                  </p>
+                </div>
+                <button
+                  onClick={handleResetFilters}
+                  className="px-5 py-2.5 bg-[#C0FF00] text-black text-xs font-black rounded-xl hover:bg-[#aee600] transition-colors"
+                >
+                  Ver Todos los Ejercicios
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="flex flex-col gap-2">
+                  {visibleExercises.map((exercise) => (
                 <button
                   key={exercise.id}
                   onClick={() => setSelectedExercise(exercise)}
@@ -224,8 +385,8 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-white capitalize truncate">
-                      {exercise.name}
-                    </p>
+                    <Highlight text={exercise.name} query={debouncedSearchQuery} />
+                  </p>
                     <p className="text-[11px] text-white/50">{translateTarget(exercise.target)}</p>
                   </div>
                 </button>
@@ -242,6 +403,25 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
             )}
           </>
         )}
+        </>
+      )}
+
+        {/* Drill-down de filtros ilustrados (1 tap por renglón) */}
+        <FilterDrillDownSheet
+          open={showFilterSheet}
+          categories={categories}
+          equipment={equipmentList}
+          targets={targets}
+          selectedCategory={selectedCategory}
+          selectedEquipment={selectedEquipment}
+          selectedTarget={selectedTarget}
+          filteredCount={filteredCount}
+          onSelectCategory={handleCategoryChange}
+          onSelectEquipment={handleEquipmentChange}
+          onSelectTarget={handleTargetChange}
+          onReset={handleResetFilters}
+          onClose={() => setShowFilterSheet(false)}
+        />
 
         {selectedExercise && (
           <ExerciseDetailModal
@@ -313,7 +493,8 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
         targets={targets}
         visibleCount={visibleExercises.length}
         filteredCount={filteredCount}
-        totalCount={EXERCISE_DATABASE.length}
+        sortOrder={sortOrder}
+        onSortChange={handleSortChange}
         onSearchChange={handleSearchChange}
         onCategoryChange={handleCategoryChange}
         onEquipmentChange={handleEquipmentChange}
@@ -352,6 +533,7 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
               key={exercise.id}
               exercise={exercise}
               routines={routines}
+              searchQuery={debouncedSearchQuery}
               onInspect={setSelectedExercise}
               onAddToRoutine={handleAddToRoutine}
             />
@@ -393,6 +575,43 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
 
 type ExerciseMeta = { id: string; label: string };
 
+export type ResultSortOrder = 'relevance' | 'name' | 'name-desc';
+
+const SortSelect: React.FC<{
+  sortOrder: ResultSortOrder;
+  onSortChange: (sort: ResultSortOrder) => void;
+  compact?: boolean;
+}> = ({ sortOrder, onSortChange, compact }) => (
+  <label className="flex items-center gap-1.5 shrink-0">
+    <ArrowUpDown className="w-3.5 h-3.5 text-white/40" />
+    <select
+      aria-label="Ordenar resultados por"
+      value={sortOrder}
+      onChange={(e) => onSortChange(e.target.value as ResultSortOrder)}
+      className="bg-[#0A0A0A] border border-white/10 text-white/70 text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:border-[#C0FF00] transition-colors cursor-pointer"
+    >
+      <option value="relevance">Relevancia</option>
+      <option value="name">{compact ? 'A-Z' : 'Nombre (A-Z)'}</option>
+      <option value="name-desc">{compact ? 'Z-A' : 'Nombre (Z-A)'}</option>
+    </select>
+  </label>
+);
+
+const Chip: React.FC<{ label: string; onRemove?: () => void }> = ({ label, onRemove }) => (
+  <span className="shrink-0 inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#C0FF00]/15 text-[#C0FF00] border border-[#C0FF00]/30 capitalize">
+    {label}
+    {onRemove && (
+      <button
+        onClick={onRemove}
+        aria-label={`Quitar filtro ${label}`}
+        className="hover:text-white transition-colors"
+      >
+        <X className="w-3 h-3" />
+      </button>
+    )}
+  </span>
+);
+
 interface ExerciseFilterBarProps {
   searchQuery: string;
   selectedCategory: string;
@@ -403,7 +622,8 @@ interface ExerciseFilterBarProps {
   targets: ExerciseMeta[];
   visibleCount: number;
   filteredCount: number;
-  totalCount: number;
+  sortOrder: 'relevance' | 'name' | 'name-desc';
+  onSortChange: (sort: 'relevance' | 'name' | 'name-desc') => void;
   onSearchChange: (q: string) => void;
   onCategoryChange: (category: string) => void;
   onEquipmentChange: (equipment: string) => void;
@@ -421,7 +641,8 @@ export const ExerciseFilterBar: React.FC<ExerciseFilterBarProps> = ({
   targets,
   visibleCount,
   filteredCount,
-  totalCount,
+  sortOrder,
+  onSortChange,
   onSearchChange,
   onCategoryChange,
   onEquipmentChange,
@@ -439,6 +660,7 @@ export const ExerciseFilterBar: React.FC<ExerciseFilterBarProps> = ({
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Buscar por nombre, músculo o equipamiento (ej. bench press, sentadilla, deltoides, mancuerna)..."
+          aria-label="Buscar por nombre, músculo o equipamiento"
           className="w-full pl-12 pr-10 py-3.5 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/40 text-sm focus:outline-none focus:border-[#C0FF00] focus:ring-1 focus:ring-[#C0FF00] transition-all"
         />
         {searchQuery && (
@@ -452,119 +674,73 @@ export const ExerciseFilterBar: React.FC<ExerciseFilterBarProps> = ({
         )}
       </div>
 
-      {/* Category Pills */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-[11px] uppercase tracking-wider text-white/40 font-bold">
-            Grupo Muscular / Región
-          </span>
+      {/* Filtros ilustrados con foto real del ejercicio representativo */}
+      <IllustratedFilterRow
+        id="filter-category"
+        title="Grupo Muscular / Región"
+        kind="category"
+        options={categories}
+        selected={selectedCategory}
+        onSelect={onCategoryChange}
+        allLabel="Todos"
+        activeCategory={selectedCategory}
+        activeEquipment={selectedEquipment}
+        activeTarget={selectedTarget}
+      />
+
+      <div className="flex flex-col gap-4 pt-2 border-t border-white/5">
+        <IllustratedFilterRow
+          id="filter-equipment"
+          title="Equipamiento Disponible"
+          kind="equipment"
+          options={equipmentList}
+          selected={selectedEquipment}
+          onSelect={onEquipmentChange}
+          allLabel="Cualquier equipamiento"
+          activeCategory={selectedCategory}
+          activeEquipment={selectedEquipment}
+          activeTarget={selectedTarget}
+          visibleLimit={9}
+        />
+
+        <IllustratedFilterRow
+          id="filter-target"
+          title="Músculo Objetivo"
+          kind="target"
+          options={targets}
+          selected={selectedTarget}
+          onSelect={onTargetChange}
+          allLabel="Cualquier músculo"
+          activeCategory={selectedCategory}
+          activeEquipment={selectedEquipment}
+          activeTarget={selectedTarget}
+          visibleLimit={9}
+        />
+      </div>
+
+      {/* Results Counter */}
+      <div className="flex items-center justify-between gap-3 text-xs text-white/50 pt-1 flex-wrap">
+        <span aria-live="polite" aria-atomic="true">
+          Mostrando <strong>{visibleCount}</strong> de <strong>{filteredCount}</strong> ejercicios
+          encontrados
+        </span>
+        <span className="flex items-center gap-3">
           {(selectedCategory !== 'all' ||
             selectedEquipment !== 'all' ||
             selectedTarget !== 'all' ||
             searchQuery) && (
             <button
               onClick={onReset}
-              className="text-xs text-[#C0FF00] hover:underline flex items-center gap-1 font-semibold"
+              className="text-[#C0FF00] hover:underline flex items-center gap-1 font-semibold"
             >
               <RotateCcw className="w-3 h-3" />
-              <span>Restablecer Filtros</span>
+              Restablecer Filtros
             </button>
           )}
-        </div>
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
-          <button
-            onClick={() => onCategoryChange('all')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
-              selectedCategory === 'all'
-                ? 'bg-[#C0FF00] text-black shadow-[0_0_15px_rgba(192,255,0,0.3)]'
-                : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'
-            }`}
-          >
-            Todos ({totalCount})
-          </button>
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => onCategoryChange(cat.id)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
-                selectedCategory === cat.id
-                  ? 'bg-[#C0FF00] text-black shadow-[0_0_15px_rgba(192,255,0,0.3)]'
-                  : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Secondary Filters (Equipment & Target Muscle) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-white/5">
-        {/* Equipment Dropdown */}
-        <div>
-          <label
-            htmlFor="exercise-filter-equipment"
-            className="text-[10px] uppercase text-white/40 font-bold block mb-1.5"
-          >
-            Equipamiento Disponible
-          </label>
-          <div className="relative">
-            <select
-              id="exercise-filter-equipment"
-              value={selectedEquipment}
-              onChange={(e) => onEquipmentChange(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 text-white rounded-xl px-3 py-2 text-xs font-medium focus:outline-none focus:border-[#C0FF00] appearance-none pr-8 cursor-pointer"
-            >
-              <option value="all" className="bg-[#121212] text-white">
-                Cualquier equipamiento ({equipmentList.length} tipos)
-              </option>
-              {equipmentList.map((eq) => (
-                <option key={eq.id} value={eq.id} className="bg-[#121212] text-white">
-                  {eq.label}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="w-4 h-4 text-white/40 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-          </div>
-        </div>
-
-        {/* Target Muscle Dropdown */}
-        <div>
-          <label
-            htmlFor="exercise-filter-target"
-            className="text-[10px] uppercase text-white/40 font-bold block mb-1.5"
-          >
-            Músculo Diana Específico
-          </label>
-          <div className="relative">
-            <select
-              id="exercise-filter-target"
-              value={selectedTarget}
-              onChange={(e) => onTargetChange(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 text-white rounded-xl px-3 py-2 text-xs font-medium focus:outline-none focus:border-[#C0FF00] appearance-none pr-8 cursor-pointer"
-            >
-              <option value="all" className="bg-[#121212] text-white">
-                Cualquier músculo diana ({targets.length} músculos)
-              </option>
-              {targets.map((t) => (
-                <option key={t.id} value={t.id} className="bg-[#121212] text-white">
-                  {t.label}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="w-4 h-4 text-white/40 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-          </div>
-        </div>
-      </div>
-
-      {/* Results Counter */}
-      <div className="flex items-center justify-between text-xs text-white/50 pt-1">
-        <span>
-          Mostrando <strong>{visibleCount}</strong> de <strong>{filteredCount}</strong> ejercicios
-          encontrados
-        </span>
-        <span className="text-[11px] text-white/40 hidden sm:inline">
-          Pasa el cursor sobre una tarjeta para ver la animación en GIF
+          <SortSelect sortOrder={sortOrder} onSortChange={onSortChange} />
+          <span className="text-[11px] text-white/40 hidden lg:inline">
+            Pasa el cursor sobre una tarjeta para ver la animación en GIF
+          </span>
         </span>
       </div>
     </div>
@@ -574,6 +750,7 @@ export const ExerciseFilterBar: React.FC<ExerciseFilterBarProps> = ({
 interface ExerciseLibraryCardProps {
   exercise: DatasetExercise;
   routines: DailyRoutine[];
+  searchQuery: string;
   onInspect: (exercise: DatasetExercise) => void;
   onAddToRoutine: (exercise: DatasetExercise, dayNumber: number) => void;
 }
@@ -581,6 +758,7 @@ interface ExerciseLibraryCardProps {
 export const ExerciseLibraryCard: React.FC<ExerciseLibraryCardProps> = ({
   exercise,
   routines,
+  searchQuery,
   onInspect,
   onAddToRoutine,
 }) => {
@@ -634,7 +812,7 @@ export const ExerciseLibraryCard: React.FC<ExerciseLibraryCardProps> = ({
         {/* Quick inspect button */}
         <button
           onClick={() => onInspect(exercise)}
-          className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]"
+          className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]"
           title="Ver técnica detallada"
         >
           <span className="px-3.5 py-2 rounded-xl bg-black/90 text-[#C0FF00] text-xs font-bold border border-[#C0FF00]/30 shadow-lg flex items-center gap-1.5">
@@ -657,7 +835,7 @@ export const ExerciseLibraryCard: React.FC<ExerciseLibraryCardProps> = ({
           </div>
 
           <h4 className="text-sm font-bold text-white capitalize line-clamp-2 title-case group-hover:text-[#C0FF00] transition-colors">
-            {exercise.name}
+            <Highlight text={exercise.name} query={searchQuery} />
           </h4>
 
           <p className="text-[11px] text-white/40 mt-1">
