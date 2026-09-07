@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import {
   EXERCISE_DATABASE,
-  setExerciseDatabase,
+  loadExerciseDatabase,
   getAvailableCategories,
   getAvailableEquipment,
   getAvailableTargets,
@@ -33,6 +33,7 @@ import { useApp } from '../context/useApp';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import { useModalAccessibility } from '../hooks/useModalAccessibility';
 import { formatNumber } from '../utils/format';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 const PAGE_SIZE = 24;
 
@@ -51,6 +52,8 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
 }) => {
   const { routines, addExerciseToRoutine, sendCoachMessage, navigateTo } = useApp();
 
+  const isMobile = useIsMobile();
+
   // Filters state
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory || 'all');
@@ -68,12 +71,8 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
 
   useEffect(() => {
     if (EXERCISE_DATABASE.length === 0) {
-      fetch('/exercisesDatabase.json')
-        .then((res) => res.json())
-        .then((data) => {
-          setExerciseDatabase(data);
-          setIsLoadingDB(false);
-        })
+      loadExerciseDatabase()
+        .then(() => setIsLoadingDB(false))
         .catch((err) => {
           console.error('Failed to load database:', err);
           setIsLoadingDB(false);
@@ -85,18 +84,28 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
   const equipmentList = useMemo(() => (isLoadingDB ? [] : getAvailableEquipment()), [isLoadingDB]);
   const targets = useMemo(() => (isLoadingDB ? [] : getAvailableTargets()), [isLoadingDB]);
 
-  // Búsqueda + filtros delegados al servicio (fuente única de verdad)
-  const { items: visibleExercises, total: filteredCount } = useMemo(
-    () =>
-      searchExercises({
-        query: debouncedSearchQuery,
-        category: selectedCategory,
-        equipment: selectedEquipment,
-        target: selectedTarget,
-        limit: displayCount,
-      }),
-    [debouncedSearchQuery, selectedCategory, selectedEquipment, selectedTarget, displayCount]
-  );
+  // Búsqueda + filtros delegados al servicio (fuente única de verdad).
+  // isLoadingDB se lee en el cuerpo para forzar la re-evaluación cuando
+  // termina la carga asíncrona del dataset (el módulo se muta fuera de React).
+  const { items: visibleExercises, total: filteredCount } = useMemo(() => {
+    if (isLoadingDB) {
+      return { items: [] as DatasetExercise[], total: 0 };
+    }
+    return searchExercises({
+      query: debouncedSearchQuery,
+      category: selectedCategory,
+      equipment: selectedEquipment,
+      target: selectedTarget,
+      limit: displayCount,
+    });
+  }, [
+    debouncedSearchQuery,
+    selectedCategory,
+    selectedEquipment,
+    selectedTarget,
+    displayCount,
+    isLoadingDB,
+  ]);
 
   const handleSearchChange = (q: string) => {
     setSearchQuery(q);
@@ -146,6 +155,107 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
     );
     navigateTo('coach');
   };
+
+  if (isMobile && !isModalMode) {
+    return (
+      <div className="flex-1 px-4 pt-5 pb-6 flex flex-col gap-4 max-w-md mx-auto w-full">
+        <div>
+          <p className="text-[10px] text-white/40 uppercase tracking-wider font-bold">Biblioteca</p>
+          <h1 className="text-2xl font-black tracking-tight text-white">Ejercicios</h1>
+          <p className="text-xs text-white/50 mt-0.5">
+            {isLoadingDB ? 'Cargando...' : `${formatNumber(EXERCISE_DATABASE.length)} ejercicios`}
+          </p>
+        </div>
+
+        <div className="relative">
+          <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
+          <input
+            id="exercise-search-input"
+            type="text"
+            value={searchQuery}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            placeholder="Buscar ejercicio o músculo..."
+            className="w-full pl-12 pr-10 py-3.5 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/40 text-sm focus:outline-none focus:border-[#C0FF00] focus:ring-1 focus:ring-[#C0FF00] transition-all"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => handleSearchChange('')}
+              aria-label="Limpiar búsqueda"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white p-1"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
+        {isLoadingDB ? (
+          <div className="flex justify-center items-center py-20">
+            <Loader2 className="w-12 h-12 text-[#C0FF00] animate-spin" />
+          </div>
+        ) : visibleExercises.length === 0 ? (
+          <div className="bg-[#0A0A0A] border border-white/10 rounded-3xl p-12 text-center flex flex-col items-center justify-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-white/40">
+              <Search className="w-7 h-7" />
+            </div>
+            <h3 className="text-lg font-bold text-white">No se encontraron ejercicios</h3>
+            <button
+              onClick={handleResetFilters}
+              className="px-5 py-2.5 bg-[#C0FF00] text-black text-xs font-black rounded-xl hover:bg-[#aee600] transition-colors"
+            >
+              Ver Todos los Ejercicios
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="flex flex-col gap-2">
+              {visibleExercises.map((exercise) => (
+                <button
+                  key={exercise.id}
+                  onClick={() => setSelectedExercise(exercise)}
+                  className="flex items-center gap-3 bg-[#0A0A0A] border border-white/10 rounded-2xl px-3 py-2.5 text-left active:border-[#C0FF00]/50 transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center">
+                    <img
+                      src={getExerciseImageUrl(exercise.image)}
+                      alt={exercise.name}
+                      loading="lazy"
+                      className="w-full h-full object-contain p-0.5"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-white capitalize truncate">
+                      {exercise.name}
+                    </p>
+                    <p className="text-[11px] text-white/50">{translateTarget(exercise.target)}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {visibleExercises.length < filteredCount && (
+              <button
+                onClick={() => setDisplayCount((prev) => prev + PAGE_SIZE)}
+                className="w-full py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 text-white font-bold text-xs transition-transform active:scale-[0.98]"
+              >
+                Cargar Más (+{Math.min(PAGE_SIZE, filteredCount - visibleExercises.length)})
+              </button>
+            )}
+          </>
+        )}
+
+        {selectedExercise && (
+          <ExerciseDetailModal
+            exercise={selectedExercise}
+            onClose={() => setSelectedExercise(null)}
+            onConsultCoach={handleConsultCoach}
+            onAddToRoutine={() => {
+              handleAddToRoutine(selectedExercise, 1);
+            }}
+          />
+        )}
+      </div>
+    );
+  }
 
   return (
     <div

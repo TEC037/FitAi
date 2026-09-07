@@ -21,17 +21,30 @@ describe('OnboardingFlow', () => {
     vi.useRealTimers();
   });
 
-  it('muestra el paso 1 (perfil biométrico) y el indicador de progreso', () => {
+  it('muestra el paso 1 (nombre obligatorio) y el indicador de progreso', () => {
     renderOnboarding();
 
-    expect(screen.getByText('Cuéntanos sobre ti')).toBeInTheDocument();
+    expect(screen.getByText('¿Cómo te llamas?')).toBeInTheDocument();
     expect(screen.getByText('Paso 1 de 5')).toBeInTheDocument();
     expect(screen.getByLabelText('Estatura (cm)')).toBeInTheDocument();
+    expect(screen.getByText('Datos opcionales')).toBeInTheDocument();
+  });
+
+  it('no avanza sin escribir el nombre y bloquea el botón de Siguiente', () => {
+    renderOnboarding();
+
+    const next = screen.getByRole('button', { name: /siguiente paso/i });
+    expect(next).toBeDisabled();
+
+    fireEvent.click(next);
+    expect(screen.getByText('¿Cómo te llamas?')).toBeInTheDocument();
+    expect(screen.getByText('Ingresa tu nombre para continuar.')).toBeInTheDocument();
   });
 
   it('avanza por el stepper hasta el paso de generación', () => {
     renderOnboarding();
 
+    fireEvent.change(screen.getByLabelText('Nombre *'), { target: { value: 'Ana Pérez' } });
     fireEvent.click(screen.getByRole('button', { name: /siguiente paso/i }));
     expect(screen.getByText('Nivel de entrenamiento y horarios')).toBeInTheDocument();
 
@@ -49,17 +62,19 @@ describe('OnboardingFlow', () => {
   it('vuelve al paso anterior con el botón Anterior', () => {
     renderOnboarding();
 
+    fireEvent.change(screen.getByLabelText('Nombre *'), { target: { value: 'Ana Pérez' } });
     fireEvent.click(screen.getByRole('button', { name: /siguiente paso/i }));
     expect(screen.getByText('Nivel de entrenamiento y horarios')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /anterior/i }));
-    expect(screen.getByText('Cuéntanos sobre ti')).toBeInTheDocument();
+    expect(screen.getByText('¿Cómo te llamas?')).toBeInTheDocument();
   });
 
   it('cambia el objetivo principal y alterna músculos priorizados', () => {
     const queryBiceps = () => screen.getByRole('button', { name: 'Glúteos' });
     renderOnboarding();
 
+    fireEvent.change(screen.getByLabelText('Nombre *'), { target: { value: 'Ana Pérez' } });
     fireEvent.click(screen.getByRole('button', { name: /siguiente paso/i }));
     fireEvent.click(screen.getByRole('button', { name: /siguiente paso/i }));
 
@@ -81,6 +96,7 @@ describe('OnboardingFlow', () => {
     vi.useFakeTimers();
     renderOnboarding();
 
+    fireEvent.change(screen.getByLabelText('Nombre *'), { target: { value: 'Ana Pérez' } });
     fireEvent.click(screen.getByRole('button', { name: /siguiente paso/i }));
     fireEvent.click(screen.getByRole('button', { name: /siguiente paso/i }));
     fireEvent.click(screen.getByRole('button', { name: /siguiente paso/i }));
@@ -106,7 +122,7 @@ describe('OnboardingFlow', () => {
       vi.advanceTimersByTime(500);
     });
 
-    expect(screen.getByText('¡Bienvenido a FitAI Coach, Carlos Ramírez!')).toBeInTheDocument();
+    expect(screen.getByText('¡Bienvenido a FitAI Coach, Ana Pérez!')).toBeInTheDocument();
     expect(screen.getByText('Entrar a Mi Dashboard')).toBeInTheDocument();
   });
 });

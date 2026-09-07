@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { AppProvider } from '../context/AppContext';
 import { useApp } from '../context/useApp';
@@ -15,11 +15,11 @@ function readUser(): UserProfile | null {
   }
 }
 
-function AuthHarness() {
+function AuthHarness({ onOpenSafetyModal = () => {} }: { onOpenSafetyModal?: () => void }) {
   const { isAuthenticated } = useApp();
   return (
     <>
-      <ProfileView onOpenSafetyModal={() => {}} />
+      <ProfileView onOpenSafetyModal={onOpenSafetyModal} />
       <span data-testid="harness-is-auth">{String(isAuthenticated)}</span>
     </>
   );
@@ -154,6 +154,80 @@ describe('ProfileView', () => {
         <AuthHarness />
       </AppProvider>
     );
+
+    expect(screen.getByTestId('harness-is-auth')).toHaveTextContent('true');
+    fireEvent.click(screen.getByRole('button', { name: /Cerrar Sesión/ }));
+    expect(screen.getByTestId('harness-is-auth')).toHaveTextContent('false');
+  });
+});
+
+describe('ProfileView (variante móvil)', () => {
+  const originalMatchMedia = window.matchMedia;
+
+  beforeEach(() => {
+    localStorage.clear();
+    window.scrollTo = () => {};
+  });
+
+  afterEach(() => {
+    if (originalMatchMedia === undefined) {
+      delete (window as unknown as { matchMedia?: unknown }).matchMedia;
+    } else {
+      window.matchMedia = originalMatchMedia;
+    }
+  });
+
+  function mockMobileViewport() {
+    window.matchMedia = vi.fn(() => ({
+      matches: true,
+      media: '(max-width: 768px)',
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })) as unknown as typeof matchMedia;
+  }
+
+  it('muestra solo los datos clave y oculta los secciones avanzadas por defecto', () => {
+    mockMobileViewport();
+    render(
+      <AppProvider>
+        <ProfileView onOpenSafetyModal={() => {}} />
+      </AppProvider>
+    );
+
+    expect(screen.getByText('Datos clave')).toBeInTheDocument();
+    expect(screen.queryByText('Notificaciones y Sonidos')).not.toBeInTheDocument();
+    expect(screen.queryByText('Datos Biométricos')).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Carlos Ramírez' })).toBeInTheDocument();
+  });
+
+  it('despliega los ajustes avanzados al pulsar el toggle', () => {
+    mockMobileViewport();
+    render(
+      <AppProvider>
+        <ProfileView onOpenSafetyModal={() => {}} />
+      </AppProvider>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /Ajustes avanzados/i }));
+    expect(screen.getByText('Notificaciones y Sonidos')).toBeInTheDocument();
+    expect(screen.getByText('Datos Biométricos')).toBeInTheDocument();
+  });
+
+  it('abre el modal médico y cierra sesión desde la vista móvil', () => {
+    const onOpenSafetyModal = vi.fn();
+    mockMobileViewport();
+    render(
+      <AppProvider>
+        <AuthHarness onOpenSafetyModal={onOpenSafetyModal} />
+      </AppProvider>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /Avisos Médicos y Seguridad/ }));
+    expect(onOpenSafetyModal).toHaveBeenCalledTimes(1);
 
     expect(screen.getByTestId('harness-is-auth')).toHaveTextContent('true');
     fireEvent.click(screen.getByRole('button', { name: /Cerrar Sesión/ }));

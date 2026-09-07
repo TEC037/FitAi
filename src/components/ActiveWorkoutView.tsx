@@ -29,6 +29,8 @@ import { LoggedSet, WorkoutSessionLog, Exercise } from '../types';
 import { getExerciseGifUrl } from '../services/exerciseDatabaseService';
 import { formatTime, formatVolumeKg } from '../utils/format';
 import { useApp } from '../context/useApp';
+import { useIsMobile } from '../hooks/useIsMobile';
+import { MobileSessionView } from './MobileSessionView';
 
 interface AllometricInfoModalProps {
   isOpen: boolean;
@@ -1062,6 +1064,8 @@ export const ActiveWorkoutView: React.FC = () => {
     navigateTo,
   } = useApp();
 
+  const isMobile = useIsMobile();
+
   // Current exercise fallback
   const currentExercise: Exercise = activeRoutine?.exercises[activeExerciseIndex] || {
     id: 'ex_demo',
@@ -1195,6 +1199,11 @@ export const ActiveWorkoutView: React.FC = () => {
   const currentSetsOfExercise = activeWorkoutSets.filter(
     (s) => s.exerciseId === currentExercise.id
   );
+
+  // En móvil (gimnasio): flujo con UN solo botón.
+  if (isMobile) {
+    return <MobileSessionView />;
+  }
 
   return (
     <div className="flex-1 p-4 sm:p-8 flex flex-col gap-6 max-w-5xl mx-auto w-full relative">

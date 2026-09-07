@@ -10,6 +10,21 @@ export const setExerciseDatabase = (data: DatasetExercise[]) => {
   EXERCISE_DATABASE = data;
 };
 
+/**
+ * Carga el dataset local `exercisesDatabase.json` (bundled en `public/`) y lo
+ * activa en memoria. Resuelve con base relativa a `import.meta.env.BASE_URL`
+ * para que funcione también desplegado en GitHub Pages bajo un subpath.
+ */
+export async function loadExerciseDatabase(): Promise<DatasetExercise[]> {
+  const res = await fetch(`${import.meta.env.BASE_URL}exercisesDatabase.json`);
+  if (!res.ok) {
+    throw new Error(`No se pudo cargar el dataset (HTTP ${res.status})`);
+  }
+  const data = (await res.json()) as DatasetExercise[];
+  setExerciseDatabase(data);
+  return data;
+}
+
 // Category translations
 export const CATEGORY_TRANSLATIONS: Record<string, string> = {
   chest: 'Pecho',

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { AppProvider } from '../context/AppContext';
 import { ProgressView } from './ProgressView';
@@ -48,5 +48,62 @@ describe('ProgressView', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'año' }));
     expect(screen.getByRole('button', { name: 'año' }).className).toContain('bg-[#C0FF00]');
+  });
+});
+
+describe('ProgressView (variante móvil)', () => {
+  const originalMatchMedia = window.matchMedia;
+
+  beforeEach(() => {
+    localStorage.clear();
+    window.scrollTo = () => {};
+  });
+
+  afterEach(() => {
+    if (originalMatchMedia === undefined) {
+      delete (window as unknown as { matchMedia?: unknown }).matchMedia;
+    } else {
+      window.matchMedia = originalMatchMedia;
+    }
+  });
+
+  function mockMobileViewport() {
+    window.matchMedia = vi.fn(() => ({
+      matches: true,
+      media: '(max-width: 768px)',
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })) as unknown as typeof matchMedia;
+  }
+
+  it('muestra métricas, curva de peso y récords en una vista compacta', () => {
+    mockMobileViewport();
+    render(
+      <AppProvider>
+        <ProgressView />
+      </AppProvider>
+    );
+
+    expect(screen.getByText('Mis Métricas')).toBeInTheDocument();
+    expect(screen.getByText('Récords Personales')).toBeInTheDocument();
+    expect(screen.getByText('Press de Banca Plano')).toBeInTheDocument();
+    expect(screen.queryByText('Biometría Alométrica Personalizada')).not.toBeInTheDocument();
+    expect(screen.queryByText('Comparativa Semanal')).not.toBeInTheDocument();
+  });
+
+  it('navega sin filtros: la vista móvil no ofrece el selector de categorías', () => {
+    mockMobileViewport();
+    render(
+      <AppProvider>
+        <ProgressView />
+      </AppProvider>
+    );
+
+    expect(screen.queryByRole('button', { name: 'piernas' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'semana' })).not.toBeInTheDocument();
   });
 });
