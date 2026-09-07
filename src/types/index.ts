@@ -1,11 +1,7 @@
 export type ExperienceLevel = 'principiante' | 'intermedio' | 'avanzado';
 
 export type FitnessGoal =
-  | 'hipertrofia'
-  | 'perdida_grasa'
-  | 'fuerza'
-  | 'resistencia'
-  | 'condicion_general';
+  'hipertrofia' | 'perdida_grasa' | 'fuerza' | 'resistencia' | 'condicion_general';
 
 export interface UserProfile {
   id: string;
@@ -128,6 +124,8 @@ export interface ChatMessage {
   text: string;
   timestamp: string;
   category?: 'technique' | 'motivation' | 'nutrition' | 'adaptation';
+  /** De dónde vino la respuesta del coach (UI: 'LLM' | 'servidor' | 'mot. local'). */
+  source?: 'llm' | 'engine' | 'local';
   suggestedAction?: {
     label: string;
     screen: 'routine' | 'workout' | 'progress' | 'profile' | 'exercises';

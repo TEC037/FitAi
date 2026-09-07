@@ -1,17 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import {
-  Bot,
-  Send,
-  Sparkles,
-  Zap,
-  HelpCircle,
-  Dumbbell,
-  ArrowRight,
-  User,
-  ShieldCheck,
-} from 'lucide-react';
-import { useApp } from '../context/AppContext';
-import { FREQUENT_COACH_QUESTIONS } from '../data/mockData';
+import { Bot, Send, Sparkles, ArrowRight, ShieldCheck } from 'lucide-react';
+import { useApp } from '../context/useApp';
+import { FREQUENT_COACH_QUESTIONS } from '../data/mockCoach';
 
 export const CoachAIView: React.FC = () => {
   const { chatMessages, sendCoachMessage, isCoachTyping, navigateTo, user } = useApp();
@@ -133,6 +123,19 @@ export const CoachAIView: React.FC = () => {
                 >
                   {msg.timestamp}
                 </span>
+
+                {isCoach && msg.source && (
+                  <span
+                    className="text-[9px] block mt-0.5 text-right text-white/25"
+                    title="Origen de la respuesta"
+                  >
+                    {msg.source === 'llm'
+                      ? 'LLM'
+                      : msg.source === 'engine'
+                        ? 'servidor'
+                        : 'mot. local'}
+                  </span>
+                )}
               </div>
             </div>
           );
@@ -148,7 +151,9 @@ export const CoachAIView: React.FC = () => {
               <span className="w-2 h-2 rounded-full bg-[#C0FF00] animate-bounce" />
               <span className="w-2 h-2 rounded-full bg-[#C0FF00] animate-bounce [animation-delay:0.2s]" />
               <span className="w-2 h-2 rounded-full bg-[#C0FF00] animate-bounce [animation-delay:0.4s]" />
-              <span className="text-xs text-white/40 ml-1">FitAI Coach analizando tu progreso...</span>
+              <span className="text-xs text-white/40 ml-1">
+                FitAI Coach analizando tu progreso...
+              </span>
             </div>
           </div>
         )}

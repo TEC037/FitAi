@@ -4,15 +4,13 @@ import {
   Settings,
   ShieldAlert,
   Bell,
-  Scale,
   LogOut,
   RotateCcw,
   CheckCircle2,
-  Sparkles,
   Save,
   Dumbbell,
 } from 'lucide-react';
-import { useApp } from '../context/AppContext';
+import { useApp } from '../context/useApp';
 import { FitnessGoal, ExperienceLevel } from '../types';
 
 interface ProfileViewProps {
@@ -100,7 +98,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenSafetyModal }) =
               Aviso Médico y Consideraciones de Salud
             </h3>
             <p className="text-xs text-white/70 mt-1 leading-relaxed max-w-2xl">
-              FitAI Coach es una herramienta de orientación y seguimiento. Las rutinas generadas son estimaciones algorítmicas y no sustituyen el diagnóstico de un médico ni de un fisioterapeuta. Si experimentas dolor agudo o mareos, interrumpe el ejercicio.
+              FitAI Coach es una herramienta de orientación y seguimiento. Las rutinas generadas son
+              estimaciones algorítmicas y no sustituyen el diagnóstico de un médico ni de un
+              fisioterapeuta. Si experimentas dolor agudo o mareos, interrumpe el ejercicio.
             </p>
           </div>
         </div>
@@ -123,7 +123,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenSafetyModal }) =
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
             <div>
-              <label className="block text-xs font-semibold text-white/70 mb-1.5">Nombre Completo</label>
+              <label className="block text-xs font-semibold text-white/70 mb-1.5">
+                Nombre Completo
+              </label>
               <input
                 type="text"
                 value={name}
@@ -133,7 +135,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenSafetyModal }) =
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-white/70 mb-1.5">Correo Electrónico</label>
+              <label className="block text-xs font-semibold text-white/70 mb-1.5">
+                Correo Electrónico
+              </label>
               <input
                 type="email"
                 value={email}
@@ -143,7 +147,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenSafetyModal }) =
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-white/70 mb-1.5">Edad (Años)</label>
+              <label className="block text-xs font-semibold text-white/70 mb-1.5">
+                Edad (Años)
+              </label>
               <input
                 type="number"
                 value={age}
@@ -153,7 +159,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenSafetyModal }) =
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-white/70 mb-1.5">Estatura ({unitSystem === 'metric' ? 'cm' : 'in'})</label>
+              <label className="block text-xs font-semibold text-white/70 mb-1.5">
+                Estatura ({unitSystem === 'metric' ? 'cm' : 'in'})
+              </label>
               <input
                 type="number"
                 value={height}
@@ -163,7 +171,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenSafetyModal }) =
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-white/70 mb-1.5">Peso Actual ({unitSystem === 'metric' ? 'kg' : 'lbs'})</label>
+              <label className="block text-xs font-semibold text-white/70 mb-1.5">
+                Peso Actual ({unitSystem === 'metric' ? 'kg' : 'lbs'})
+              </label>
               <input
                 type="number"
                 step="0.1"
@@ -174,7 +184,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenSafetyModal }) =
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-white/70 mb-1.5">Sistema de Unidades</label>
+              <label className="block text-xs font-semibold text-white/70 mb-1.5">
+                Sistema de Unidades
+              </label>
               <div className="flex gap-2">
                 <button
                   type="button"
@@ -212,35 +224,57 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenSafetyModal }) =
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
             <div>
-              <label className="block text-xs font-semibold text-white/70 mb-1.5">Objetivo Principal</label>
+              <label className="block text-xs font-semibold text-white/70 mb-1.5">
+                Objetivo Principal
+              </label>
               <select
                 value={primaryGoal}
                 onChange={(e) => setPrimaryGoal(e.target.value as FitnessGoal)}
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C0FF00]"
               >
-                <option value="hipertrofia" className="bg-[#111]">Ganar Masa Muscular (Hipertrofia)</option>
-                <option value="perdida_grasa" className="bg-[#111]">Perder Grasa / Definición</option>
-                <option value="fuerza" className="bg-[#111]">Aumentar Fuerza Máxima</option>
-                <option value="resistencia" className="bg-[#111]">Mejorar Resistencia Muscular</option>
-                <option value="condicion_general" className="bg-[#111]">Condición Física General</option>
+                <option value="hipertrofia" className="bg-[#111]">
+                  Ganar Masa Muscular (Hipertrofia)
+                </option>
+                <option value="perdida_grasa" className="bg-[#111]">
+                  Perder Grasa / Definición
+                </option>
+                <option value="fuerza" className="bg-[#111]">
+                  Aumentar Fuerza Máxima
+                </option>
+                <option value="resistencia" className="bg-[#111]">
+                  Mejorar Resistencia Muscular
+                </option>
+                <option value="condicion_general" className="bg-[#111]">
+                  Condición Física General
+                </option>
               </select>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-white/70 mb-1.5">Nivel de Experiencia</label>
+              <label className="block text-xs font-semibold text-white/70 mb-1.5">
+                Nivel de Experiencia
+              </label>
               <select
                 value={experience}
                 onChange={(e) => setExperience(e.target.value as ExperienceLevel)}
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C0FF00]"
               >
-                <option value="principiante" className="bg-[#111]">Principiante (&lt; 1 año)</option>
-                <option value="intermedio" className="bg-[#111]">Intermedio (1 a 3 años)</option>
-                <option value="avanzado" className="bg-[#111]">Avanzado (3+ años)</option>
+                <option value="principiante" className="bg-[#111]">
+                  Principiante (&lt; 1 año)
+                </option>
+                <option value="intermedio" className="bg-[#111]">
+                  Intermedio (1 a 3 años)
+                </option>
+                <option value="avanzado" className="bg-[#111]">
+                  Avanzado (3+ años)
+                </option>
               </select>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-white/70 mb-1.5">Días por Semana</label>
+              <label className="block text-xs font-semibold text-white/70 mb-1.5">
+                Días por Semana
+              </label>
               <input
                 type="number"
                 min={2}
@@ -252,7 +286,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenSafetyModal }) =
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-white/70 mb-1.5">Duración Sesión (min)</label>
+              <label className="block text-xs font-semibold text-white/70 mb-1.5">
+                Duración Sesión (min)
+              </label>
               <input
                 type="number"
                 step={5}
@@ -307,7 +343,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenSafetyModal }) =
             </label>
 
             <label className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 cursor-pointer">
-              <span className="text-xs text-white/80">Aviso sonoro al terminar el temporizador de descanso</span>
+              <span className="text-xs text-white/80">
+                Aviso sonoro al terminar el temporizador de descanso
+              </span>
               <input
                 type="checkbox"
                 checked={restTimerSound}

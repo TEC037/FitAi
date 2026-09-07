@@ -1,44 +1,20 @@
-import {
-  UserProfile,
-  DailyRoutine,
-  WorkoutSessionLog,
-  PersonalRecord,
-  ChatMessage,
-} from '../types';
-
-export const INITIAL_USER: UserProfile = {
-  id: 'usr_carlos_01',
-  name: 'Carlos Ramírez',
-  email: 'carlos.ramirez@fitai.example',
-  age: 28,
-  gender: 'Masculino',
-  height: 178,
-  weight: 78.2,
-  experience: 'intermedio',
-  daysPerWeek: 4,
-  avgDuration: 60,
-  primaryGoal: 'hipertrofia',
-  targetMuscles: ['Pecho', 'Espalda', 'Hombros', 'Piernas', 'Brazos'],
-  equipment: ['Gimnasio completo', 'Barras y discos', 'Mancuernas', 'Poleas', 'Máquinas'],
-  injuries: 'Molestia ocasional en manguito rotador derecho si se sobrecarga el press militar detrás de la cabeza.',
-  weeklyCompliance: 75,
-  unitSystem: 'metric',
-  notifications: {
-    workoutReminders: true,
-    coachTips: true,
-    restTimerSound: true,
-  },
-};
+import { DailyRoutine } from '../types';
 
 export const MOCK_ROUTINES: DailyRoutine[] = [
   {
     dayNumber: 1,
     name: 'Empuje Dinámico',
     focus: 'Pecho y Tríceps',
-    description: 'Enfoque en tensión mecánica pectoral, estabilidad escapular y sobrecarga progresiva en tríceps.',
+    description:
+      'Enfoque en tensión mecánica pectoral, estabilidad escapular y sobrecarga progresiva en tríceps.',
     estimatedMinutes: 65,
     difficulty: 'intermedio',
-    targetMuscles: ['Pectoral mayor', 'Pectoral clavicular', 'Tríceps braquial', 'Deltoides anterior'],
+    targetMuscles: [
+      'Pectoral mayor',
+      'Pectoral clavicular',
+      'Tríceps braquial',
+      'Deltoides anterior',
+    ],
     exercises: [
       {
         id: 'ex_bench_press',
@@ -54,18 +30,19 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 82.5,
         restSeconds: 90,
         rpe: 8,
-        technicalCue: 'Retrae las escápulas, apoya los pies firmes y desciende con control hacia el esternón medio.',
+        technicalCue:
+          'Retrae las escápulas, apoya los pies firmes y desciende con control hacia el esternón medio.',
         fullInstructions: [
           'Acuéstate con los ojos directamente debajo de la barra.',
           'Agarra la barra a un ancho ligeramente superior a los hombros.',
           'Desclava la barra, toma aire y comprime el abdomen creando una base sólida.',
           'Baja en 2-3 segundos hasta rozar suavemente la parte media del pecho.',
-          'Empuja explosivamente en línea diagonal hacia arriba y ligeramente hacia tu cara.'
+          'Empuja explosivamente en línea diagonal hacia arriba y ligeramente hacia tu cara.',
         ],
         commonMistakes: [
           'Rebotar la barra en la caja torácica.',
           'Abrir los codos a 90 grados (riesgo articular para hombros).',
-          'Levantar los glúteos del banco para forzar repeticiones.'
+          'Levantar los glúteos del banco para forzar repeticiones.',
         ],
         equipment: 'Barra olímpica y banco plano',
         difficulty: 'intermedio',
@@ -85,17 +62,18 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 28,
         restSeconds: 75,
         rpe: 8,
-        technicalCue: 'Banco a 30° de inclinación; siente la apertura torácica en la base del movimiento.',
+        technicalCue:
+          'Banco a 30° de inclinación; siente la apertura torácica en la base del movimiento.',
         fullInstructions: [
           'Coloca el banco a una inclinación de entre 30° y 45°.',
           'Sube las mancuernas impulsándote con las rodillas al tumbarte.',
           'Mantén las muñecas neutras y los codos a unos 45-60 grados del torso.',
           'Baja controladamente hasta sentir un buen estiramiento en la porción clavicular.',
-          'Empuja convergiendo ligeramente hacia arriba sin chocar las mancuernas.'
+          'Empuja convergiendo ligeramente hacia arriba sin chocar las mancuernas.',
         ],
         commonMistakes: [
           'Inclinación excesiva del banco (más de 45° pasa a ser press de hombros).',
-          'Golpear las mancuernas ruidosamente arriba.'
+          'Golpear las mancuernas ruidosamente arriba.',
         ],
         equipment: 'Mancuernas y banco ajustable',
         difficulty: 'intermedio',
@@ -115,16 +93,17 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 17.5,
         restSeconds: 60,
         rpe: 8.5,
-        technicalCue: 'Imagina abrazar un barril ancho manteniendo una ligera flexión de codos constante.',
+        technicalCue:
+          'Imagina abrazar un barril ancho manteniendo una ligera flexión de codos constante.',
         fullInstructions: [
           'Ajusta las poleas a la altura del pecho o ligeramente por encima.',
           'Da un paso al frente para crear tensión inicial con un pie adelantado para estabilidad.',
           'Con el pecho erguido y codos ligeramente flexionados, junta las manos al frente apretando 1 segundo.',
-          'Abre controladamente hasta que sientas el estiramiento pectoral.'
+          'Abre controladamente hasta que sientas el estiramiento pectoral.',
         ],
         commonMistakes: [
           'Usar balanceo del tronco para mover las poleas.',
-          'Flexionar y extender los codos como si fuera press.'
+          'Flexionar y extender los codos como si fuera press.',
         ],
         equipment: 'Doble polea ajustable',
         difficulty: 'intermedio',
@@ -144,16 +123,17 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 0,
         restSeconds: 75,
         rpe: 8,
-        technicalCue: 'Torso perpendicular al suelo para mayor énfasis en tríceps; no bajes más allá de 90° si hay molestia.',
+        technicalCue:
+          'Torso perpendicular al suelo para mayor énfasis en tríceps; no bajes más allá de 90° si hay molestia.',
         fullInstructions: [
           'Sujétate en las barras paralelas con los brazos extendidos pero sin bloquear violentamente los codos.',
           'Mantén el cuerpo recto para aislar tríceps (o ligeramente inclinado si prefieres pecho).',
           'Desciende doblando los codos hacia atrás hasta un ángulo de 90 grados.',
-          'Empuja fuerte con las palmas para volver a la posición inicial.'
+          'Empuja fuerte con las palmas para volver a la posición inicial.',
         ],
         commonMistakes: [
           'Encoger los hombros hacia las orejas.',
-          'Bajar en exceso comprometiendo el hombro anterior.'
+          'Bajar en exceso comprometiendo el hombro anterior.',
         ],
         equipment: 'Barras paralelas / Torre de fondos',
         difficulty: 'intermedio',
@@ -173,17 +153,18 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 25,
         restSeconds: 60,
         rpe: 9,
-        technicalCue: 'Fija los codos pegados a los costados y bloquea el tríceps con contracción de 1 segundo.',
+        technicalCue:
+          'Fija los codos pegados a los costados y bloquea el tríceps con contracción de 1 segundo.',
         fullInstructions: [
           'Usa la cuerda o barra recta en polea alta.',
           'Inclina levemente el torso hacia adelante desde la cadera.',
           'Mantén los codos pegados al cuerpo durante todo el recorrido.',
           'Extiende completamente los brazos hacia abajo y separa las cuerdas al final.',
-          'Regresa despacio hasta que los antebrazos queden horizontales.'
+          'Regresa despacio hasta que los antebrazos queden horizontales.',
         ],
         commonMistakes: [
           'Permitir que los codos se desplacen adelante y atrás.',
-          'Ayudarse con el peso corporal encogiéndose sobre la barra.'
+          'Ayudarse con el peso corporal encogiéndose sobre la barra.',
         ],
         equipment: 'Polea alta con cuerda',
         difficulty: 'principiante',
@@ -203,16 +184,17 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 12,
         restSeconds: 60,
         rpe: 8,
-        technicalCue: 'Mantén los brazos inclinados ligeramente hacia atrás para tensión continua en la cabeza larga.',
+        technicalCue:
+          'Mantén los brazos inclinados ligeramente hacia atrás para tensión continua en la cabeza larga.',
         fullInstructions: [
           'Acuéstate en el banco plano sosteniendo dos mancuernas neutras.',
           'Brazos extendidos verticalmente y luego inclinados unos 10° hacia tu cabeza.',
           'Flexiona únicamente los antebrazos bajando las mancuernas a los lados de las orejas.',
-          'Extiende de nuevo los antebrazos sin mover la articulación del hombro.'
+          'Extiende de nuevo los antebrazos sin mover la articulación del hombro.',
         ],
         commonMistakes: [
           'Mover los codos hacia afuera desalineando el antebrazo.',
-          'Acelerar la fase excéntrica con riesgo de golpe.'
+          'Acelerar la fase excéntrica con riesgo de golpe.',
         ],
         equipment: 'Mancuernas y banco plano',
         difficulty: 'intermedio',
@@ -224,10 +206,17 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
     dayNumber: 2,
     name: 'Tracción & Espalda Fuerte',
     focus: 'Espalda y Bíceps',
-    description: 'Densidad y amplitud dorsal con activación de cadena posterior y flexores de codo.',
+    description:
+      'Densidad y amplitud dorsal con activación de cadena posterior y flexores de codo.',
     estimatedMinutes: 60,
     difficulty: 'intermedio',
-    targetMuscles: ['Dorsal ancho', 'Trapecio medio e inferior', 'Romboides', 'Bíceps braquial', 'Braquial anterior'],
+    targetMuscles: [
+      'Dorsal ancho',
+      'Trapecio medio e inferior',
+      'Romboides',
+      'Bíceps braquial',
+      'Braquial anterior',
+    ],
     exercises: [
       {
         id: 'ex_barbell_row',
@@ -243,16 +232,17 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 70,
         restSeconds: 90,
         rpe: 8.5,
-        technicalCue: 'Espalda neutra a 45 grados; jala la barra hacia el ombligo pensando en guiar con los codos.',
+        technicalCue:
+          'Espalda neutra a 45 grados; jala la barra hacia el ombligo pensando en guiar con los codos.',
         fullInstructions: [
           'Párate con pies al ancho de hombros sujetando la barra con agarre prono.',
           'Flexiona caderas hacia atrás manteniendo la curvatura lumbar natural.',
           'Tira la barra hacia la parte baja de tu abdomen apretando los dorsales.',
-          'Extiende los brazos controladamente sin arquear la espalda.'
+          'Extiende los brazos controladamente sin arquear la espalda.',
         ],
         commonMistakes: [
           'Redondear la espalda baja.',
-          'Tironear con impulso de piernas en cada repetición.'
+          'Tironear con impulso de piernas en cada repetición.',
         ],
         equipment: 'Barra olímpica y discos',
         difficulty: 'intermedio',
@@ -272,16 +262,17 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 65,
         restSeconds: 75,
         rpe: 8,
-        technicalCue: 'Saca el pecho y lleva la barra a la parte alta del esternón sin columpiar la espalda.',
+        technicalCue:
+          'Saca el pecho y lleva la barra a la parte alta del esternón sin columpiar la espalda.',
         fullInstructions: [
           'Ajusta la almohadilla de las piernas para que tus muslos queden firmes.',
           'Toma la barra ancha, inclina el torso unos 10-15 grados hacia atrás.',
           'Inicia el movimiento bajando los hombros (depresión escapular) y luego flexionando los codos.',
-          'Toca suavemente la clavícula y regresa estirando el dorsal.'
+          'Toca suavemente la clavícula y regresa estirando el dorsal.',
         ],
         commonMistakes: [
           'Bajar la barra detrás de la nuca (peligro cervical).',
-          'Columpiarse hacia atrás para hacer palanca con el peso.'
+          'Columpiarse hacia atrás para hacer palanca con el peso.',
         ],
         equipment: 'Máquina de jalón al pecho',
         difficulty: 'principiante',
@@ -301,16 +292,17 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 32,
         restSeconds: 60,
         rpe: 8,
-        technicalCue: 'Apoya rodilla y mano en banco; tira hacia la cadera describiendo un arco suave.',
+        technicalCue:
+          'Apoya rodilla y mano en banco; tira hacia la cadera describiendo un arco suave.',
         fullInstructions: [
           'Apoya rodilla y mano izquierda en un banco plano. Pie derecho firme en el suelo.',
           'Sujeta la mancuerna con el brazo extendido apuntando hacia el suelo.',
           'Lleva la mancuerna hacia tu cadera manteniendo el codo cerca del costado.',
-          'Pausa brevemente arriba y baja de forma suave.'
+          'Pausa brevemente arriba y baja de forma suave.',
         ],
         commonMistakes: [
           'Rotar el torso bruscamente al subir.',
-          'Subir la mancuerna en línea recta hacia el hombro en lugar de hacia la cadera.'
+          'Subir la mancuerna en línea recta hacia el hombro en lugar de hacia la cadera.',
         ],
         equipment: 'Mancuerna y banco plano',
         difficulty: 'intermedio',
@@ -330,16 +322,17 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 32.5,
         restSeconds: 60,
         rpe: 8.5,
-        technicalCue: 'Codos pegados al cuerpo sin balanceo lumbar; aprieta el bíceps en el punto más alto.',
+        technicalCue:
+          'Codos pegados al cuerpo sin balanceo lumbar; aprieta el bíceps en el punto más alto.',
         fullInstructions: [
           'Ponte de pie con la barra Z sostenida con agarre supino.',
           'Sube la barra contrayendo los bíceps hasta la altura del pecho.',
           'Mantén los codos quietos y pegados al cuerpo.',
-          'Desciende despacio en 3 segundos resistiendo la bajada.'
+          'Desciende despacio en 3 segundos resistiendo la bajada.',
         ],
         commonMistakes: [
           'Balancear la espalda para empezar el movimiento.',
-          'Dejar caer la barra rápido sin controlar la bajada.'
+          'Dejar caer la barra rápido sin controlar la bajada.',
         ],
         equipment: 'Barra Z',
         difficulty: 'intermedio',
@@ -359,15 +352,14 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 16,
         restSeconds: 60,
         rpe: 8,
-        technicalCue: 'Palmas mirándose entre sí durante todo el recorrido para desarrollar grosor en antebrazo.',
+        technicalCue:
+          'Palmas mirándose entre sí durante todo el recorrido para desarrollar grosor en antebrazo.',
         fullInstructions: [
           'De pie con mancuernas en agarre neutro a los lados.',
           'Eleva ambas o de forma alterna sin rotar las muñecas.',
-          'Aprieta fuertemente arriba y baja con cadencia controlada.'
+          'Aprieta fuertemente arriba y baja con cadencia controlada.',
         ],
-        commonMistakes: [
-          'Elevar los codos hacia adelante perdiendo la tensión en el brazo.'
-        ],
+        commonMistakes: ['Elevar los codos hacia adelante perdiendo la tensión en el brazo.'],
         equipment: 'Mancuernas',
         difficulty: 'principiante',
         iconType: 'dumbbell',
@@ -378,10 +370,16 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
     dayNumber: 3,
     name: 'Descanso Activo & Movilidad',
     focus: 'Recuperación y Flexibilidad',
-    description: 'Sesión regenerativa diseñada para desinflamar tendones, mejorar rango de movimiento articular y circulación.',
+    description:
+      'Sesión regenerativa diseñada para desinflamar tendones, mejorar rango de movimiento articular y circulación.',
     estimatedMinutes: 35,
     difficulty: 'principiante',
-    targetMuscles: ['Movilidad torácica', 'Flexores de cadera', 'Fascia plantar', 'Hombros y escápulas'],
+    targetMuscles: [
+      'Movilidad torácica',
+      'Flexores de cadera',
+      'Fascia plantar',
+      'Hombros y escápulas',
+    ],
     isRestDay: true,
     exercises: [
       {
@@ -398,16 +396,15 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 0,
         restSeconds: 30,
         rpe: 4,
-        technicalCue: 'Rueda despacio; respira profundo y quédate 15 segundos en puntos gatillo de mayor tensión.',
+        technicalCue:
+          'Rueda despacio; respira profundo y quédate 15 segundos en puntos gatillo de mayor tensión.',
         fullInstructions: [
           'Coloca el rodillo bajo la zona muscular objetivo.',
           'Aplica presión gradual usando tu propio peso corporal.',
           'Muévete lentamente unos 5-10 cm hacia adelante y atrás.',
-          'Respira rítmicamente sin contraer la zona masajeada.'
+          'Respira rítmicamente sin contraer la zona masajeada.',
         ],
-        commonMistakes: [
-          'Rodar directamente sobre articulaciones o la columna lumbar baja.'
-        ],
+        commonMistakes: ['Rodar directamente sobre articulaciones o la columna lumbar baja.'],
         equipment: 'Foam Roller',
         difficulty: 'principiante',
         iconType: 'bodyweight',
@@ -426,15 +423,14 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 0,
         restSeconds: 30,
         rpe: 3,
-        technicalCue: 'Inhala mirando suavemente arriba abriendo el pecho; exhala redondeando y mirando al ombligo.',
+        technicalCue:
+          'Inhala mirando suavemente arriba abriendo el pecho; exhala redondeando y mirando al ombligo.',
         fullInstructions: [
           'Ponte en cuadrupedia con manos bajo hombros y rodillas bajo caderas.',
           'Inhala: arquea la espalda suavemente, bajando el abdomen y elevando la mirada.',
-          'Exhala: empuja el suelo, redondea la espalda hacia el techo y relaja la cabeza.'
+          'Exhala: empuja el suelo, redondea la espalda hacia el techo y relaja la cabeza.',
         ],
-        commonMistakes: [
-          'Movimientos bruscos o forzar el cuello hacia atrás.'
-        ],
+        commonMistakes: ['Movimientos bruscos o forzar el cuello hacia atrás.'],
         equipment: 'Colchoneta',
         difficulty: 'principiante',
         iconType: 'bodyweight',
@@ -453,15 +449,14 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 0,
         restSeconds: 30,
         rpe: 4,
-        technicalCue: 'Mantén el pecho erguido y rota ambas rodillas de un lado a otro sintiendo la rotación interna y externa.',
+        technicalCue:
+          'Mantén el pecho erguido y rota ambas rodillas de un lado a otro sintiendo la rotación interna y externa.',
         fullInstructions: [
           'Siéntate en el suelo con una pierna doblada al frente a 90° y la otra atrás a 90°.',
           'Mantén el torso alto e inclínate ligeramente sobre la pierna delantera.',
-          'Rota controladamente al lado opuesto sin despegar los talones del suelo si es posible.'
+          'Rota controladamente al lado opuesto sin despegar los talones del suelo si es posible.',
         ],
-        commonMistakes: [
-          'Colapsar el torso sobre el suelo sin control.'
-        ],
+        commonMistakes: ['Colapsar el torso sobre el suelo sin control.'],
         equipment: 'Colchoneta',
         difficulty: 'principiante',
         iconType: 'bodyweight',
@@ -480,16 +475,17 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 0,
         restSeconds: 45,
         rpe: 6,
-        technicalCue: 'Cuerpo en línea recta desde talones a cabeza; aprieta glúteos y empuja el suelo con los codos.',
+        technicalCue:
+          'Cuerpo en línea recta desde talones a cabeza; aprieta glúteos y empuja el suelo con los codos.',
         fullInstructions: [
           'Colócate boca abajo apoyado sobre los antebrazos y las puntas de los pies.',
           'Activa el abdomen como si fueras a recibir un golpe.',
           'Evita que la cadera caiga o se eleve en forma de carpa.',
-          'Mantén una respiración controlada y diafragmática.'
+          'Mantén una respiración controlada y diafragmática.',
         ],
         commonMistakes: [
           'Dejar caer la zona lumbar produciendo arqueo doloroso.',
-          'Contener la respiración durante la serie.'
+          'Contener la respiración durante la serie.',
         ],
         equipment: 'Colchoneta',
         difficulty: 'principiante',
@@ -501,7 +497,8 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
     dayNumber: 4,
     name: 'Poder de Tren Inferior',
     focus: 'Piernas y Glúteos',
-    description: 'Desarrollo de fuerza en cuádriceps, cadena posterior isquiosural y estabilidad pélvica.',
+    description:
+      'Desarrollo de fuerza en cuádriceps, cadena posterior isquiosural y estabilidad pélvica.',
     estimatedMinutes: 65,
     difficulty: 'intermedio',
     targetMuscles: ['Cuádriceps', 'Glúteo mayor', 'Isquiotibiales', 'Gemelos', 'Core'],
@@ -520,16 +517,17 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 110,
         restSeconds: 120,
         rpe: 8.5,
-        technicalCue: 'Apoya la barra firme en trapecios, abre las rodillas en dirección de los dedos y desciende rompiendo el paralelo.',
+        technicalCue:
+          'Apoya la barra firme en trapecios, abre las rodillas en dirección de los dedos y desciende rompiendo el paralelo.',
         fullInstructions: [
           'Coloca la barra sobre la espalda alta (trapecios). Pies al ancho de hombros con puntas ligeramente abiertas.',
           'Toma aire, bloquea el core mediante maniobra de Valsalva.',
           'Desciende doblando caderas y rodillas simultáneamente hasta que la cadera pase el nivel de la rodilla.',
-          'Empuja el suelo con todo el pie para volver a la posición erguida.'
+          'Empuja el suelo con todo el pie para volver a la posición erguida.',
         ],
         commonMistakes: [
           'Permitir que las rodillas colapsen hacia adentro (valgo de rodilla).',
-          'Levantar los talones del suelo durante el descenso.'
+          'Levantar los talones del suelo durante el descenso.',
         ],
         equipment: 'Rack de sentadillas y barra olímpica',
         difficulty: 'intermedio',
@@ -549,16 +547,17 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 100,
         restSeconds: 90,
         rpe: 8,
-        technicalCue: 'Empuja las caderas hacia la pared de atrás; mantén la barra rozando los muslos en todo momento.',
+        technicalCue:
+          'Empuja las caderas hacia la pared de atrás; mantén la barra rozando los muslos en todo momento.',
         fullInstructions: [
           'Párate erguido con la barra sostenida a la altura de los muslos.',
           'Con una microflexión fija en rodillas, empuja la cadera hacia atrás.',
           'Desciende la barra rozando espinillas hasta que sientas el estiramiento máximo en isquiotibiales.',
-          'Contrae fuertemente glúteos para volver a posición vertical sin hiperextender la espalda.'
+          'Contrae fuertemente glúteos para volver a posición vertical sin hiperextender la espalda.',
         ],
         commonMistakes: [
           'Convertirlo en una sentadilla doblando demasiado las rodillas.',
-          'Alejar la barra del cuerpo aumentando la palanca sobre la espalda baja.'
+          'Alejar la barra del cuerpo aumentando la palanca sobre la espalda baja.',
         ],
         equipment: 'Barra olímpica y discos',
         difficulty: 'intermedio',
@@ -578,16 +577,17 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 180,
         restSeconds: 75,
         rpe: 8.5,
-        technicalCue: 'No despegues la zona lumbar del respaldo al descender; no bloquees las rodillas arriba.',
+        technicalCue:
+          'No despegues la zona lumbar del respaldo al descender; no bloquees las rodillas arriba.',
         fullInstructions: [
           'Ubica los pies en la plataforma al ancho de hombros.',
           'Quita el seguro y baja la plataforma con control flexionando las rodillas hacia el pecho.',
           'Detén el descenso justo antes de que la pelvis empiece a despegarse del respaldo.',
-          'Empuja extendiendo las piernas sin bloquear las rodillas.'
+          'Empuja extendiendo las piernas sin bloquear las rodillas.',
         ],
         commonMistakes: [
           'Colocar las manos en las rodillas para empujar.',
-          'Bloqueo articular brusco de rodillas arriba.'
+          'Bloqueo articular brusco de rodillas arriba.',
         ],
         equipment: 'Máquina de prensa de piernas 45°',
         difficulty: 'principiante',
@@ -607,16 +607,15 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 45,
         restSeconds: 60,
         rpe: 9,
-        technicalCue: 'Mantén las caderas pegadas al cojín y aprieta 1 segundo arriba flexionando las rodillas.',
+        technicalCue:
+          'Mantén las caderas pegadas al cojín y aprieta 1 segundo arriba flexionando las rodillas.',
         fullInstructions: [
           'Acuéstate boca abajo con el rodillo apoyado justo encima de los talones.',
           'Sujeta los agarres y mantén las caderas firmes sobre la almohadilla.',
           'Flexiona las piernas llevando los talones hacia los glúteos.',
-          'Baja despacio sintiendo el control excéntrico.'
+          'Baja despacio sintiendo el control excéntrico.',
         ],
-        commonMistakes: [
-          'Elevar la cadera para hacer trampa con el peso.'
-        ],
+        commonMistakes: ['Elevar la cadera para hacer trampa con el peso.'],
         equipment: 'Máquina de curl femoral',
         difficulty: 'principiante',
         iconType: 'machine',
@@ -635,15 +634,14 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 60,
         restSeconds: 45,
         rpe: 8.5,
-        technicalCue: 'Estira al máximo abajo 2 segundos y sube hasta las puntas apretando con potencia.',
+        technicalCue:
+          'Estira al máximo abajo 2 segundos y sube hasta las puntas apretando con potencia.',
         fullInstructions: [
           'Apoya la punta de los pies en el escalón y almohadillas en hombros.',
           'Baja los talones por debajo del nivel del escalón sintiendo el estiramiento profundo.',
-          'Elévate sobre los metatarsos tan alto como puedas y mantén 1 segundo.'
+          'Elévate sobre los metatarsos tan alto como puedas y mantén 1 segundo.',
         ],
-        commonMistakes: [
-          'Rebotar rápidamente sin controlar el estiramiento.'
-        ],
+        commonMistakes: ['Rebotar rápidamente sin controlar el estiramiento.'],
         equipment: 'Máquina de gemelos de pie',
         difficulty: 'principiante',
         iconType: 'machine',
@@ -654,10 +652,17 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
     dayNumber: 5,
     name: 'Escultura de Hombros & Zona Media',
     focus: 'Hombros y Abdomen',
-    description: 'Estética en V con deltoides redondos, salud postural escapular y firmeza del core.',
+    description:
+      'Estética en V con deltoides redondos, salud postural escapular y firmeza del core.',
     estimatedMinutes: 55,
     difficulty: 'intermedio',
-    targetMuscles: ['Deltoides lateral', 'Deltoides anterior', 'Deltoides posterior', 'Core', 'Oblicuos'],
+    targetMuscles: [
+      'Deltoides lateral',
+      'Deltoides anterior',
+      'Deltoides posterior',
+      'Core',
+      'Oblicuos',
+    ],
     exercises: [
       {
         id: 'ex_military_press',
@@ -673,16 +678,17 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 22,
         restSeconds: 90,
         rpe: 8,
-        technicalCue: 'Codos ligeramente al frente (plano escapular); evita arquear en exceso la espalda baja.',
+        technicalCue:
+          'Codos ligeramente al frente (plano escapular); evita arquear en exceso la espalda baja.',
         fullInstructions: [
           'Ajusta el respaldo del banco casi vertical (80°-85°).',
           'Sube las mancuernas al nivel de las orejas con palmas hacia el frente.',
           'Empuja hacia arriba extendiendo los brazos sin chocar las mancuernas arriba.',
-          'Desciende hasta que las mancuernas queden al nivel de la barbilla o parte alta del pecho.'
+          'Desciende hasta que las mancuernas queden al nivel de la barbilla o parte alta del pecho.',
         ],
         commonMistakes: [
           'Bajar demasiado rápido si sientes molestia en el manguito rotador.',
-          'Hiperextender la columna lumbar.'
+          'Hiperextender la columna lumbar.',
         ],
         equipment: 'Mancuernas y banco',
         difficulty: 'intermedio',
@@ -702,16 +708,17 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 10,
         restSeconds: 60,
         rpe: 9,
-        technicalCue: 'Imagina verter agua de una jarra; guía con los codos y no uses impulso con las piernas.',
+        technicalCue:
+          'Imagina verter agua de una jarra; guía con los codos y no uses impulso con las piernas.',
         fullInstructions: [
           'De pie con mancuernas a los lados del cuerpo, ligera flexión en rodillas y codos.',
           'Eleva los brazos hacia los laterales hasta la altura de los hombros.',
           'Mantén los meñiques ligeramente más altos que los pulgares.',
-          'Baja lentamente en 2 segundos sin dejar caer el peso.'
+          'Baja lentamente en 2 segundos sin dejar caer el peso.',
         ],
         commonMistakes: [
           'Elevar los brazos por encima del nivel de la cabeza usando trapecios.',
-          'Balancear el tronco hacia atrás.'
+          'Balancear el tronco hacia atrás.',
         ],
         equipment: 'Mancuernas ligeras',
         difficulty: 'intermedio',
@@ -731,16 +738,17 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 20,
         restSeconds: 60,
         rpe: 8,
-        technicalCue: 'Tira de la cuerda hacia la altura de tus ojos o frente separando las manos al final.',
+        technicalCue:
+          'Tira de la cuerda hacia la altura de tus ojos o frente separando las manos al final.',
         fullInstructions: [
           'Coloca la polea a la altura del cuello o frente con accesorio de cuerda.',
           'Agarra la cuerda con pulgares apuntando hacia ti.',
           'Da un paso atrás y tira llevando la cuerda a la cara, rotando externamente los hombros.',
-          'Siente la activación de la parte trasera del hombro y escápulas.'
+          'Siente la activación de la parte trasera del hombro y escápulas.',
         ],
         commonMistakes: [
           'Usar demasiado peso y tirar hacia el pecho en vez de a la cara.',
-          'Echar la cabeza hacia adelante al tirar.'
+          'Echar la cabeza hacia adelante al tirar.',
         ],
         equipment: 'Polea alta con cuerda',
         difficulty: 'principiante',
@@ -760,16 +768,17 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 0,
         restSeconds: 60,
         rpe: 8.5,
-        technicalCue: 'Inicia basculando la pelvis hacia arriba; no uses el balanceo del cuerpo para subir.',
+        technicalCue:
+          'Inicia basculando la pelvis hacia arriba; no uses el balanceo del cuerpo para subir.',
         fullInstructions: [
           'Cuélgate de una barra de dominadas con agarre prono.',
           'Contrae el abdomen y sube las rodillas (o piernas rectas si puedes) hacia el pecho.',
           'Concéntrate en enrollar la pelvis hacia tu ombligo.',
-          'Desciende despacio evitando que el cuerpo se balancee.'
+          'Desciende despacio evitando que el cuerpo se balancee.',
         ],
         commonMistakes: [
           'Balancear el cuerpo hacia adelante y atrás para tomar impulso.',
-          'Mover únicamente las piernas sin rotar la pelvis.'
+          'Mover únicamente las piernas sin rotar la pelvis.',
         ],
         equipment: 'Barra de dominadas',
         difficulty: 'intermedio',
@@ -789,15 +798,16 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
         suggestedWeightKg: 0,
         restSeconds: 60,
         rpe: 9,
-        technicalCue: 'Mantén la espalda ligeramente redondeada (retroversión pélvica); no dejes que la lumbar se hunda.',
+        technicalCue:
+          'Mantén la espalda ligeramente redondeada (retroversión pélvica); no dejes que la lumbar se hunda.',
         fullInstructions: [
           'De rodillas sobre una colchoneta sujetando la rueda abdominal frente a ti.',
           'Rueda lentamente hacia adelante estirando el cuerpo tanto como puedas controlar.',
           'Mantén el abdomen apretado al 100%.',
-          'Tira con el abdomen y los dorsales para regresar a la posición inicial.'
+          'Tira con el abdomen y los dorsales para regresar a la posición inicial.',
         ],
         commonMistakes: [
-          'Permitir que la pelvis caiga hacia el suelo provocando hiperextensión lumbar dolorosa.'
+          'Permitir que la pelvis caiga hacia el suelo provocando hiperextensión lumbar dolorosa.',
         ],
         equipment: 'Rueda abdominal',
         difficulty: 'intermedio',
@@ -805,203 +815,4 @@ export const MOCK_ROUTINES: DailyRoutine[] = [
       },
     ],
   },
-];
-
-export const MOCK_HISTORY: WorkoutSessionLog[] = [
-  {
-    id: 'wlog_01',
-    date: '2026-09-02',
-    routineName: 'Empuje Dinámico (Pecho y Tríceps)',
-    durationMinutes: 62,
-    totalVolumeKg: 12450,
-    exercisesCompleted: 6,
-    totalSets: 19,
-    averageRpe: 8.2,
-    caloriesBurned: 486,
-    averageHeartRate: 142,
-    peakHeartRate: 172,
-    allometricPowerWatts: 248,
-    allometricCalories: 486,
-    userObservations: 'Excelente congestión en pectoral. El press banca se sintió fluido con 82.5kg, completé las 4 series sin dolor en hombros.',
-    aiCoachFeedback: 'Gran ejecución técnica, Carlos. Detecto un incremento de +2.5% en volumen total respecto a la semana anterior. Mantén este ritmo para asegurar sobrecarga progresiva controlada.',
-    completedSets: [
-      { exerciseId: 'ex_bench_press', exerciseName: 'Press de Banca con Barra', setNumber: 1, weightKg: 80, reps: 10, rpe: 8, completedAt: '18:15' },
-      { exerciseId: 'ex_bench_press', exerciseName: 'Press de Banca con Barra', setNumber: 2, weightKg: 82.5, reps: 9, rpe: 8, completedAt: '18:18' },
-      { exerciseId: 'ex_bench_press', exerciseName: 'Press de Banca con Barra', setNumber: 3, weightKg: 82.5, reps: 8, rpe: 8.5, completedAt: '18:21' },
-      { exerciseId: 'ex_bench_press', exerciseName: 'Press de Banca con Barra', setNumber: 4, weightKg: 82.5, reps: 8, rpe: 9, completedAt: '18:24' },
-    ],
-  },
-  {
-    id: 'wlog_02',
-    date: '2026-08-31',
-    routineName: 'Tracción & Espalda Fuerte',
-    durationMinutes: 58,
-    totalVolumeKg: 11800,
-    exercisesCompleted: 5,
-    totalSets: 17,
-    averageRpe: 8.0,
-    caloriesBurned: 442,
-    averageHeartRate: 138,
-    peakHeartRate: 166,
-    allometricPowerWatts: 236,
-    allometricCalories: 442,
-    userObservations: 'El remo con barra a 70kg estuvo muy sólido. Buen agarre sin necesidad de correas.',
-    aiCoachFeedback: 'Buen reclutamiento dorsal. Tu descanso entre series se mantuvo dentro de la ventana óptima de 90 segundos.',
-    completedSets: [
-      { exerciseId: 'ex_barbell_row', exerciseName: 'Remo con Barra Pesa Libre', setNumber: 1, weightKg: 70, reps: 10, rpe: 8, completedAt: '19:10' },
-      { exerciseId: 'ex_lat_pulldown', exerciseName: 'Jalón al Pecho en Polea Alta', setNumber: 1, weightKg: 65, reps: 10, rpe: 8, completedAt: '19:25' },
-    ],
-  },
-  {
-    id: 'wlog_03',
-    date: '2026-08-28',
-    routineName: 'Poder de Tren Inferior',
-    durationMinutes: 66,
-    totalVolumeKg: 14200,
-    exercisesCompleted: 5,
-    totalSets: 18,
-    averageRpe: 8.7,
-    caloriesBurned: 538,
-    averageHeartRate: 149,
-    peakHeartRate: 178,
-    allometricPowerWatts: 275,
-    allometricCalories: 538,
-    userObservations: 'Sentadilla exigente pero con buena profundidad. El peso muerto rumano dejó los femorales activos.',
-    aiCoachFeedback: 'Excelente compromiso con el tren inferior. Sugiero hidratación extra y 8 horas de sueño para regenerar fibras musculares en cuádriceps.',
-    completedSets: [
-      { exerciseId: 'ex_squat_barbell', exerciseName: 'Sentadilla Trasera con Barra', setNumber: 1, weightKg: 110, reps: 8, rpe: 8.5, completedAt: '18:30' },
-    ],
-  },
-  {
-    id: 'wlog_04',
-    date: '2026-08-25',
-    routineName: 'Escultura de Hombros & Zona Media',
-    durationMinutes: 52,
-    totalVolumeKg: 8900,
-    exercisesCompleted: 5,
-    totalSets: 18,
-    averageRpe: 7.8,
-    caloriesBurned: 388,
-    averageHeartRate: 132,
-    peakHeartRate: 159,
-    allometricPowerWatts: 210,
-    allometricCalories: 388,
-    userObservations: 'Respeté el ángulo escapular en el press militar y no sentí ninguna molestia en el manguito rotador.',
-    aiCoachFeedback: 'Magnífica decisión al priorizar la salud articular sobre el ego lifting. Esa adaptación previene lesiones crónicas y permite ganancias consistentes.',
-    completedSets: [
-      { exerciseId: 'ex_military_press', exerciseName: 'Press Militar Sentado', setNumber: 1, weightKg: 22, reps: 10, rpe: 7.5, completedAt: '17:40' },
-    ],
-  },
-];
-
-export const MOCK_PRS: PersonalRecord[] = [
-  {
-    id: 'pr_01',
-    exerciseName: 'Press de Banca Plano',
-    recordValue: '95 kg (x2 reps)',
-    date: '15 Ago 2026',
-    category: 'Pecho',
-    previousValue: '92.5 kg',
-    progressPercent: 2.7,
-    allometricScore: 5.19,
-    normalized70kgLoad: 88.3,
-  },
-  {
-    id: 'pr_02',
-    exerciseName: 'Sentadilla Trasera',
-    recordValue: '130 kg (x1 rep)',
-    date: '20 Ago 2026',
-    category: 'Piernas',
-    previousValue: '125 kg',
-    progressPercent: 4.0,
-    allometricScore: 7.11,
-    normalized70kgLoad: 120.8,
-  },
-  {
-    id: 'pr_03',
-    exerciseName: 'Peso Muerto Rumano',
-    recordValue: '125 kg (x6 reps)',
-    date: '28 Ago 2026',
-    category: 'Cadena Posterior',
-    previousValue: '120 kg',
-    progressPercent: 4.1,
-    allometricScore: 6.83,
-    normalized70kgLoad: 116.1,
-  },
-  {
-    id: 'pr_04',
-    exerciseName: 'Remo Unilateral con Mancuerna',
-    recordValue: '36 kg (x8 reps)',
-    date: '22 Ago 2026',
-    category: 'Espalda',
-    previousValue: '34 kg',
-    progressPercent: 5.8,
-    allometricScore: 1.97,
-    normalized70kgLoad: 33.5,
-  },
-  {
-    id: 'pr_05',
-    exerciseName: 'Press Militar con Mancuernas',
-    recordValue: '26 kg c/u (x6 reps)',
-    date: '10 Jul 2026',
-    category: 'Hombros',
-    previousValue: '24 kg',
-    progressPercent: 8.3,
-    allometricScore: 2.84,
-    normalized70kgLoad: 48.3,
-  },
-];
-
-export const MOCK_WEIGHT_HISTORY = [
-  { date: '10 Jul', weight: 79.5 },
-  { date: '18 Jul', weight: 79.2 },
-  { date: '26 Jul', weight: 78.9 },
-  { date: '04 Ago', weight: 78.7 },
-  { date: '12 Ago', weight: 78.5 },
-  { date: '20 Ago', weight: 78.3 },
-  { date: '28 Ago', weight: 78.1 },
-  { date: '03 Sep', weight: 78.2 },
-];
-
-export const MOCK_WEEKLY_VOLUME = [
-  { week: 'Sem 1', volumeKg: 10800, workouts: 3 },
-  { week: 'Sem 2', volumeKg: 11400, workouts: 4 },
-  { week: 'Sem 3', volumeKg: 12100, workouts: 4 },
-  { week: 'Sem 4 (Actual)', volumeKg: 12450, workouts: 3 },
-];
-
-export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
-  {
-    id: 'msg_01',
-    sender: 'coach',
-    text: '¡Hola Carlos! Soy tu Coach IA. He analizado tu progreso y tus registros recientes. Hoy tienes programado "Empuje Dinámico" (Pecho y Tríceps). ¿En qué puedo ayudarte hoy para maximizar tu sesión?',
-    timestamp: '10:30',
-    category: 'motivation',
-  },
-  {
-    id: 'msg_02',
-    sender: 'user',
-    text: '¿Debo aumentar el peso en el press de banca hoy?',
-    timestamp: '10:32',
-  },
-  {
-    id: 'msg_03',
-    sender: 'coach',
-    text: '¡Buena pregunta! En tu última sesión completaste 4 series de 8-10 reps con 82.5 kg manteniendo un RPE de 8.2 y sin molestias en hombros.\n\nMi recomendación:\n1. Mantén la primera serie en 82.5 kg como calentamiento activo.\n2. Si las repeticiones salen con velocidad y técnica estricta, sube a 85 kg para las series 2 y 3 buscando 7-8 repeticiones sólidas.\n3. Si la velocidad de barra cae por debajo de lo habitual, mantén 82.5 kg y busca 1 repetición más.',
-    timestamp: '10:33',
-    category: 'technique',
-    suggestedAction: {
-      label: 'Ver rutina de hoy',
-      screen: 'routine',
-    },
-  },
-];
-
-export const FREQUENT_COACH_QUESTIONS = [
-  '¿Cómo mejoro mi técnica en sentadilla?',
-  '¿Qué puedo hacer si no tengo tiempo para entrenar hoy?',
-  '¿Debo aumentar el peso esta semana?',
-  '¿Qué ejercicio puedo usar en lugar del press de banca?',
-  'Me siento cansado, ¿cómo adapto mi rutina?',
-  '¿Cómo caliento adecuadamente los hombros?',
 ];

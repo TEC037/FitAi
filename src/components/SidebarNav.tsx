@@ -1,19 +1,8 @@
 import React from 'react';
-import {
-  LayoutDashboard,
-  Dumbbell,
-  Play,
-  TrendingUp,
-  Bot,
-  History,
-  User,
-  Zap,
-  ShieldAlert,
-  LogOut,
-  BookOpen,
-} from 'lucide-react';
-import { useApp } from '../context/AppContext';
-import { AppScreen } from '../types';
+import { Zap, ShieldAlert, LogOut } from 'lucide-react';
+import { useApp } from '../context/useApp';
+
+import { NAV_ROUTES } from '../config/navigation';
 
 interface SidebarNavProps {
   onOpenSafetyModal: () => void;
@@ -22,51 +11,12 @@ interface SidebarNavProps {
 export const SidebarNav: React.FC<SidebarNavProps> = ({ onOpenSafetyModal }) => {
   const { currentScreen, navigateTo, user, logout, isWorkoutActive } = useApp();
 
-  const navItems: { id: AppScreen; label: string; icon: React.ReactNode; badge?: string }[] = [
-    {
-      id: 'dashboard',
-      label: 'Dashboard',
-      icon: <LayoutDashboard className="w-5 h-5" />,
-    },
-    {
-      id: 'routine',
-      label: 'Mi Rutina',
-      icon: <Dumbbell className="w-5 h-5" />,
-    },
-    {
-      id: 'exercises',
-      label: 'Biblioteca',
-      icon: <BookOpen className="w-5 h-5" />,
-      badge: '1.3k',
-    },
-    {
-      id: 'workout',
-      label: 'Entrenamiento',
-      icon: <Play className="w-5 h-5 fill-current" />,
-      badge: isWorkoutActive ? 'EN VIVO' : undefined,
-    },
-    {
-      id: 'progress',
-      label: 'Progreso',
-      icon: <TrendingUp className="w-5 h-5" />,
-    },
-    {
-      id: 'coach',
-      label: 'Coach IA',
-      icon: <Bot className="w-5 h-5" />,
-      badge: 'IA',
-    },
-    {
-      id: 'history',
-      label: 'Historial',
-      icon: <History className="w-5 h-5" />,
-    },
-    {
-      id: 'profile',
-      label: 'Perfil',
-      icon: <User className="w-5 h-5" />,
-    },
-  ];
+  const navItems = NAV_ROUTES.map((route) => ({
+    id: route.id,
+    label: route.label,
+    icon: <route.icon className={`w-5 h-5 ${route.id === 'workout' ? 'fill-current' : ''}`} />,
+    badge: route.id === 'workout' && isWorkoutActive ? 'EN VIVO' : route.badge,
+  }));
 
   return (
     <nav className="w-64 bg-[#0A0A0A] border-r border-white/10 flex flex-col p-6 h-screen sticky top-0 shrink-0 z-30 select-none">
@@ -83,7 +33,9 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({ onOpenSafetyModal }) => 
           <span className="text-xl font-black tracking-tight text-white flex items-center gap-1.5">
             FitAI <span className="text-[#C0FF00]">Coach</span>
           </span>
-          <p className="text-[10px] text-white/40 uppercase tracking-widest font-semibold">PaaS Gym AI</p>
+          <p className="text-[10px] text-white/40 uppercase tracking-widest font-semibold">
+            PaaS Gym AI
+          </p>
         </div>
       </div>
 
@@ -96,6 +48,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({ onOpenSafetyModal }) => 
               key={item.id}
               id={`nav-link-${item.id}`}
               onClick={() => navigateTo(item.id)}
+              aria-current={isActive ? 'page' : undefined}
               className={`w-full flex items-center justify-between p-3 rounded-xl font-medium text-sm transition-all duration-200 text-left ${
                 isActive
                   ? 'bg-white/10 text-[#C0FF00] shadow-sm font-semibold'
@@ -103,9 +56,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({ onOpenSafetyModal }) => 
               }`}
             >
               <div className="flex items-center gap-3.5">
-                <span className={isActive ? 'text-[#C0FF00]' : 'text-white/50'}>
-                  {item.icon}
-                </span>
+                <span className={isActive ? 'text-[#C0FF00]' : 'text-white/50'}>{item.icon}</span>
                 <span>{item.label}</span>
               </div>
               {item.badge && (
