@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/useApp';
 import { formatIsoDate } from '../utils/format';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 const DEFAULT_AVERAGE_HR_BPM = 142;
 const DEFAULT_PEAK_HR_BPM = 165;
@@ -21,10 +22,132 @@ const DEFAULT_ALLOMETRIC_POWER_W = 490;
 export const HistoryView: React.FC = () => {
   const { history, startWorkout } = useApp();
   const [expandedId, setExpandedId] = useState<string | null>(history[0]?.id || null);
+  const isMobile = useIsMobile();
 
   const toggleExpand = (id: string) => {
     setExpandedId((prev) => (prev === id ? null : id));
   };
+
+  if (isMobile) {
+    return (
+      <div className="flex-1 px-4 pt-5 pb-6 max-w-md mx-auto w-full">
+        <div className="mb-4">
+          <p className="text-[10px] text-white/40 uppercase tracking-wider font-bold">Historial</p>
+          <h1 className="text-2xl font-black tracking-tight text-white">Mis Sesiones</h1>
+          <p className="text-xs text-white/50 mt-0.5">
+            {history.length} sesiones registradas
+          </p>
+        </div>
+
+        {history.length === 0 ? (
+          <div className="bg-[#0A0A0A] border border-white/10 rounded-3xl p-8 text-center space-y-4">
+            <Dumbbell className="w-10 h-10 text-white/30 mx-auto" />
+            <h3 className="text-base font-bold text-white">Aún no hay sesiones registradas</h3>
+            <p className="text-xs text-white/50">
+              Inicia tu primera sesión hoy para que el Coach IA comience a almacenar tus métricas.
+            </p>
+            <button
+              onClick={() => startWorkout(1)}
+              className="px-6 py-3 bg-[#C0FF00] text-black font-black text-xs rounded-xl"
+            >
+              Comenzar Entrenamiento
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {history.map((log) => {
+              const isExpanded = expandedId === log.id;
+              return (
+                <div
+                  key={log.id}
+                  className="bg-[#0A0A0A] border border-white/10 rounded-3xl overflow-hidden"
+                >
+                  <button
+                    onClick={() => toggleExpand(log.id)}
+                    className="w-full text-left p-5 flex items-center justify-between gap-3"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-mono text-[#C0FF00] font-semibold">
+                        {formatIsoDate(log.date)} · RPE {log.averageRpe}
+                      </p>
+                      <p className="text-sm font-bold text-white mt-0.5 truncate">
+                        {log.routineName}
+                      </p>
+                      <p className="text-[10px] text-white/40 mt-0.5">
+                        {log.durationMinutes}m · {log.totalSets} series ·{' '}
+                        {(log.totalVolumeKg / 1000).toFixed(1)}t
+                      </p>
+                    </div>
+                    <span className="shrink-0">
+                      {isExpanded ? (
+                        <ChevronUp className="w-4 h-4 text-white/50" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4 text-white/50" />
+                      )}
+                    </span>
+                  </button>
+
+                  {isExpanded && (
+                    <div className="px-5 pb-5 pt-0 border-t border-white/5 space-y-3 animate-fadeIn">
+                      <div className="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-xs">
+                        <div className="flex items-center gap-2 mb-1.5 text-indigo-400 font-bold">
+                          <Sparkles className="w-3.5 h-3.5" />
+                          <span>Evaluación del Coach IA</span>
+                        </div>
+                        <p className="text-white/80 leading-relaxed italic">
+                          "{log.aiCoachFeedback}"
+                        </p>
+                      </div>
+
+                      {log.userObservations && (
+                        <div className="p-4 rounded-2xl bg-white/5 border border-white/5 text-xs">
+                          <div className="flex items-center gap-2 mb-1 text-white/60 font-semibold">
+                            <MessageSquare className="w-3.5 h-3.5" />
+                            <span>Observaciones:</span>
+                          </div>
+                          <p className="text-white/80 leading-relaxed">
+                            "{log.userObservations}"
+                          </p>
+                        </div>
+                      )}
+
+                      {log.completedSets && log.completedSets.length > 0 && (
+                        <div>
+                          <h4 className="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-2">
+                            Detalle de Series
+                          </h4>
+                          <div className="space-y-1.5">
+                            {log.completedSets.map((s, idx) => (
+                              <div
+                                key={idx}
+                                className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between text-xs text-white/80"
+                              >
+                                <div className="flex items-center gap-2.5 min-w-0">
+                                  <span className="w-6 h-6 rounded-full bg-[#C0FF00]/10 text-[#C0FF00] font-bold flex items-center justify-center text-[10px] shrink-0">
+                                    {s.setNumber}
+                                  </span>
+                                  <span className="font-semibold text-white truncate">
+                                    {s.exerciseName}
+                                  </span>
+                                </div>
+                                <span className="text-[#C0FF00] font-mono font-bold shrink-0">
+                                  {s.weightKg} kg × {s.reps} (RPE {s.rpe})
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 p-4 sm:p-8 flex flex-col gap-8 max-w-5xl mx-auto w-full relative">

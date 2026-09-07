@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { AppProvider } from '../context/AppContext';
 import { useApp } from '../context/useApp';
@@ -121,5 +121,75 @@ describe('HistoryView', () => {
     fireEvent.click(screen.getByText('Tracción & Espalda Fuerte'));
     expect(screen.queryAllByText('Press de Banca con Barra').length).toBe(0);
     expect(screen.getByText('Jalón al Pecho en Polea Alta')).toBeInTheDocument();
+  });
+});
+
+describe('HistoryView (variante móvil)', () => {
+  const originalMatchMedia = window.matchMedia;
+
+  beforeEach(() => {
+    localStorage.clear();
+    window.scrollTo = () => {};
+  });
+
+  afterEach(() => {
+    if (originalMatchMedia === undefined) {
+      delete (window as unknown as { matchMedia?: unknown }).matchMedia;
+    } else {
+      window.matchMedia = originalMatchMedia;
+    }
+  });
+
+  function mockMobileViewport() {
+    window.matchMedia = vi.fn(() => ({
+      matches: true,
+      media: '(max-width: 768px)',
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })) as unknown as typeof matchMedia;
+  }
+
+  it('muestra el historial en filas compactas con la fecha y las métricas clave', () => {
+    mockMobileViewport();
+    render(
+      <AppProvider>
+        <HistoryView />
+      </AppProvider>
+    );
+
+    expect(screen.getByText('Mis Sesiones')).toBeInTheDocument();
+    expect(screen.getByText('Empuje Dinámico (Pecho y Tríceps)')).toBeInTheDocument();
+  });
+
+  it('expande una sesión compacta para ver la evaluación y las series', () => {
+    mockMobileViewport();
+    render(
+      <AppProvider>
+        <HistoryView />
+      </AppProvider>
+    );
+
+    fireEvent.click(screen.getByText('Tracción & Espalda Fuerte'));
+    expect(screen.getByText('Jalón al Pecho en Polea Alta')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('Tracción & Espalda Fuerte'));
+    expect(screen.queryByText('Jalón al Pecho en Polea Alta')).not.toBeInTheDocument();
+  });
+
+  it('muestra el estado vacío con botón para comenzar en móvil', () => {
+    localStorage.setItem(STORAGE_KEYS.HISTORY, '[]');
+    mockMobileViewport();
+    render(
+      <AppProvider>
+        <HistoryView />
+      </AppProvider>
+    );
+
+    expect(screen.getByText('Aún no hay sesiones registradas')).toBeInTheDocument();
+    expect(screen.getByText('Comenzar Entrenamiento')).toBeInTheDocument();
   });
 });

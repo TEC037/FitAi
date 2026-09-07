@@ -16,11 +16,13 @@ import { MAX_WEEKLY_VOLUME_REFERENCE } from '../config/constants';
 import { formatNumber } from '../utils/format';
 import { PersonalRecord } from '../types';
 import { AllometricProfile, calculateAllometricStrengthScore } from '../services/allometricService';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 export const ProgressView: React.FC = () => {
   const { user, personalRecords, weightHistory, history, allometricProfile } = useApp();
   const [timeFilter, setTimeFilter] = useState<'semana' | 'mes' | 'año'>('mes');
   const [categoryFilter, setCategoryFilter] = useState<string>('todos');
+  const isMobile = useIsMobile();
 
   const filteredPrs = personalRecords.filter((pr) => {
     if (categoryFilter === 'todos') return true;
@@ -32,6 +34,60 @@ export const ProgressView: React.FC = () => {
   const totalHoursTrained = (history.reduce((sum, h) => sum + h.durationMinutes, 0) / 60).toFixed(
     1
   );
+
+  if (isMobile) {
+    return (
+      <div className="flex-1 px-4 pt-5 pb-6 flex flex-col gap-4 max-w-md mx-auto w-full">
+        <div>
+          <p className="text-[10px] text-white/40 uppercase tracking-wider font-bold">Progreso</p>
+          <h1 className="text-2xl font-black tracking-tight text-white">Mis Métricas</h1>
+          <p className="text-xs text-white/50 mt-0.5">
+            Evolución, constancia y récords actuales.
+          </p>
+        </div>
+
+        <StatsKpiGrid
+          compliance={user.weeklyCompliance}
+          totalVolumeTonnes={(totalVolumeAllHistory / 1000).toFixed(1)}
+          totalHoursTrained={totalHoursTrained}
+          sessionCount={history.length}
+          personalRecordsCount={personalRecords.length}
+        />
+
+        <WeightEvolutionChart weightHistory={weightHistory} currentWeight={user.weight} />
+
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Trophy className="w-4 h-4 text-[#C0FF00]" />
+            <h3 className="text-sm font-black text-white">Récords Personales</h3>
+          </div>
+          {personalRecords.length === 0 ? (
+            <p className="text-xs text-white/50 px-1">
+              Aún no hay récords registrados.
+            </p>
+          ) : (
+            personalRecords.map((pr) => (
+              <div
+                key={pr.id}
+                className="p-4 rounded-2xl bg-[#0A0A0A] border border-white/10 flex items-center justify-between gap-3"
+              >
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-white truncate">{pr.exerciseName}</p>
+                  <p className="text-[10px] uppercase font-bold text-white/40">
+                    {pr.category} • {pr.date}
+                  </p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="text-lg font-black text-[#C0FF00] font-mono">{pr.recordValue}</p>
+                  <p className="text-[10px] font-bold text-emerald-400">+{pr.progressPercent}%</p>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 p-4 sm:p-8 flex flex-col gap-8 max-w-[1600px] mx-auto w-full relative">

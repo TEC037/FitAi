@@ -38,8 +38,8 @@ export const NAV_ROUTES: NavRoute[] = [
     isMobileAction: true,
     showInMobile: true,
   },
-  { id: 'progress', label: 'Progreso', icon: TrendingUp, showInMobile: false },
+  { id: 'progress', label: 'Progreso', mobileLabel: 'Progreso', icon: TrendingUp, showInMobile: true },
   { id: 'coach', label: 'Coach IA', icon: Bot, badge: 'IA', showInMobile: true },
-  { id: 'history', label: 'Historial', icon: History, showInMobile: false },
+  { id: 'history', label: 'Historial', mobileLabel: 'Historial', icon: History, showInMobile: true },
   { id: 'profile', label: 'Perfil', icon: User, showInMobile: true },
 ];

@@ -126,7 +126,9 @@ describe('MobileNav (navegación con 1 botón)', () => {
     expect(screen.getByText('Rutina')).toBeInTheDocument();
     expect(screen.getByText('Entrenar')).toBeInTheDocument();
     expect(screen.getByText('Biblioteca')).toBeInTheDocument();
+    expect(screen.getByText('Progreso')).toBeInTheDocument();
     expect(screen.getByText('Coach IA')).toBeInTheDocument();
+    expect(screen.getByText('Historial')).toBeInTheDocument();
     expect(screen.getByText('Perfil')).toBeInTheDocument();
   });
 
