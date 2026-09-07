@@ -1,6 +1,0 @@
-{
-  "name": "FitAI Coach",
-  "description": "Plataforma PaaS inteligente para seguimiento personalizado de rutinas de ejercicio en gimnasio con entrenador personal asistido por IA.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}

@@ -10,7 +10,7 @@ import {
   Award,
   ChevronRight,
 } from 'lucide-react';
-import { useApp } from '../context/AppContext';
+import { useApp } from '../context/useApp';
 
 export const LandingPage: React.FC = () => {
   const { navigateTo, loginDemoUser } = useApp();
@@ -68,11 +68,14 @@ export const LandingPage: React.FC = () => {
         </div>
 
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight max-w-4xl leading-[1.1] mb-6">
-          Tu entrenador inteligente para <span className="text-[#C0FF00]">entrenar mejor</span>, medir tu progreso y alcanzar tus objetivos.
+          Tu entrenador inteligente para <span className="text-[#C0FF00]">entrenar mejor</span>,
+          medir tu progreso y alcanzar tus objetivos.
         </h1>
 
         <p className="text-lg sm:text-xl text-white/60 max-w-2xl font-normal leading-relaxed mb-10">
-          Supera el estancamiento en el gimnasio con rutinas hiper-personalizadas por IA, cálculo dinámico de sobrecarga progresiva y un asistente virtual que adapta cada serie en tiempo real.
+          Supera el estancamiento en el gimnasio con rutinas hiper-personalizadas por IA, cálculo
+          dinámico de sobrecarga progresiva y un asistente virtual que adapta cada serie en tiempo
+          real.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mb-16">
@@ -102,10 +105,13 @@ export const LandingPage: React.FC = () => {
               </span>
               <h2 className="text-3xl sm:text-4xl font-black mt-3 mb-2 italic">EMPUJE DINÁMICO</h2>
               <p className="text-white/60 text-sm mb-6 leading-relaxed">
-                Diseñada específicamente para hipertrofia de pectoral y tríceps con protección del manguito rotador y descansos óptimos de 90s.
+                Diseñada específicamente para hipertrofia de pectoral y tríceps con protección del
+                manguito rotador y descansos óptimos de 90s.
               </p>
               <div className="flex items-center gap-4 text-xs text-white/50">
-                <span className="flex items-center gap-1.5"><Activity className="w-4 h-4 text-[#C0FF00]" /> 6 Ejercicios</span>
+                <span className="flex items-center gap-1.5">
+                  <Activity className="w-4 h-4 text-[#C0FF00]" /> 6 Ejercicios
+                </span>
                 <span>•</span>
                 <span>65 Minutos</span>
                 <span>•</span>
@@ -115,7 +121,9 @@ export const LandingPage: React.FC = () => {
 
             <div className="md:col-span-5 bg-white/5 border border-white/10 rounded-2xl p-5 space-y-3">
               <div className="flex items-center justify-between text-xs pb-2 border-b border-white/10">
-                <span className="text-white/40 uppercase tracking-wider font-semibold">Ejercicio Actual</span>
+                <span className="text-white/40 uppercase tracking-wider font-semibold">
+                  Ejercicio Actual
+                </span>
                 <span className="text-[#C0FF00] font-bold">Serie 2 de 4</span>
               </div>
               <p className="font-bold text-base text-white">Press de Banca con Barra</p>
@@ -140,7 +148,9 @@ export const LandingPage: React.FC = () => {
       {/* How it works */}
       <section className="py-20 px-6 max-w-7xl mx-auto w-full border-t border-white/10">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <p className="text-[11px] uppercase tracking-[0.2em] text-[#C0FF00] font-bold mb-2">Paso a Paso</p>
+          <p className="text-[11px] uppercase tracking-[0.2em] text-[#C0FF00] font-bold mb-2">
+            Paso a Paso
+          </p>
           <h2 className="text-3xl sm:text-4xl font-black">¿Cómo funciona FitAI Coach?</h2>
         </div>
 
@@ -151,7 +161,8 @@ export const LandingPage: React.FC = () => {
             </div>
             <h3 className="text-xl font-bold mb-3">1. Perfil & Objetivos</h3>
             <p className="text-sm text-white/60 leading-relaxed">
-              Indica tu experiencia, días disponibles, equipo en tu gimnasio y si tienes limitaciones o lesiones previas para proteger tus articulaciones.
+              Indica tu experiencia, días disponibles, equipo en tu gimnasio y si tienes
+              limitaciones o lesiones previas para proteger tus articulaciones.
             </p>
           </div>
 
@@ -161,7 +172,8 @@ export const LandingPage: React.FC = () => {
             </div>
             <h3 className="text-xl font-bold mb-3">2. Rutina Adaptativa con IA</h3>
             <p className="text-sm text-white/60 leading-relaxed">
-              El motor algorítmico genera una planificación balanceada con selección de ejercicios, repeticiones, pesos iniciales y tiempos de descanso óptimos.
+              El motor algorítmico genera una planificación balanceada con selección de ejercicios,
+              repeticiones, pesos iniciales y tiempos de descanso óptimos.
             </p>
           </div>
 
@@ -171,7 +183,8 @@ export const LandingPage: React.FC = () => {
             </div>
             <h3 className="text-xl font-bold mb-3">3. Registro en Vivo & Feedback</h3>
             <p className="text-sm text-white/60 leading-relaxed">
-              Usa el modo entrenamiento activo en el gimnasio. Registra series, usa el cronómetro de descanso y recibe ajustes inmediatos para la próxima sesión.
+              Usa el modo entrenamiento activo en el gimnasio. Registra series, usa el cronómetro de
+              descanso y recibe ajustes inmediatos para la próxima sesión.
             </p>
           </div>
         </div>
@@ -180,7 +193,9 @@ export const LandingPage: React.FC = () => {
       {/* Benefits */}
       <section className="py-20 px-6 max-w-7xl mx-auto w-full border-t border-white/10">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <p className="text-[11px] uppercase tracking-[0.2em] text-[#C0FF00] font-bold mb-2">Ventajas Clave</p>
+          <p className="text-[11px] uppercase tracking-[0.2em] text-[#C0FF00] font-bold mb-2">
+            Ventajas Clave
+          </p>
           <h2 className="text-3xl sm:text-4xl font-black">¿Por qué entrenar con FitAI Coach?</h2>
         </div>
 
@@ -191,7 +206,8 @@ export const LandingPage: React.FC = () => {
             </div>
             <h4 className="font-bold text-base mb-2">Sobrecarga Progresiva</h4>
             <p className="text-xs text-white/60 leading-relaxed">
-              Cálculo automático de cuándo subir peso o repeticiones evitando el estancamiento muscular.
+              Cálculo automático de cuándo subir peso o repeticiones evitando el estancamiento
+              muscular.
             </p>
           </div>
 
@@ -201,7 +217,8 @@ export const LandingPage: React.FC = () => {
             </div>
             <h4 className="font-bold text-base mb-2">Prevención de Lesiones</h4>
             <p className="text-xs text-white/60 leading-relaxed">
-              Cues técnicos y alternativas inmediatas si sientes molestias articulares o fatiga extrema.
+              Cues técnicos y alternativas inmediatas si sientes molestias articulares o fatiga
+              extrema.
             </p>
           </div>
 
@@ -211,7 +228,8 @@ export const LandingPage: React.FC = () => {
             </div>
             <h4 className="font-bold text-base mb-2">Métricas y Récords (PRs)</h4>
             <p className="text-xs text-white/60 leading-relaxed">
-              Visualiza el volumen levantado, evolución de peso y récords históricos en gráficos limpios.
+              Visualiza el volumen levantado, evolución de peso y récords históricos en gráficos
+              limpios.
             </p>
           </div>
 
@@ -221,7 +239,8 @@ export const LandingPage: React.FC = () => {
             </div>
             <h4 className="font-bold text-base mb-2">Coach en tu Bolsillo 24/7</h4>
             <p className="text-xs text-white/60 leading-relaxed">
-              Pregunta dudas de biomecánica, tiempos o alternativas en el gimnasio sin esperar a nadie.
+              Pregunta dudas de biomecánica, tiempos o alternativas en el gimnasio sin esperar a
+              nadie.
             </p>
           </div>
         </div>
@@ -234,7 +253,8 @@ export const LandingPage: React.FC = () => {
             ¿Listo para llevar tu entrenamiento al siguiente nivel?
           </h2>
           <p className="text-white/60 max-w-xl mx-auto text-sm sm:text-base mb-8">
-            Únete a la plataforma que combina la ciencia de la hipertrofia con la precisión de la inteligencia artificial.
+            Únete a la plataforma que combina la ciencia de la hipertrofia con la precisión de la
+            inteligencia artificial.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button
@@ -257,7 +277,8 @@ export const LandingPage: React.FC = () => {
       <footer className="mt-auto border-t border-white/10 py-8 px-6 text-center text-xs text-white/40">
         <p>© 2026 FitAI Coach. Prototipo PaaS de entrenamiento con Inteligencia Artificial.</p>
         <p className="mt-1">
-          Aviso: Las recomendaciones son orientativas y no reemplazan la valoración de un profesional de la salud.
+          Aviso: Las recomendaciones son orientativas y no reemplazan la valoración de un
+          profesional de la salud.
         </p>
       </footer>
     </div>

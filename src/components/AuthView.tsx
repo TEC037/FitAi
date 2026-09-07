@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
-import { Zap, Mail, Lock, User, ArrowLeft, ArrowRight, CheckCircle2, ShieldCheck } from 'lucide-react';
-import { useApp } from '../context/AppContext';
+import {
+  Zap,
+  Mail,
+  Lock,
+  User,
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle2,
+  ShieldCheck,
+} from 'lucide-react';
+import { useApp } from '../context/useApp';
 
 export const AuthView: React.FC = () => {
   const { navigateTo, loginDemoUser, updateUserProfile } = useApp();
@@ -73,7 +82,9 @@ export const AuthView: React.FC = () => {
             <Zap className="w-7 h-7 text-black fill-current" />
           </div>
           <h1 className="text-2xl font-black text-white">FitAI Coach</h1>
-          <p className="text-xs text-white/50 mt-1">Plataforma PaaS para entrenamiento inteligente</p>
+          <p className="text-xs text-white/50 mt-1">
+            Plataforma PaaS para entrenamiento inteligente
+          </p>
         </div>
 
         {/* Tab switchers */}
@@ -118,7 +129,9 @@ export const AuthView: React.FC = () => {
         {tab === 'login' && (
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-white/70 mb-1.5">Correo Electrónico</label>
+              <label className="block text-xs font-semibold text-white/70 mb-1.5">
+                Correo Electrónico
+              </label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-white/40 absolute left-3.5 top-3.5" />
                 <input
@@ -200,7 +213,9 @@ export const AuthView: React.FC = () => {
         {tab === 'register' && (
           <form onSubmit={handleRegister} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-white/70 mb-1.5">Nombre Completo</label>
+              <label className="block text-xs font-semibold text-white/70 mb-1.5">
+                Nombre Completo
+              </label>
               <div className="relative">
                 <User className="w-4 h-4 text-white/40 absolute left-3.5 top-3.5" />
                 <input
@@ -214,7 +229,9 @@ export const AuthView: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-white/70 mb-1.5">Correo Electrónico</label>
+              <label className="block text-xs font-semibold text-white/70 mb-1.5">
+                Correo Electrónico
+              </label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-white/40 absolute left-3.5 top-3.5" />
                 <input
@@ -242,7 +259,8 @@ export const AuthView: React.FC = () => {
             </div>
 
             <p className="text-[11px] text-white/50 leading-relaxed">
-              Al registrarte, pasarás al Onboarding de 5 pasos para calibrar tu rutina personalizada con el Coach IA.
+              Al registrarte, pasarás al Onboarding de 5 pasos para calibrar tu rutina personalizada
+              con el Coach IA.
             </p>
 
             <button
@@ -260,7 +278,8 @@ export const AuthView: React.FC = () => {
           <div className="space-y-4">
             <h3 className="text-lg font-bold text-white">Recuperación de Contraseña</h3>
             <p className="text-xs text-white/60 leading-relaxed">
-              Ingresa el correo asociado a tu cuenta y te enviaremos un enlace de restablecimiento seguro.
+              Ingresa el correo asociado a tu cuenta y te enviaremos un enlace de restablecimiento
+              seguro.
             </p>
 
             {recoverySent ? (
@@ -268,7 +287,8 @@ export const AuthView: React.FC = () => {
                 <CheckCircle2 className="w-8 h-8 text-[#C0FF00] mx-auto" />
                 <p className="text-xs font-bold text-white">¡Enlace simulado enviado!</p>
                 <p className="text-[11px] text-white/70">
-                  Hemos enviado las instrucciones para restablecer tu contraseña a <strong>{email}</strong>.
+                  Hemos enviado las instrucciones para restablecer tu contraseña a{' '}
+                  <strong>{email}</strong>.
                 </p>
                 <button
                   onClick={() => {
@@ -283,7 +303,9 @@ export const AuthView: React.FC = () => {
             ) : (
               <form onSubmit={handleForgot} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-white/70 mb-1.5">Correo Registrado</label>
+                  <label className="block text-xs font-semibold text-white/70 mb-1.5">
+                    Correo Registrado
+                  </label>
                   <div className="relative">
                     <Mail className="w-4 h-4 text-white/40 absolute left-3.5 top-3.5" />
                     <input

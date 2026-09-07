@@ -2,21 +2,21 @@ import React, { useState } from 'react';
 import {
   History,
   Calendar,
-  Clock,
   Flame,
   ChevronDown,
   ChevronUp,
   Sparkles,
   Dumbbell,
-  CheckCircle2,
-  TrendingUp,
   MessageSquare,
   Heart,
-  Activity,
   Zap,
 } from 'lucide-react';
-import { useApp } from '../context/AppContext';
-import { WorkoutSessionLog } from '../types';
+import { useApp } from '../context/useApp';
+import { formatIsoDate } from '../utils/format';
+
+const DEFAULT_AVERAGE_HR_BPM = 142;
+const DEFAULT_PEAK_HR_BPM = 165;
+const DEFAULT_ALLOMETRIC_POWER_W = 490;
 
 export const HistoryView: React.FC = () => {
   const { history, startWorkout } = useApp();
@@ -38,7 +38,9 @@ export const HistoryView: React.FC = () => {
             <History className="w-3.5 h-3.5" />
             <span>Registro Cronológico de Sesiones</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black text-white">Historial de Entrenamientos</h1>
+          <h1 className="text-3xl sm:text-4xl font-black text-white">
+            Historial de Entrenamientos
+          </h1>
           <p className="text-sm text-white/60 mt-1">
             Revisa cada serie realizada, sensaciones registradas y los ajustes del Coach IA.
           </p>
@@ -81,7 +83,7 @@ export const HistoryView: React.FC = () => {
                   <div>
                     <div className="flex items-center gap-2 mb-1 text-xs text-white/40">
                       <Calendar className="w-3.5 h-3.5 text-[#C0FF00]" />
-                      <span className="font-mono">{log.date}</span>
+                      <span className="font-mono">{formatIsoDate(log.date)}</span>
                       <span>•</span>
                       <span className="text-[#C0FF00] font-semibold">RPE {log.averageRpe}</span>
                     </div>
@@ -111,13 +113,18 @@ export const HistoryView: React.FC = () => {
                       <div className="px-2">
                         <span className="text-[9px] text-red-400 uppercase block">Pulso</span>
                         <span className="font-black text-red-400 font-mono">
-                          {log.averageHeartRate || 142} <span className="text-[8px] font-normal text-white/40">bpm</span>
+                          {log.averageHeartRate ?? DEFAULT_AVERAGE_HR_BPM}{' '}
+                          <span className="text-[8px] font-normal text-white/40">bpm</span>
                         </span>
                       </div>
                     </div>
 
                     <button className="p-2 rounded-xl bg-white/5 text-white/50 hover:text-white transition-colors">
-                      {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                      {isExpanded ? (
+                        <ChevronUp className="w-4 h-4" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4" />
+                      )}
                     </button>
                   </div>
                 </div>
@@ -136,9 +143,9 @@ export const HistoryView: React.FC = () => {
                             Ritmo Cardíaco (M^-1/4)
                           </span>
                           <span className="font-mono font-black text-white text-sm">
-                            {log.averageHeartRate || 142} bpm{' '}
+                            {log.averageHeartRate ?? DEFAULT_AVERAGE_HR_BPM} bpm{' '}
                             <span className="text-[10px] text-white/40 font-normal">
-                              (Pico: {log.peakHeartRate || 165})
+                              (Pico: {log.peakHeartRate ?? DEFAULT_PEAK_HR_BPM})
                             </span>
                           </span>
                         </div>
@@ -153,7 +160,7 @@ export const HistoryView: React.FC = () => {
                             Calorías Kleiber (M^3/4)
                           </span>
                           <span className="font-mono font-black text-[#C0FF00] text-sm">
-                            {log.allometricCalories || log.caloriesBurned} kcal
+                            {log.allometricCalories ?? log.caloriesBurned} kcal
                           </span>
                         </div>
                       </div>
@@ -167,7 +174,7 @@ export const HistoryView: React.FC = () => {
                             Potencia Metabólica
                           </span>
                           <span className="font-mono font-black text-amber-400 text-sm">
-                            {log.allometricPowerWatts || 490} W
+                            {log.allometricPowerWatts ?? DEFAULT_ALLOMETRIC_POWER_W} W
                           </span>
                         </div>
                       </div>
@@ -191,9 +198,7 @@ export const HistoryView: React.FC = () => {
                           <MessageSquare className="w-3.5 h-3.5" />
                           <span>Observaciones del atleta:</span>
                         </div>
-                        <p className="text-white/80 leading-relaxed">
-                          "{log.userObservations}"
-                        </p>
+                        <p className="text-white/80 leading-relaxed">"{log.userObservations}"</p>
                       </div>
                     )}
 
@@ -225,7 +230,9 @@ export const HistoryView: React.FC = () => {
                                   "{s.sensation}"
                                 </span>
                               )}
-                              <span className="text-[10px] text-white/30 font-mono">{s.completedAt}</span>
+                              <span className="text-[10px] text-white/30 font-mono">
+                                {s.completedAt}
+                              </span>
                             </div>
                           ))}
                         </div>

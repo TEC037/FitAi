@@ -1,20 +1,50 @@
 /**
  * Allometric Scaling Engine (Escala Alométrica Biológica)
- * 
+ *
  * Implementa las leyes de escala biológica basadas en alometría:
  * 1. Escala de 1/4 y -1/4 (Quarter-Power Law - West, Brown & Enquist / Schmidt-Nielsen):
  *    - Frecuencia cardíaca en reposo: f_HR ∝ M^(-1/4)
  *    - Periodo del ciclo cardíaco: τ ∝ M^(1/4)
  *    - Constante de tiempo de recuperación cardíaca: τ_rec ∝ M^(1/4)
- * 
+ *
  * 2. Escala de 3/4 (Ley de Kleiber - 1932):
  *    - Tasa metabólica basal (BMR): BMR ∝ M^(3/4) = 70 * M^0.75 kcal/día
  *    - Gasto calórico activo y potencia metabólica en entrenamiento: P_met ∝ M^(3/4)
- * 
+ *
  * 3. Escala geométrica de 2/3 (Jaric / Siff - Allometric Strength Index):
  *    - Fuerza muscular isométrica y transversal: S ∝ M^(2/3)
  *    - Normalización de fuerza relativa a masa de referencia (70 kg)
  */
+
+// Perfil fisiológico de referencia (masa humana estándar internacional Ainsworth)
+const REFERENCE_BODYWEIGHT_KG = 70;
+const REFERENCE_RESTING_HR_BPM = 68;
+const REFERENCE_HR_CYCLE_MIN_SEC = 60;
+const REFERENCE_HEART_RATE_RECOVERY_SEC = 42;
+
+// Límites de saneamiento antropométrico
+const MIN_BODYWEIGHT_KG = 35;
+const MAX_BODYWEIGHT_KG = 220;
+const MIN_USER_AGE = 14;
+const MAX_USER_AGE = 95;
+const MIN_WORKOUT_DURATION_MIN = 1;
+
+// Metabolismo alométrico (Ley de Kleiber x^3/4)
+const KLEIBER_BMR_CONSTANT = 70;
+const DEFAULT_ACTIVITY_LEVEL = 1.55;
+const PAL_SEDENTARY = 1.2;
+const PAL_LIGHT = 1.375;
+const PAL_MODERATE = 1.55;
+const PAL_VERY_ACTIVE = 1.725;
+const PAL_ATHLETE = 1.9;
+const ACTIVITY_GOAL_ADJUSTMENT = 0.05;
+const CALORIE_BURN_RATE_PER_MIN_BASE = 7.2;
+const CALORIE_MASS_SCALE_MET = 6.0;
+const CALORIE_FLUX_FACTOR = 1.15;
+const JOULES_PER_KCAL = 4184;
+
+import { FitnessGoal } from '../types';
+import { DEFAULT_AVERAGE_RPE } from '../config/constants';
 
 export interface CardiacZone {
   zone: number;
@@ -36,22 +66,59 @@ export interface AllometricProfile {
   gender: string;
 
   // Escala -1/4 y 1/4: Dinámica Cardíaca
-  allometricRestingHr: number;        // f_HR ∝ M^(-0.25)
-  cardiacCycleDurationSec: number;    // τ ∝ M^(0.25)
-  maxHeartRateBpm: number;            // Tanaka / Gellish
-  heartRateReserve: number;           // HR_max - HR_rest
+  allometricRestingHr: number; // f_HR ∝ M^(-0.25)
+  cardiacCycleDurationSec: number; // τ ∝ M^(0.25)
+  maxHeartRateBpm: number; // Tanaka / Gellish
+  heartRateReserve: number; // HR_max - HR_rest
   cardiacRecoveryHalfLifeSec: number; // τ_rec ∝ M^(0.25)
   zones: CardiacZone[];
 
   // Escala 3/4: Metabolismo y Energía (Ley de Kleiber)
-  kleiberBmrKcal: number;             // 70 * M^(0.75)
-  linearBmrComparisonKcal: number;    // Harris-Benedict tradicional para contraste
-  bmrAllometricDeltaKcal: number;     // Diferencia de precisión
-  allometricTdeeKcal: number;         // TDEE = Kleiber BMR * PAL
+  kleiberBmrKcal: number; // 70 * M^(0.75)
+  linearBmrComparisonKcal: number; // Harris-Benedict tradicional para contraste
+  bmrAllometricDeltaKcal: number; // Diferencia de precisión
+  allometricTdeeKcal: number; // TDEE = Kleiber BMR * PAL
   allometricCalorieBurnPerMinuteAtMet6: number; // Cal/min alométrica
 
   // Escala 2/3: Fuerza Isométrica y Transversal (Jaric / Siff)
-  strengthScalingFactor: number;      // (70 / M)^(2/3)
+  strengthScalingFactor: number; // (70 / M)^(2/3)
+}
+
+/**
+ * Traduce los días de entrenamiento semanales a un factor de actividad física (PAL)
+ * y aplica un ajuste según el objetivo del usuario. Vincula el TDEE real con el
+ * perfil del usuario en vez de usar el PAL por defecto (1.55).
+ */
+export function resolveActivityLevel(
+  daysPerWeek: number,
+  goal: FitnessGoal = 'hipertrofia'
+): number {
+  const safeDays = Math.max(0, Math.min(7, daysPerWeek));
+
+  const palLevels: [number, number][] = [
+    [0, PAL_SEDENTARY],
+    [2, PAL_LIGHT],
+    [4, PAL_MODERATE],
+    [6, PAL_VERY_ACTIVE],
+    [7, PAL_ATHLETE],
+  ];
+
+  let pal = DEFAULT_ACTIVITY_LEVEL;
+  for (let i = palLevels.length - 1; i >= 0; i--) {
+    if (safeDays >= palLevels[i][0]) {
+      pal = palLevels[i][1];
+      break;
+    }
+  }
+
+  // Ajuste por demanda energética del objetivo (déficit/superávit)
+  if (goal === 'perdida_grasa') {
+    pal -= ACTIVITY_GOAL_ADJUSTMENT;
+  } else if (goal === 'hipertrofia' || goal === 'fuerza') {
+    pal += ACTIVITY_GOAL_ADJUSTMENT;
+  }
+
+  return Number(pal.toFixed(2));
 }
 
 /**
@@ -62,19 +129,23 @@ export function calculateAllometricProfile(
   age: number = 28,
   heightCm: number = 175,
   gender: string = 'Masculino',
-  activityLevel: number = 1.55 // Actividad moderada-alta
+  activityLevel: number = DEFAULT_ACTIVITY_LEVEL
 ): AllometricProfile {
-  const safeWeight = Math.max(35, Math.min(220, weightKg));
-  const safeAge = Math.max(14, Math.min(95, age));
-  const refWeight = 70; // Masa humana de referencia internacional (70 kg)
+  const safeWeight = Math.max(MIN_BODYWEIGHT_KG, Math.min(MAX_BODYWEIGHT_KG, weightKg));
+  const safeAge = Math.max(MIN_USER_AGE, Math.min(MAX_USER_AGE, age));
+  const refWeight = REFERENCE_BODYWEIGHT_KG;
 
   // 1. ESCALA -1/4 y 1/4: FRECUENCIA CARDÍACA Y CICLO BIOLÓGICO
   // f_HR(M) = f_0 * (M / 70)^(-0.25)
   // Referencia en reposo para 70kg: 68 bpm
-  const allometricRestingHr = Math.round(68 * Math.pow(safeWeight / refWeight, -0.25));
+  const allometricRestingHr = Math.round(
+    REFERENCE_RESTING_HR_BPM * Math.pow(safeWeight / refWeight, -0.25)
+  );
 
   // Duración del ciclo cardíaco: τ = 60 / f_HR ∝ M^(0.25)
-  const cardiacCycleDurationSec = Number((60 / allometricRestingHr).toFixed(3));
+  const cardiacCycleDurationSec = Number(
+    (REFERENCE_HR_CYCLE_MIN_SEC / allometricRestingHr).toFixed(3)
+  );
 
   // Frecuencia cardíaca máxima (Ecuación Tanaka / Gellish adaptada alométricamente)
   const maxHeartRateBpm = Math.round(208 - 0.7 * safeAge);
@@ -84,7 +155,9 @@ export function calculateAllometricProfile(
 
   // Constante de tiempo de recuperación cardíaca post-esfuerzo: τ_rec ∝ M^(0.25)
   // Una persona de 70kg tiene una constante base de ~42 segundos
-  const cardiacRecoveryHalfLifeSec = Math.round(42 * Math.pow(safeWeight / refWeight, 0.25));
+  const cardiacRecoveryHalfLifeSec = Math.round(
+    REFERENCE_HEART_RATE_RECOVERY_SEC * Math.pow(safeWeight / refWeight, 0.25)
+  );
 
   // Zonas cardíacas de Karvonen calibradas con factor alométrico
   const zones: CardiacZone[] = [
@@ -94,7 +167,8 @@ export function calculateAllometricProfile(
       percentRange: '50% - 60% HRR',
       minBpm: Math.round(allometricRestingHr + heartRateReserve * 0.5),
       maxBpm: Math.round(allometricRestingHr + heartRateReserve * 0.6),
-      description: 'Favorece el retorno venoso, eliminación de lactato y regeneración mitocondrial.',
+      description:
+        'Favorece el retorno venoso, eliminación de lactato y regeneración mitocondrial.',
       metabolicFuel: 'Lípidos (Ácidos grasos libres >85%)',
       color: '#38BDF8', // Celeste
       allometricFactor: Math.pow(safeWeight / refWeight, 0.75) * 0.55,
@@ -127,7 +201,8 @@ export function calculateAllometricProfile(
       percentRange: '80% - 90% HRR',
       minBpm: Math.round(allometricRestingHr + heartRateReserve * 0.8),
       maxBpm: Math.round(allometricRestingHr + heartRateReserve * 0.9),
-      description: 'Acumulación de metabolitos, esfuerzo máximo sostenido en series pesadas (RPE 8-9).',
+      description:
+        'Acumulación de metabolitos, esfuerzo máximo sostenido en series pesadas (RPE 8-9).',
       metabolicFuel: 'Glucógeno muscular predominante (>80%)',
       color: '#FB923C', // Naranja
       allometricFactor: Math.pow(safeWeight / refWeight, 0.75) * 0.85,
@@ -147,7 +222,7 @@ export function calculateAllometricProfile(
 
   // 2. ESCALA 3/4: METABOLISMO Y ENERGÍA (LEY DE KLEIBER)
   // BMR = 70 * M^(0.75) kcal/día
-  const kleiberBmrKcal = Math.round(70 * Math.pow(safeWeight, 0.75));
+  const kleiberBmrKcal = Math.round(KLEIBER_BMR_CONSTANT * Math.pow(safeWeight, 0.75));
 
   // Comparativa con modelo lineal convencional (Harris-Benedict simplificado)
   const isMale = gender.toLowerCase() !== 'femenino';
@@ -161,7 +236,9 @@ export function calculateAllometricProfile(
   // Gasto calórico por minuto a MET 6.0 (entrenamiento con cargas convencional)
   // Tasa cal/min = 1.15 * (M / 70)^(0.75) * 6.0
   const allometricCalorieBurnPerMinuteAtMet6 = Number(
-    (1.15 * Math.pow(safeWeight / refWeight, 0.75) * 6.0).toFixed(2)
+    (CALORIE_FLUX_FACTOR * Math.pow(safeWeight / refWeight, 0.75) * CALORIE_MASS_SCALE_MET).toFixed(
+      2
+    )
   );
 
   // 3. ESCALA 2/3: FUERZA ALOMÉTRICA (Jaric / Siff)
@@ -190,36 +267,6 @@ export function calculateAllometricProfile(
 }
 
 /**
- * Obtiene la zona cardíaca alométrica correspondiente a un valor actual de BPM.
- */
-export function getAllometricZoneForBpm(
-  bpm: number,
-  profile: AllometricProfile
-): CardiacZone {
-  if (bpm < profile.zones[0].minBpm) {
-    return {
-      zone: 0,
-      name: 'Reposo Fisiológico Basal',
-      percentRange: '<50% HRR',
-      minBpm: profile.allometricRestingHr,
-      maxBpm: profile.zones[0].minBpm,
-      description: 'Frecuencia cardíaca en reposo gobernada por escala de 1/4.',
-      metabolicFuel: 'Lípidos basales',
-      color: '#94A3B8', // Gris azulado
-      allometricFactor: 0.3,
-    };
-  }
-
-  for (let i = profile.zones.length - 1; i >= 0; i--) {
-    if (bpm >= profile.zones[i].minBpm) {
-      return profile.zones[i];
-    }
-  }
-
-  return profile.zones[0];
-}
-
-/**
  * Simula de forma fisiológicamente fiel el pulso cardíaco alométrico dinámico.
  * Durante una serie activa: sube con la intensidad (RPE) y masa muscular según x^(3/4).
  * Durante el descanso: decae exponencialmente según la constante biológica de recuperación τ_rec ∝ M^(1/4).
@@ -235,7 +282,12 @@ export function computeDynamicHeartRate(
   // Factor de masa muscular involucrada (piernas y espalda reclutan mayor lecho vascular)
   let muscleFactor = 1.0;
   const lower = muscleGroup.toLowerCase();
-  if (lower.includes('pierna') || lower.includes('sentadilla') || lower.includes('muerto') || lower.includes('quad')) {
+  if (
+    lower.includes('pierna') ||
+    lower.includes('sentadilla') ||
+    lower.includes('muerto') ||
+    lower.includes('quad')
+  ) {
     muscleFactor = 1.15; // Mayor gasto cardíaco
   } else if (lower.includes('espalda') || lower.includes('remo')) {
     muscleFactor = 1.08;
@@ -260,8 +312,7 @@ export function computeDynamicHeartRate(
     const metabolicDrive = Math.pow(intensity, 0.75);
 
     calculatedBpm =
-      profile.allometricRestingHr +
-      profile.heartRateReserve * metabolicDrive * 0.88 * muscleFactor;
+      profile.allometricRestingHr + profile.heartRateReserve * metabolicDrive * 0.88 * muscleFactor;
   }
 
   // Clampear entre reposo y HR max con pequeña variación biológica natural
@@ -270,7 +321,27 @@ export function computeDynamicHeartRate(
     Math.max(profile.allometricRestingHr, Math.round(calculatedBpm))
   );
 
-  const zone = getAllometricZoneForBpm(boundedBpm, profile);
+  let zone: CardiacZone = profile.zones[0];
+  if (boundedBpm < profile.zones[0].minBpm) {
+    zone = {
+      zone: 0,
+      name: 'Reposo Fisiológico Basal',
+      percentRange: '<50% HRR',
+      minBpm: profile.allometricRestingHr,
+      maxBpm: profile.zones[0].minBpm,
+      description: 'Frecuencia cardíaca en reposo gobernada por escala de 1/4.',
+      metabolicFuel: 'Lípidos basales',
+      color: '#94A3B8', // Gris azulado
+      allometricFactor: 0.3,
+    };
+  } else {
+    for (let i = profile.zones.length - 1; i >= 0; i--) {
+      if (boundedBpm >= profile.zones[i].minBpm) {
+        zone = profile.zones[i];
+        break;
+      }
+    }
+  }
   // Periodo instantáneo del latido cardíaco: T = 60000 / BPM ms
   const cyclePeriodMs = Math.round(60000 / Math.max(40, boundedBpm));
 
@@ -290,7 +361,7 @@ export function computeDynamicHeartRate(
 export function calculateAllometricWorkoutCalories(
   weightKg: number,
   durationMinutes: number,
-  averageRpe: number = 8,
+  averageRpe: number = DEFAULT_AVERAGE_RPE,
   totalSets: number = 15
 ): {
   allometricCalories: number;
@@ -298,9 +369,9 @@ export function calculateAllometricWorkoutCalories(
   metabolicPowerWatts: number;
   kleiberScalingRatio: number;
 } {
-  const safeWeight = Math.max(35, Math.min(220, weightKg));
-  const safeDuration = Math.max(1, durationMinutes);
-  const refWeight = 70;
+  const safeWeight = Math.max(MIN_BODYWEIGHT_KG, Math.min(MAX_BODYWEIGHT_KG, weightKg));
+  const safeDuration = Math.max(MIN_WORKOUT_DURATION_MIN, durationMinutes);
+  const refWeight = REFERENCE_BODYWEIGHT_KG;
 
   // Escala alométrica de masa para energía: (M / 70)^(3/4)
   const kleiberMassScale = Math.pow(safeWeight / refWeight, 0.75);
@@ -313,7 +384,7 @@ export function calculateAllometricWorkoutCalories(
   const densityBonus = Math.min(1.25, 1.0 + (totalSets / 20) * 0.15);
 
   // Tasa calórica alométrica base: ~7.2 kcal/min para 70kg a RPE 8
-  const baseBurnRatePerMin = 7.2;
+  const baseBurnRatePerMin = CALORIE_BURN_RATE_PER_MIN_BASE;
   const allometricCalories = Math.round(
     safeDuration * baseBurnRatePerMin * kleiberMassScale * rpeIntensityFactor * densityBonus
   );
@@ -325,7 +396,7 @@ export function calculateAllometricWorkoutCalories(
 
   // Potencia metabólica media equivalente en Vatios (Watts)
   // 1 kcal = 4184 Joules; P = (E_joules) / (duration * 60)
-  const totalJoules = allometricCalories * 4184;
+  const totalJoules = allometricCalories * JOULES_PER_KCAL;
   const metabolicPowerWatts = Math.round(totalJoules / (safeDuration * 60));
 
   return {
@@ -345,14 +416,14 @@ export function calculateAllometricStrengthScore(
   liftedWeightKg: number,
   bodyweightKg: number
 ): {
-  allometricScore: number;       // Load / M^(2/3)
-  normalized70kgLoad: number;    // Carga equivalente si pesara 70 kg
-  linearStrengthRatio: number;   // Carga / Peso corporal (lineal)
+  allometricScore: number; // Load / M^(2/3)
+  normalized70kgLoad: number; // Carga equivalente si pesara 70 kg
+  linearStrengthRatio: number; // Carga / Peso corporal (lineal)
   classification: string;
 } {
-  const safeBodyweight = Math.max(35, Math.min(220, bodyweightKg));
+  const safeBodyweight = Math.max(MIN_BODYWEIGHT_KG, Math.min(MAX_BODYWEIGHT_KG, bodyweightKg));
   const safeLift = Math.max(0, liftedWeightKg);
-  const refWeight = 70;
+  const refWeight = REFERENCE_BODYWEIGHT_KG;
 
   // Escala geométrica de sección transversal: M^(2/3)
   const geometricMuscleAreaFactor = Math.pow(safeBodyweight, 2 / 3);

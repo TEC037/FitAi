@@ -1,19 +1,43 @@
-import React, { useState } from 'react';
-import { AppProvider, useApp } from './context/AppContext';
-import { LandingPage } from './components/LandingPage';
-import { AuthView } from './components/AuthView';
-import { OnboardingFlow } from './components/OnboardingFlow';
-import { DashboardView } from './components/DashboardView';
-import { RoutineView } from './components/RoutineView';
-import { ActiveWorkoutView } from './components/ActiveWorkoutView';
-import { CoachAIView } from './components/CoachAIView';
-import { ProgressView } from './components/ProgressView';
-import { HistoryView } from './components/HistoryView';
-import { ProfileView } from './components/ProfileView';
-import { ExerciseDatabaseView } from './components/ExerciseDatabaseView';
+import React, { Suspense, lazy, useState } from 'react';
+import { AppProvider } from './context/AppContext';
+import { useApp } from './context/useApp';
 import { SidebarNav } from './components/SidebarNav';
 import { MobileNav } from './components/MobileNav';
 import { SafetyModal } from './components/SafetyModal';
+import { PageLoader } from './components/PageLoader';
+import { ErrorBoundary } from './components/ErrorBoundary';
+
+const LandingPage = lazy(() =>
+  import('./components/LandingPage').then((m) => ({ default: m.LandingPage }))
+);
+const AuthView = lazy(() => import('./components/AuthView').then((m) => ({ default: m.AuthView })));
+const OnboardingFlow = lazy(() =>
+  import('./components/OnboardingFlow').then((m) => ({ default: m.OnboardingFlow }))
+);
+const DashboardView = lazy(() =>
+  import('./components/DashboardView').then((m) => ({ default: m.DashboardView }))
+);
+const RoutineView = lazy(() =>
+  import('./components/RoutineView').then((m) => ({ default: m.RoutineView }))
+);
+const ActiveWorkoutView = lazy(() =>
+  import('./components/ActiveWorkoutView').then((m) => ({ default: m.ActiveWorkoutView }))
+);
+const CoachAIView = lazy(() =>
+  import('./components/CoachAIView').then((m) => ({ default: m.CoachAIView }))
+);
+const ProgressView = lazy(() =>
+  import('./components/ProgressView').then((m) => ({ default: m.ProgressView }))
+);
+const HistoryView = lazy(() =>
+  import('./components/HistoryView').then((m) => ({ default: m.HistoryView }))
+);
+const ProfileView = lazy(() =>
+  import('./components/ProfileView').then((m) => ({ default: m.ProfileView }))
+);
+const ExerciseDatabaseView = lazy(() =>
+  import('./components/ExerciseDatabaseView').then((m) => ({ default: m.ExerciseDatabaseView }))
+);
 
 const AppContent: React.FC = () => {
   const { currentScreen, isAuthenticated } = useApp();
@@ -23,28 +47,34 @@ const AppContent: React.FC = () => {
   if (!isAuthenticated) {
     if (currentScreen === 'auth') {
       return (
-        <>
-          <AuthView />
-          <SafetyModal isOpen={isSafetyModalOpen} onClose={() => setIsSafetyModalOpen(false)} />
-        </>
+        <ErrorBoundary>
+          <Suspense fallback={<PageLoader />}>
+            <AuthView />
+            <SafetyModal isOpen={isSafetyModalOpen} onClose={() => setIsSafetyModalOpen(false)} />
+          </Suspense>
+        </ErrorBoundary>
       );
     }
     // Default unauthenticated is Landing Page
     return (
-      <>
-        <LandingPage />
-        <SafetyModal isOpen={isSafetyModalOpen} onClose={() => setIsSafetyModalOpen(false)} />
-      </>
+      <ErrorBoundary>
+        <Suspense fallback={<PageLoader />}>
+          <LandingPage />
+          <SafetyModal isOpen={isSafetyModalOpen} onClose={() => setIsSafetyModalOpen(false)} />
+        </Suspense>
+      </ErrorBoundary>
     );
   }
 
   // If user is in onboarding flow: Full screen stepper
   if (currentScreen === 'onboarding') {
     return (
-      <>
-        <OnboardingFlow />
-        <SafetyModal isOpen={isSafetyModalOpen} onClose={() => setIsSafetyModalOpen(false)} />
-      </>
+      <ErrorBoundary>
+        <Suspense fallback={<PageLoader />}>
+          <OnboardingFlow />
+          <SafetyModal isOpen={isSafetyModalOpen} onClose={() => setIsSafetyModalOpen(false)} />
+        </Suspense>
+      </ErrorBoundary>
     );
   }
 
@@ -58,16 +88,20 @@ const AppContent: React.FC = () => {
 
       {/* Main Scrollable View Area */}
       <main className="flex-1 overflow-y-auto pb-24 md:pb-8 flex flex-col">
-        {currentScreen === 'dashboard' && <DashboardView />}
-        {currentScreen === 'routine' && <RoutineView />}
-        {currentScreen === 'exercises' && <ExerciseDatabaseView />}
-        {currentScreen === 'workout' && <ActiveWorkoutView />}
-        {currentScreen === 'coach' && <CoachAIView />}
-        {currentScreen === 'progress' && <ProgressView />}
-        {currentScreen === 'history' && <HistoryView />}
-        {currentScreen === 'profile' && (
-          <ProfileView onOpenSafetyModal={() => setIsSafetyModalOpen(true)} />
-        )}
+        <ErrorBoundary>
+          <Suspense fallback={<PageLoader />}>
+            {currentScreen === 'dashboard' && <DashboardView />}
+            {currentScreen === 'routine' && <RoutineView />}
+            {currentScreen === 'exercises' && <ExerciseDatabaseView />}
+            {currentScreen === 'workout' && <ActiveWorkoutView />}
+            {currentScreen === 'coach' && <CoachAIView />}
+            {currentScreen === 'progress' && <ProgressView />}
+            {currentScreen === 'history' && <HistoryView />}
+            {currentScreen === 'profile' && (
+              <ProfileView onOpenSafetyModal={() => setIsSafetyModalOpen(true)} />
+            )}
+          </Suspense>
+        </ErrorBoundary>
       </main>
 
       {/* Mobile Bottom Navigation Bar */}

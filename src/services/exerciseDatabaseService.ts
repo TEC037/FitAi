@@ -1,70 +1,73 @@
 import { DatasetExercise, Exercise } from '../types';
-import rawDataset from '../data/exercisesDatabase.json';
-
 export const DATASET_GITHUB_REPO = 'https://github.com/hasaneyldrm/exercises-dataset';
 export const DATASET_CDN_BASE = 'https://cdn.jsdelivr.net/gh/hasaneyldrm/exercises-dataset@main/';
-export const DATASET_RAW_BASE = 'https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/';
+export const DATASET_RAW_BASE =
+  'https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/';
 
-export const EXERCISE_DATABASE: DatasetExercise[] = rawDataset as DatasetExercise[];
+export let EXERCISE_DATABASE: DatasetExercise[] = [];
+
+export const setExerciseDatabase = (data: DatasetExercise[]) => {
+  EXERCISE_DATABASE = data;
+};
 
 // Category translations
 export const CATEGORY_TRANSLATIONS: Record<string, string> = {
-  'chest': 'Pecho',
-  'back': 'Espalda',
+  chest: 'Pecho',
+  back: 'Espalda',
   'upper legs': 'Piernas (Cuádriceps e Isquios)',
   'lower legs': 'Pantorrillas',
-  'shoulders': 'Hombros',
+  shoulders: 'Hombros',
   'upper arms': 'Brazos (Bíceps y Tríceps)',
   'lower arms': 'Antebrazos',
-  'waist': 'Cintura y Abdomen',
-  'cardio': 'Cardiovascular',
-  'neck': 'Cuello',
+  waist: 'Cintura y Abdomen',
+  cardio: 'Cardiovascular',
+  neck: 'Cuello',
 };
 
 // Equipment translations
 export const EQUIPMENT_TRANSLATIONS: Record<string, string> = {
-  'barbell': 'Barra',
-  'dumbbell': 'Mancuernas',
+  barbell: 'Barra',
+  dumbbell: 'Mancuernas',
   'body weight': 'Peso Corporal',
-  'cable': 'Poleas',
+  cable: 'Poleas',
   'leverage machine': 'Máquina de Palanca',
   'smith machine': 'Máquina Multipower',
-  'band': 'Banda Elástica',
+  band: 'Banda Elástica',
   'resistance band': 'Banda de Resistencia',
-  'kettlebell': 'Pesa Rusa (Kettlebell)',
+  kettlebell: 'Pesa Rusa (Kettlebell)',
   'ez barbell': 'Barra Z',
-  'roller': 'Rodillo (Foam Roller)',
+  roller: 'Rodillo (Foam Roller)',
   'medicine ball': 'Balón Medicinal',
   'stability ball': 'Pelota de Estabilidad (Fitball)',
-  'assisted': 'Asistido por Máquina',
-  'rope': 'Cuerda',
+  assisted: 'Asistido por Máquina',
+  rope: 'Cuerda',
   'wheel roller': 'Rueda Abdominal',
   'stationary bike': 'Bicicleta Estática',
   'trap bar': 'Barra Hexagonal (Trap Bar)',
   'sled machine': 'Trineo de Empuje',
   'bosu ball': 'Bosu Ball',
-  'weighted': 'Con Lastre',
+  weighted: 'Con Lastre',
 };
 
 // Target muscle translations
 export const TARGET_TRANSLATIONS: Record<string, string> = {
-  'pectorals': 'Pectorales',
-  'lats': 'Dorsal Ancho',
-  'delts': 'Deltoides',
-  'biceps': 'Bíceps',
-  'triceps': 'Tríceps',
-  'glutes': 'Glúteos',
-  'quads': 'Cuádriceps',
-  'hamstrings': 'Isquiotibiales',
-  'calves': 'Pantorrillas (Gemelos/Sóleo)',
-  'abs': 'Abdominales Rectos',
-  'spine': 'Erectores Espinales',
-  'traps': 'Trapecios',
-  'forearms': 'Antebrazos',
+  pectorals: 'Pectorales',
+  lats: 'Dorsal Ancho',
+  delts: 'Deltoides',
+  biceps: 'Bíceps',
+  triceps: 'Tríceps',
+  glutes: 'Glúteos',
+  quads: 'Cuádriceps',
+  hamstrings: 'Isquiotibiales',
+  calves: 'Pantorrillas (Gemelos/Sóleo)',
+  abs: 'Abdominales Rectos',
+  spine: 'Erectores Espinales',
+  traps: 'Trapecios',
+  forearms: 'Antebrazos',
   'upper back': 'Espalda Alta / Romboides',
   'serratus anterior': 'Serrato Anterior',
-  'adductors': 'Aductores',
-  'abductors': 'Abductores',
+  adductors: 'Aductores',
+  abductors: 'Abductores',
   'levator scapulae': 'Elevador de la Escápula',
   'cardiovascular system': 'Sistema Cardiovascular',
 };
@@ -172,9 +175,14 @@ export function searchExercises(options: {
     const q = query.toLowerCase().trim();
     results = results.filter((e) => {
       const nameMatch = e.name.toLowerCase().includes(q);
-      const catMatch = translateCategory(e.category).toLowerCase().includes(q) || e.category.toLowerCase().includes(q);
-      const eqMatch = translateEquipment(e.equipment).toLowerCase().includes(q) || e.equipment.toLowerCase().includes(q);
-      const targetMatch = translateTarget(e.target).toLowerCase().includes(q) || e.target.toLowerCase().includes(q);
+      const catMatch =
+        translateCategory(e.category).toLowerCase().includes(q) ||
+        e.category.toLowerCase().includes(q);
+      const eqMatch =
+        translateEquipment(e.equipment).toLowerCase().includes(q) ||
+        e.equipment.toLowerCase().includes(q);
+      const targetMatch =
+        translateTarget(e.target).toLowerCase().includes(q) || e.target.toLowerCase().includes(q);
       const secMatch = e.secondary_muscles?.some((m) => m.toLowerCase().includes(q));
       return nameMatch || catMatch || eqMatch || targetMatch || secMatch;
     });
@@ -215,21 +223,26 @@ export function datasetToRoutineExercise(
     defaultSets = 4;
     defaultReps = '8-10';
     defaultRest = 90;
-    suggestedWeight = item.equipment.includes('barbell') ? 60 : item.equipment.includes('dumbbell') ? 22 : 40;
+    suggestedWeight = item.equipment.includes('barbell')
+      ? 60
+      : item.equipment.includes('dumbbell')
+        ? 22
+        : 40;
   } else if (item.equipment === 'body weight') {
     suggestedWeight = 0;
     defaultReps = '12-15';
   }
 
-  const iconType: 'barbell' | 'dumbbell' | 'bodyweight' | 'cable' | 'machine' = item.equipment.includes('barbell')
-    ? 'barbell'
-    : item.equipment.includes('dumbbell')
-    ? 'dumbbell'
-    : item.equipment.includes('cable')
-    ? 'cable'
-    : item.equipment.includes('machine') || item.equipment.includes('lever')
-    ? 'machine'
-    : 'bodyweight';
+  const iconType: 'barbell' | 'dumbbell' | 'bodyweight' | 'cable' | 'machine' =
+    item.equipment.includes('barbell')
+      ? 'barbell'
+      : item.equipment.includes('dumbbell')
+        ? 'dumbbell'
+        : item.equipment.includes('cable')
+          ? 'cable'
+          : item.equipment.includes('machine') || item.equipment.includes('lever')
+            ? 'machine'
+            : 'bodyweight';
 
   return {
     id: `custom_${item.id}_${Date.now()}`,
@@ -242,7 +255,8 @@ export function datasetToRoutineExercise(
     suggestedWeightKg: suggestedWeight,
     restSeconds: defaultRest,
     rpe: 8,
-    technicalCue: spanishSteps[0] || 'Mantén el control en la fase excéntrica y conecta mente-músculo.',
+    technicalCue:
+      spanishSteps[0] || 'Mantén el control en la fase excéntrica y conecta mente-músculo.',
     fullInstructions: spanishSteps,
     commonMistakes: [
       'Acelerar la fase descendente perdiendo la tensión mecánica.',
