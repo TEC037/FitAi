@@ -8,6 +8,56 @@ import { FinishWorkoutModal } from './ActiveWorkoutView';
 
 const DEFAULT_SESSION_RPE = 8;
 
+interface RestTimerProps {
+  restSeconds: number;
+}
+
+function RestTimer({ restSeconds }: RestTimerProps) {
+  const isFinalCountdown = restSeconds <= 10;
+
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <div className="relative w-36 h-36">
+        {/* Static ring base */}
+        <svg className="w-full h-full -rotate-90" viewBox="0 0 144 144">
+          <circle
+            cx="72"
+            cy="72"
+            r="64"
+            fill="none"
+            stroke="rgba(255,255,255,0.08)"
+            strokeWidth="6"
+          />
+          <circle
+            cx="72"
+            cy="72"
+            r="64"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="6"
+            strokeLinecap="round"
+            strokeDasharray="402"
+            className={`text-[#C0FF00] ${
+              isFinalCountdown ? 'animate-pulse' : ''
+            }`}
+          />
+        </svg>
+        <div
+          className={`absolute inset-0 flex flex-col items-center justify-center ${
+            isFinalCountdown ? 'animate-pulse' : ''
+          }`}
+        >
+          <Timer className={`w-6 h-6 mb-1 ${isFinalCountdown ? 'text-red-400' : 'text-[#C0FF00]/70'}`} />
+          <span className="font-mono text-6xl font-black text-[#C0FF00] leading-none">
+            {formatTime(restSeconds)}
+          </span>
+        </div>
+      </div>
+      <p className="text-xs text-white/40 uppercase font-bold tracking-widest">Descanso</p>
+    </div>
+  );
+}
+
 /**
  * Flujo de entrenamiento en móvil: UN solo botón.
  * - Registra cada serie con los valores sugeridos del plan (sin formularios).
@@ -140,18 +190,7 @@ export const MobileSessionView: React.FC = () => {
       {/* Zona central: ejercicio o descanso */}
       <div className="flex-1 flex flex-col items-center justify-center text-center gap-3 min-h-0">
         {isResting && !isWorkoutComplete ? (
-          <>
-            <div className="w-16 h-16 rounded-3xl bg-[#C0FF00]/10 border border-[#C0FF00]/30 flex items-center justify-center">
-              <Timer className="w-8 h-8 text-[#C0FF00]" />
-            </div>
-            <p className="text-xs text-white/40 uppercase font-bold tracking-widest">
-              Descanso
-            </p>
-            <p className="font-mono text-6xl font-black text-[#C0FF00] leading-none">
-              {formatTime(restTimerSeconds)}
-            </p>
-            <p className="text-xs text-white/50">Descansa para la siguiente serie.</p>
-          </>
+          <RestTimer restSeconds={restTimerSeconds} />
         ) : (
           <>
             <span className="text-xs text-[#C0FF00] font-bold uppercase tracking-wider">

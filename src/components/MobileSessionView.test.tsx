@@ -146,6 +146,14 @@ describe('MobileSessionView (flujo 1 botón)', () => {
     expect(screen.getByRole('button', { name: /COMPLETAR SERIE/i })).toBeInTheDocument();
   });
 
+  it('muestra el countdown del descanso en grande y avisa al final', () => {
+    renderView({ restTimerSeconds: 9, isRestTimerActive: true });
+
+    expect(screen.getByText('Descanso')).toBeInTheDocument();
+    expect(screen.getByText('00:09')).toBeInTheDocument();
+    expect(screen.getByText('00:09').className).toContain('text-6xl');
+  });
+
   it('al completar la última serie abre el modal final que solo pide RPE y notas', () => {
     renderView({ activeSetIndex: 3, activeWorkoutSets: [makeLoggedSet(1), makeLoggedSet(2)] });
 
