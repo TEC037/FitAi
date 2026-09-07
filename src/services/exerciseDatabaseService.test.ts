@@ -82,6 +82,18 @@ describe('searchExercises', () => {
     const r = searchExercises({ query: 'barbell' });
     expect(r.total).toBeGreaterThan(0);
   });
+
+  it('ordena por nombre A-Z y Z-A', () => {
+    const asc = searchExercises({ sort: 'name', limit: 100 });
+    const names = asc.items.map((e) => e.name);
+    const sorted = [...names].sort((a, b) => a.localeCompare(b));
+    expect(names).toEqual(sorted);
+
+    const desc = searchExercises({ sort: 'name-desc', limit: 100 });
+    const descNames = desc.items.map((e) => e.name);
+    const sortedDesc = [...descNames].sort((a, b) => b.localeCompare(a));
+    expect(descNames).toEqual(sortedDesc);
+  });
 });
 
 describe('getAvailableCategories', () => {

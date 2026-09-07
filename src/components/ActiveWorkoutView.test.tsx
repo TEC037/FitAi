@@ -53,6 +53,18 @@ describe('ActiveWorkoutView', () => {
     expect(screen.getByRole('button', { name: 'Volver al Dashboard' })).toBeInTheDocument();
   });
 
+  it('marca con aria-pressed el RPE seleccionado en el modal de finalización', () => {
+    renderActiveWorkout();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Finalizar Sesión' }));
+
+    const rpe7 = screen.getByRole('button', { name: 'RPE 7' });
+    expect(rpe7).toHaveAttribute('aria-pressed', 'false');
+
+    fireEvent.click(rpe7);
+    expect(screen.getByRole('button', { name: 'RPE 7' })).toHaveAttribute('aria-pressed', 'true');
+  });
+
   it('abre el modal de ciencia de escalas alométricas desde la telemetría', () => {
     renderActiveWorkout();
 

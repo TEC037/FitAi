@@ -87,6 +87,62 @@ export const TARGET_TRANSLATIONS: Record<string, string> = {
   'cardiovascular system': 'Sistema Cardiovascular',
 };
 
+export type ExerciseFilterKind = 'category' | 'equipment' | 'target';
+
+/**
+ * Devuelve la imagen representativa y el total de ejercicios para un valor de
+ * filtro (categoría, equipamiento o músculo diana). Sirve para ilustrar los
+ * filtros de la biblioteca con fotos reales del dataset (p. ej. "ver la
+ * máquina" o "ver la pelota" antes de elegir).
+ *
+ * `active` permite mostrar conteos cruzados: cuando ya hay filtros activos en
+ * otras dimensiones, el conteo refleja las combinaciones posibles (evita
+ * callejones sin salida). La dimensión actual (`kind`) se excluye del cruce.
+ */
+export function getFilterOptionPreview(
+  kind: ExerciseFilterKind,
+  value: string,
+  active?: { category?: string; equipment?: string; target?: string }
+): { imageUrl: string; count: number } {
+  const key = value.toLowerCase();
+  let count = 0;
+  let firstWithImage: DatasetExercise | undefined;
+  for (const exercise of EXERCISE_DATABASE) {
+    if (
+      active?.category &&
+      active.category !== 'all' &&
+      kind !== 'category' &&
+      !(exercise.category === active.category || exercise.body_part === active.category)
+    ) {
+      continue;
+    }
+    if (
+      active?.equipment &&
+      active.equipment !== 'all' &&
+      kind !== 'equipment' &&
+      exercise.equipment !== active.equipment
+    ) {
+      continue;
+    }
+    if (
+      active?.target &&
+      active.target !== 'all' &&
+      kind !== 'target' &&
+      exercise.target !== active.target
+    ) {
+      continue;
+    }
+    const raw = exercise[kind];
+    if (!raw || String(raw).toLowerCase() !== key) continue;
+    count += 1;
+    if (!firstWithImage && exercise.image) firstWithImage = exercise;
+  }
+  return {
+    imageUrl: firstWithImage ? getExerciseImageUrl(firstWithImage.image) : '',
+    count,
+  };
+}
+
 /**
  * Returns the CDN URL for the exercise 180x180 thumbnail image.
  */
@@ -167,10 +223,11 @@ export function searchExercises(options: {
   category?: string;
   equipment?: string;
   target?: string;
+  sort?: 'name' | 'name-desc';
   limit?: number;
   offset?: number;
 }): { items: DatasetExercise[]; total: number } {
-  const { query, category, equipment, target, limit = 24, offset = 0 } = options;
+  const { query, category, equipment, target, sort, limit = 24, offset = 0 } = options;
 
   let results = EXERCISE_DATABASE;
 
@@ -201,6 +258,11 @@ export function searchExercises(options: {
       const secMatch = e.secondary_muscles?.some((m) => m.toLowerCase().includes(q));
       return nameMatch || catMatch || eqMatch || targetMatch || secMatch;
     });
+  }
+
+  if (sort === 'name' || sort === 'name-desc') {
+    const direction = sort === 'name' ? 1 : -1;
+    results = [...results].sort((a, b) => a.name.localeCompare(b.name) * direction);
   }
 
   const total = results.length;

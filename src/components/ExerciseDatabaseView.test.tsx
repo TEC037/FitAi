@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { ExerciseDatabaseView } from './ExerciseDatabaseView';
 import { DatasetExercise } from '../types';
 
@@ -61,21 +61,34 @@ const {
   return {
     exercises: items,
     repository: 'https://github.com/hasaneyldrm/exercises-dataset',
-    categories: [{ id: 'chest', label: 'Pecho' }],
-    equipment: [{ id: 'barbell', label: 'Barra' }],
-    targets: [{ id: 'biceps', label: 'Bíceps' }],
-    translateCategory: (c: string) => (c === 'chest' ? 'Pecho' : c),
-    translateEquipment: (e: string) => (e === 'barbell' ? 'Barra' : e),
-    translateTarget: (t: string) => (t === 'biceps' ? 'Bíceps' : t),
+    categories: [
+      { id: 'chest', label: 'Pecho' },
+      { id: 'upper legs', label: 'Piernas (Cuádriceps e Isquios)' },
+    ],
+    equipment: [
+      { id: 'barbell', label: 'Barra' },
+      { id: 'dumbbell', label: 'Mancuernas' },
+    ],
+    targets: [
+      { id: 'pectorals', label: 'Pectorales' },
+      { id: 'quads', label: 'Cuádriceps' },
+      { id: 'biceps', label: 'Bíceps' },
+    ],
+    translateCategory: (c: string) =>
+      c === 'chest' ? 'Pecho' : c === 'upper legs' ? 'Piernas (Cuádriceps e Isquios)' : c,
+    translateEquipment: (e: string) => (e === 'barbell' ? 'Barra' : e === 'dumbbell' ? 'Mancuernas' : e),
+    translateTarget: (t: string) =>
+      t === 'biceps' ? 'Bíceps' : t === 'pectorals' ? 'Pectorales' : t === 'quads' ? 'Cuádriceps' : t,
     searchExercises: (options: {
       query?: string;
       category?: string;
       equipment?: string;
       target?: string;
+      sort?: 'name' | 'name-desc';
       limit?: number;
       offset?: number;
     }) => {
-      const { query, category, equipment, target, limit = 24, offset = 0 } = options;
+      const { query, category, equipment, target, sort, limit = 24, offset = 0 } = options;
       let results = exercises;
       if (category && category !== 'all') {
         results = results.filter((e) => e.category === category || e.body_part === category);
@@ -99,6 +112,10 @@ const {
           return translates.some((s) => s.toLowerCase().includes(q));
         });
       }
+      if (sort === 'name' || sort === 'name-desc') {
+        const direction = sort === 'name' ? 1 : -1;
+        results = [...results].sort((a, b) => a.name.localeCompare(b.name) * direction);
+      }
       return { items: results.slice(offset, offset + limit), total: results.length };
     },
   };
@@ -117,6 +134,43 @@ vi.mock('../services/exerciseDatabaseService', async () => ({
   searchExercises,
   getExerciseImageUrl: () => '/mock.png',
   getExerciseGifUrl: () => '/mock.gif',
+  getFilterOptionPreview: (
+    kind: 'category' | 'equipment' | 'target',
+    value: string,
+    active?: { category?: string; equipment?: string; target?: string }
+  ) => {
+    const matching = exercises.filter((e) => {
+      if (
+        active?.category &&
+        active.category !== 'all' &&
+        kind !== 'category' &&
+        !(e.category === active.category || e.body_part === active.category)
+      ) {
+        return false;
+      }
+      if (
+        active?.equipment &&
+        active.equipment !== 'all' &&
+        kind !== 'equipment' &&
+        e.equipment !== active.equipment
+      ) {
+        return false;
+      }
+      if (
+        active?.target &&
+        active.target !== 'all' &&
+        kind !== 'target' &&
+        e.target !== active.target
+      ) {
+        return false;
+      }
+      return String(e[kind]).toLowerCase() === value.toLowerCase();
+    });
+    return {
+      imageUrl: matching.length > 0 ? '/mock.png' : '',
+      count: matching.length,
+    };
+  },
   datasetToRoutineExercise: (item: DatasetExercise) => ({
     id: `custom_${item.id}`,
     name: item.name,
@@ -155,13 +209,101 @@ describe('ExerciseDatabaseView (DOM)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     window.scrollTo = vi.fn();
+    window.sessionStorage.clear();
   });
 
   it('muestra el encabezado y el total de ejercicios', () => {
     renderView();
 
     expect(screen.getByText('Biblioteca de Ejercicios')).toBeInTheDocument();
-    expect(screen.getByText('3 ejercicios')).toBeInTheDocument();
+    expect(screen.getAllByText('3 ejercicios').length).toBeGreaterThan(0);
+  });
+
+  it('expone el nombre accesible del buscador desktop', () => {
+    renderView();
+    expect(
+      screen.getByRole('textbox', { name: 'Buscar por nombre, músculo o equipamiento' })
+    ).toBeInTheDocument();
+  });
+
+  it('anuncia el conteo de resultados en el encabezado desktop', () => {
+    renderView();
+
+    const strongs = screen.getAllByText((content, el) => {
+      if (el?.tagName !== 'STRONG' || !el.closest('span[aria-live="polite"]')) return false;
+      return content === '3';
+    });
+    const counter = strongs[0].closest('span');
+    expect(counter).not.toBeNull();
+    expect(counter).toHaveAttribute('aria-live', 'polite');
+    expect(counter).toHaveAttribute('aria-atomic', 'true');
+  });
+
+  it('ordena los resultados por nombre en desktop', () => {
+    renderView();
+
+    expect(screen.getAllByRole('heading', { level: 4 })[0]).toHaveTextContent('Bench Press');
+
+    fireEvent.change(screen.getByLabelText('Ordenar resultados por'), {
+      target: { value: 'name-desc' },
+    });
+
+    const headings = screen.getAllByRole('heading', { level: 4 });
+    expect(headings[0]).toHaveTextContent('Squat');
+    expect(headings[1]).toHaveTextContent('Dumbbell Curl');
+    expect(headings[2]).toHaveTextContent('Bench Press');
+  });
+
+  it('marca con aria-pressed la opción seleccionada en las filas ilustradas', () => {
+    renderView();
+
+    const pecho = screen.getByRole('button', { name: 'Pecho' });
+    expect(pecho).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('button', { name: 'Todos (3 ejercicios)' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+
+    fireEvent.click(pecho);
+
+    expect(screen.getByRole('button', { name: 'Pecho' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'Todos (3 ejercicios)' })).toHaveAttribute(
+      'aria-pressed',
+      'false'
+    );
+  });
+
+  it('desplaza a la vista el chip enfocado al navegar con flechas', () => {
+    const original = Element.prototype.scrollIntoView;
+    const spy = vi.fn(() => {});
+    Element.prototype.scrollIntoView = spy as () => void;
+    try {
+      renderView();
+
+      const barra = screen.getByRole('button', { name: 'Barra' });
+      barra.focus();
+      fireEvent.keyDown(barra, { key: 'ArrowRight' });
+
+      expect(spy).toHaveBeenCalledWith({ inline: 'nearest', block: 'nearest' });
+    } finally {
+      Element.prototype.scrollIntoView = original;
+    }
+  });
+
+  it('navega con flechas entre las opciones de una fila ilustrada', () => {
+    renderView();
+
+    const barra = screen.getByRole('button', { name: 'Barra' });
+    barra.focus();
+
+    fireEvent.keyDown(barra, { key: 'ArrowRight' });
+    expect(screen.getByRole('button', { name: 'Mancuernas' })).toHaveFocus();
+
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: 'ArrowRight' });
+    expect(screen.getByRole('button', { name: 'Cualquier equipamiento (3 ejercicios)' })).toHaveFocus();
+
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: 'ArrowLeft' });
+    expect(screen.getByRole('button', { name: 'Mancuernas' })).toHaveFocus();
   });
 
   it('filtra por término de búsqueda', async () => {
@@ -175,6 +317,18 @@ describe('ExerciseDatabaseView (DOM)', () => {
       expect(screen.getByText('Squat')).toBeInTheDocument();
     });
     expect(screen.getByText(/squat/i)).toBeInTheDocument();
+  });
+
+  it('resalta el término buscado en el nombre de la tarjeta', async () => {
+    renderView();
+
+    const input = screen.getByPlaceholderText(/Buscar por nombre/);
+    fireEvent.change(input, { target: { value: 'press' } });
+
+    await waitFor(() => {
+      const hl = screen.getByText('Press');
+      expect(hl.className).toContain('text-[#C0FF00]');
+    });
   });
 
   it('muestra el mensaje de "sin resultados" y permite restablecer', async () => {
@@ -211,6 +365,14 @@ describe('ExerciseDatabaseView (DOM)', () => {
     fireEvent.click(screen.getAllByText('Detalles')[1]);
 
     expect(screen.getByText(/Flexiona las rodillas/)).toBeInTheDocument();
+  });
+
+  it('hace visible el overlay de técnica con el foco de teclado', () => {
+    renderView();
+
+    const overlay = screen.getAllByRole('button', { name: /Ver Técnica/i })[0];
+    expect(overlay.className).toContain('group-hover:opacity-100');
+    expect(overlay.className).toContain('group-focus-within:opacity-100');
   });
 
   it('filtra por grupo muscular desde el chip de categoría', async () => {
@@ -250,6 +412,71 @@ describe('ExerciseDatabaseView (DOM)', () => {
       expect.objectContaining({ name: 'Squat' })
     );
   });
+
+  it('cruza los conteos de las filas de desktop con los filtros de otras dimensiones', () => {
+    renderView();
+
+    // Filtrar por categoría Pecho desde la fila ilustrada de desktop
+    fireEvent.click(screen.getByRole('button', { name: 'Pecho' }));
+
+    const barra = screen.getByRole('button', { name: 'Barra' });
+    expect(within(barra).getByText('1 ejercicios')).toBeInTheDocument();
+
+    const mancuernas = screen.getByRole('button', { name: 'Mancuernas' });
+    expect(within(mancuernas).getByText('0 ejercicios')).toBeInTheDocument();
+
+    // El chip "Todo" de equipamiento refleja la categoría activa (Pecho -> 1)
+    const equipoTodo = screen.getByRole('button', { name: 'Cualquier equipamiento (1 ejercicios)' });
+    expect(within(equipoTodo).getByText('1 ejercicios')).toBeInTheDocument();
+  });
+
+  it('quita el filtro de una sola dimensión desde su encabezado en desktop', () => {
+    renderView();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Pecho' }));
+    expect(screen.getByRole('button', { name: 'Borrar filtro Grupo Muscular / Región' })).toBeInTheDocument();
+
+    // Al quitar la categoría, los conteos de equipamiento vuelven a las bases completas
+    fireEvent.click(screen.getByRole('button', { name: 'Borrar filtro Grupo Muscular / Región' }));
+
+    expect(
+      screen.queryByRole('button', { name: 'Borrar filtro Grupo Muscular / Región' })
+    ).not.toBeInTheDocument();
+    const barra = screen.getByRole('button', { name: 'Barra' });
+    expect(within(barra).getByText('2 ejercicios')).toBeInTheDocument();
+  });
+
+  it('mantiene los filtros entre montajes gracias a la sesión', () => {
+    const view = renderView();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Pecho' }));
+    const barra = screen.getByRole('button', { name: 'Barra' });
+    expect(within(barra).getByText('1 ejercicios')).toBeInTheDocument();
+
+    // Simula navegar a otra pantalla y volver: el estado local se pierde pero
+    // la sesión rehidrata los filtros.
+    view.unmount();
+    renderView();
+
+    const barra2 = screen.getByRole('button', { name: 'Barra' });
+    expect(within(barra2).getByText('1 ejercicios')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Borrar filtro Grupo Muscular / Región' })).toBeInTheDocument();
+  });
+
+  it('mantiene el orden elegido entre montajes gracias a la sesión', () => {
+    const view = renderView();
+
+    fireEvent.change(screen.getByLabelText('Ordenar resultados por'), {
+      target: { value: 'name-desc' },
+    });
+    expect(screen.getAllByRole('heading', { level: 4 })[0]).toHaveTextContent('Squat');
+
+    view.unmount();
+    renderView();
+
+    expect(screen.getByLabelText('Ordenar resultados por')).toHaveValue('name-desc');
+    expect(screen.getAllByRole('heading', { level: 4 })[0]).toHaveTextContent('Squat');
+  });
 });
 
 describe('ExerciseDatabaseView (variante móvil)', () => {
@@ -258,6 +485,8 @@ describe('ExerciseDatabaseView (variante móvil)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     window.scrollTo = vi.fn();
+    window.sessionStorage.clear();
+    mockMobileViewport();
   });
 
   afterEach(() => {
@@ -282,7 +511,6 @@ describe('ExerciseDatabaseView (variante móvil)', () => {
   }
 
   it('muestra solo buscador y lista sencilla, sin filtros densos', () => {
-    mockMobileViewport();
     renderView();
 
     expect(screen.queryByText('Biblioteca de Ejercicios')).not.toBeInTheDocument();
@@ -291,11 +519,310 @@ describe('ExerciseDatabaseView (variante móvil)', () => {
     expect(screen.queryByText('Grupo Muscular / Región')).not.toBeInTheDocument();
   });
 
+  it('expone el nombre accesible del buscador móvil', () => {
+    renderView();
+    expect(
+      screen.getByRole('textbox', { name: 'Buscar ejercicio o músculo' })
+    ).toBeInTheDocument();
+  });
+
+  it('ordena los resultados por nombre en móvil', () => {
+    renderView();
+
+    fireEvent.change(screen.getByLabelText('Ordenar resultados por'), {
+      target: { value: 'name-desc' },
+    });
+
+    const rows = screen
+      .getAllByRole('button')
+      .filter((b) => /Cuádriceps|Pectorales|Bíceps/.test(b.textContent ?? ''));
+    expect(rows[0]).toHaveTextContent('Squat');
+    expect(rows[1]).toHaveTextContent('Dumbbell Curl');
+    expect(rows[2]).toHaveTextContent('Bench Press');
+  });
+
+  it('resalta el término buscado en las filas móviles', async () => {
+    renderView();
+
+    const input = screen.getByPlaceholderText('Buscar ejercicio o músculo...');
+    fireEvent.change(input, { target: { value: 'curl' } });
+
+    await waitFor(() => {
+      const hl = screen.getByText('Curl');
+      expect(hl.className).toContain('text-[#C0FF00]');
+    });
+  });
+
+  it('permite limpiar la búsqueda desde el chip sin volver al buscador', async () => {
+    renderView();
+
+    const input = screen.getByPlaceholderText('Buscar ejercicio o músculo...');
+    fireEvent.change(input, { target: { value: 'curl' } });
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Quitar filtro "curl"' })).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Quitar filtro "curl"' }));
+
+    expect(input).toHaveValue('');
+    expect(screen.getByText('Bench Press')).toBeInTheDocument();
+  });
+
   it('abre la ficha del ejercicio al tocar una fila', () => {
-    mockMobileViewport();
     renderView();
 
     fireEvent.click(screen.getByRole('button', { name: /Squat/i }));
     expect(screen.getByText(/Flexiona las rodillas/)).toBeInTheDocument();
+  });
+
+  it('abre el sheet de filtros con tabs y lista las opciones de la categoría', () => {
+    renderView();
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Filtros/i }));
+
+    const dialog = screen.getByRole('dialog');
+    expect(dialog).toBeInTheDocument();
+    expect(within(dialog).getByRole('tab', { name: /Categoría/i })).toBeInTheDocument();
+    expect(within(dialog).getByRole('tab', { name: /Equipamiento/i })).toBeInTheDocument();
+    expect(within(dialog).getByRole('tab', { name: /Músculo/i })).toBeInTheDocument();
+    expect(within(dialog).getByRole('button', { name: 'Pecho' })).toBeInTheDocument();
+    expect(
+      within(dialog).getByRole('button', { name: 'Piernas (Cuádriceps e Isquios)' })
+    ).toBeInTheDocument();
+  });
+
+  it('permite filtrar por equipamiento sin elegir categoría primero', () => {
+    renderView();
+
+    fireEvent.click(screen.getByRole('button', { name: /Filtros/i }));
+    const dialog = screen.getByRole('dialog');
+
+    fireEvent.click(within(dialog).getByRole('tab', { name: /Equipamiento/i }));
+    expect(within(dialog).getByRole('button', { name: 'Barra' })).toBeInTheDocument();
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Barra' }));
+    fireEvent.click(within(dialog).getByRole('button', { name: /^Listo/ }));
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByText('Bench Press')).toBeInTheDocument();
+    expect(screen.getByText('Squat')).toBeInTheDocument();
+    expect(screen.queryByText('Dumbbell Curl')).not.toBeInTheDocument();
+  });
+
+  it('permite filtrar por músculo objetivo sin elegir categoría ni equipamiento', () => {
+    renderView();
+
+    fireEvent.click(screen.getByRole('button', { name: /Filtros/i }));
+    const dialog = screen.getByRole('dialog');
+
+    fireEvent.click(within(dialog).getByRole('tab', { name: /Músculo/i }));
+    expect(within(dialog).getByRole('button', { name: 'Bíceps' })).toBeInTheDocument();
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Bíceps' }));
+    fireEvent.click(within(dialog).getByRole('button', { name: /^Listo/ }));
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByText('Dumbbell Curl')).toBeInTheDocument();
+    expect(screen.queryByText('Bench Press')).not.toBeInTheDocument();
+    expect(screen.queryByText('Squat')).not.toBeInTheDocument();
+  });
+
+  it('combina filtros de distintas dimensiones desde cualquier tab y los muestra en chips', () => {
+    renderView();
+
+    fireEvent.click(screen.getByRole('button', { name: /Filtros/i }));
+    const dialog = screen.getByRole('dialog');
+
+    // Categoría -> Pecho
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Pecho' }));
+    // Salta al tab de equipamiento (sin drill-down) y elige Barra
+    fireEvent.click(within(dialog).getByRole('tab', { name: /Equipamiento/i }));
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Barra' }));
+
+    // Chips resumen con ambos filtros activos
+    expect(within(dialog).getByRole('button', { name: 'Quitar filtro Pecho' })).toBeInTheDocument();
+    expect(within(dialog).getByRole('button', { name: 'Quitar filtro Barra' })).toBeInTheDocument();
+
+    fireEvent.click(within(dialog).getByRole('button', { name: /^Listo/ }));
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByText('Bench Press')).toBeInTheDocument();
+    expect(screen.queryByText('Squat')).not.toBeInTheDocument();
+    expect(screen.queryByText('Dumbbell Curl')).not.toBeInTheDocument();
+  });
+
+  it('muestra los conteos reales de cada opción en la sheet', () => {
+    renderView();
+
+    fireEvent.click(screen.getByRole('button', { name: /Filtros/i }));
+    const dialog = screen.getByRole('dialog');
+
+    expect(within(dialog).getAllByText('1 ejercicios').length).toBeGreaterThanOrEqual(1);
+    expect(within(dialog).getAllByText('3 ejercicios').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('recalcula los conteos de opciones según filtros activos de otras dimensiones', () => {
+    renderView();
+
+    fireEvent.click(screen.getByRole('button', { name: /Filtros/i }));
+    const dialog = screen.getByRole('dialog');
+
+    // Filtro de categoría: Pecho (solo Bench Press)
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Pecho' }));
+
+    // Al abrir el tab de equipamiento, los conteos se cruzan con la categoría activa
+    fireEvent.click(within(dialog).getByRole('tab', { name: /Equipamiento/i }));
+
+    const barra = within(dialog).getByRole('button', { name: 'Barra' });
+    expect(within(barra).getByText('1 ejercicios')).toBeInTheDocument();
+
+    const mancuernas = within(dialog).getByRole('button', { name: 'Mancuernas' });
+    expect(within(mancuernas).getByText('0 ejercicios')).toBeInTheDocument();
+
+    // "Cualquiera" muestra las bases de la categoría activa (Pecho -> 1)
+    const cualquiera = within(dialog).getByRole('button', { name: 'Cualquiera' });
+    expect(within(cualquiera).getByText('1 ejercicios')).toBeInTheDocument();
+  });
+
+  it('busca opciones dentro del tab activo del sheet', () => {
+    renderView();
+
+    fireEvent.click(screen.getByRole('button', { name: /Filtros/i }));
+    const dialog = screen.getByRole('dialog');
+
+    fireEvent.click(within(dialog).getByRole('tab', { name: /Equipamiento/i }));
+    expect(within(dialog).getByRole('button', { name: 'Barra' })).toBeInTheDocument();
+    expect(within(dialog).getByRole('button', { name: 'Mancuernas' })).toBeInTheDocument();
+
+    const input = within(dialog).getByPlaceholderText('Buscar en equipamiento...');
+    fireEvent.change(input, { target: { value: 'man' } });
+
+    expect(within(dialog).getByRole('button', { name: 'Mancuernas' })).toBeInTheDocument();
+    expect(within(dialog).queryByRole('button', { name: 'Barra' })).not.toBeInTheDocument();
+  });
+
+  it('marca con aria-pressed la opción seleccionada en el sheet', () => {
+    renderView();
+
+    fireEvent.click(screen.getByRole('button', { name: /Filtros/i }));
+    const dialog = screen.getByRole('dialog');
+
+    const pecho = within(dialog).getByRole('button', { name: 'Pecho' });
+    expect(pecho).toHaveAttribute('aria-pressed', 'false');
+    expect(within(dialog).getByRole('button', { name: 'Todos' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+
+    fireEvent.click(pecho);
+
+    expect(within(dialog).getByRole('button', { name: 'Pecho' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    expect(within(dialog).getByRole('button', { name: 'Todos' })).toHaveAttribute(
+      'aria-pressed',
+      'false'
+    );
+  });
+
+  it('resalta el término buscado dentro de las opciones del sheet', () => {
+    renderView();
+
+    fireEvent.click(screen.getByRole('button', { name: /Filtros/i }));
+    const dialog = screen.getByRole('dialog');
+
+    fireEvent.click(within(dialog).getByRole('tab', { name: /Equipamiento/i }));
+    fireEvent.change(within(dialog).getByPlaceholderText('Buscar en equipamiento...'), {
+      target: { value: 'man' },
+    });
+
+    const option = within(dialog).getByRole('button', { name: 'Mancuernas' });
+    const hl = within(option).getByText('Man');
+    expect(hl.className).toContain('text-[#C0FF00]');
+  });
+
+  it('navega con flechas verticales entre las opciones del sheet', () => {
+    renderView();
+
+    fireEvent.click(screen.getByRole('button', { name: /Filtros/i }));
+    const dialog = screen.getByRole('dialog');
+
+    const pecho = within(dialog).getByRole('button', { name: 'Pecho' });
+    pecho.focus();
+
+    fireEvent.keyDown(pecho, { key: 'ArrowDown' });
+    expect(
+      within(dialog).getByRole('button', { name: 'Piernas (Cuádriceps e Isquios)' })
+    ).toHaveFocus();
+
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: 'ArrowDown' });
+    expect(within(dialog).getByRole('button', { name: 'Todos' })).toHaveFocus();
+  });
+
+  it('descarta un filtro individual desde el chip resumen del sheet', () => {
+    renderView();
+
+    fireEvent.click(screen.getByRole('button', { name: /Filtros/i }));
+    const dialog = screen.getByRole('dialog');
+
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Pecho' }));
+    expect(within(dialog).getByRole('button', { name: 'Quitar filtro Pecho' })).toBeInTheDocument();
+
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Quitar filtro Pecho' }));
+    expect(
+      within(dialog).queryByRole('button', { name: 'Quitar filtro Pecho' })
+    ).not.toBeInTheDocument();
+
+    // Se mantiene en el tab de categoría sin el filtro aplicado
+    expect(within(dialog).getByRole('tab', { name: /Categoría/i })).toBeInTheDocument();
+  });
+
+  it('restablece todos los filtros desde la sheet', () => {
+    renderView();
+
+    fireEvent.click(screen.getByRole('button', { name: /Filtros/i }));
+    const dialog = screen.getByRole('dialog');
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Pecho' }));
+    fireEvent.click(within(dialog).getByRole('button', { name: /Restablecer filtros/i }));
+
+    expect(within(dialog).queryByRole('button', { name: 'Quitar filtro Pecho' })).not.toBeInTheDocument();
+  });
+
+  it('el chip resumen del encabezado permite quitar un filtro individual', () => {
+    renderView();
+
+    // Se selecciona categoría desde el sheet
+    fireEvent.click(screen.getByRole('button', { name: /Filtros/i }));
+    fireEvent.click(
+      within(screen.getByRole('dialog')).getByRole('button', { name: 'Pecho' })
+    );
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: /^Listo/ }));
+
+    expect(screen.getByText('Bench Press')).toBeInTheDocument();
+    expect(screen.queryByText('Squat')).not.toBeInTheDocument();
+
+    // Se quita solo el filtro de categoría desde el chip del encabezado
+    fireEvent.click(screen.getByRole('button', { name: 'Quitar filtro Pecho' }));
+
+    expect(screen.getByText('Squat')).toBeInTheDocument();
+    expect(screen.getByText('Dumbbell Curl')).toBeInTheDocument();
+  });
+
+  it('mueve el foco al abrir el sheet y lo restaura con Escape', () => {
+    renderView();
+
+    const trigger = screen.getByRole('button', { name: /Filtros/i });
+    trigger.focus();
+    fireEvent.click(trigger);
+
+    // El foco entra al diálogo al abrirse
+    const dialog = screen.getByRole('dialog');
+    expect(dialog.contains(document.activeElement)).toBe(true);
+
+    // Escape cierra y restaura el foco al disparador
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(document.activeElement).toBe(trigger);
   });
 });
