@@ -126,10 +126,20 @@ describe('MobileNav (navegación con 1 botón)', () => {
     expect(screen.getByText('Rutina')).toBeInTheDocument();
     expect(screen.getByText('Entrenar')).toBeInTheDocument();
     expect(screen.getByText('Biblioteca')).toBeInTheDocument();
-    expect(screen.getByText('Progreso')).toBeInTheDocument();
-    expect(screen.getByText('Coach IA')).toBeInTheDocument();
-    expect(screen.getByText('Historial')).toBeInTheDocument();
-    expect(screen.getByText('Perfil')).toBeInTheDocument();
+    expect(screen.queryByText('Progreso')).not.toBeInTheDocument();
+    expect(screen.queryByText('Coach IA')).not.toBeInTheDocument();
+    expect(screen.queryByText('Historial')).not.toBeInTheDocument();
+    expect(screen.queryByText('Perfil')).not.toBeInTheDocument();
+  });
+
+  it('mantiene los destinos secundarios fuera del menú y solo los accede por Inicio', () => {
+    render(<MobileNav />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir menú' }));
+    expect(screen.getAllByRole('button')).toHaveLength(5);
+    expect(screen.queryByText('Progreso')).not.toBeInTheDocument();
+    expect(screen.queryByText('Historial')).not.toBeInTheDocument();
+    expect(screen.queryByText('Perfil')).not.toBeInTheDocument();
   });
 
   it('navega al hacer clic en un enlace y cierra el menú', () => {
@@ -140,17 +150,20 @@ describe('MobileNav (navegación con 1 botón)', () => {
     expect(navigateTo).toHaveBeenCalledWith('routine');
 
     fireEvent.click(screen.getByRole('button', { name: 'Abrir menú' }));
-    fireEvent.click(screen.getByText('Coach IA'));
-    expect(navigateTo).toHaveBeenCalledWith('coach');
-    expect(screen.queryByText('Coach IA')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByText('Biblioteca'));
+    expect(navigateTo).toHaveBeenCalledWith('exercises');
+    expect(screen.queryByText('Biblioteca')).not.toBeInTheDocument();
   });
 
   it('marca con aria-current el enlace activo', () => {
-    mockApp({ currentScreen: 'coach' });
+    mockApp({ currentScreen: 'exercises' });
     render(<MobileNav />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Abrir menú' }));
-    expect(screen.getByText('Coach IA').closest('button')).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByText('Biblioteca').closest('button')).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
   });
 
   it('cambia la etiqueta a "En vivo" durante una sesión activa', () => {
@@ -169,11 +182,11 @@ describe('MobileNav (navegación con 1 botón)', () => {
     expect(navigateTo).toHaveBeenCalledWith('workout');
   });
 
-  it('navega al perfil al hacer clic en Perfil', () => {
+  it('navega a Biblioteca desde el menú', () => {
     render(<MobileNav />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Abrir menú' }));
-    fireEvent.click(screen.getByText('Perfil'));
-    expect(navigateTo).toHaveBeenCalledWith('profile');
+    fireEvent.click(screen.getByText('Biblioteca'));
+    expect(navigateTo).toHaveBeenCalledWith('exercises');
   });
 });

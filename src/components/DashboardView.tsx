@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Play, Dumbbell, ArrowUpRight, Sparkles, ChevronRight, BookOpen } from 'lucide-react';
 import { useApp } from '../context/useApp';
+import { NAV_ROUTES } from '../config/navigation';
 import {
   getExerciseImageUrl,
   EXERCISE_DATABASE,
@@ -52,6 +53,8 @@ export const DashboardView: React.FC = () => {
   const latestPr = stats.latestPersonalRecord;
 
   const isMobile = useIsMobile();
+
+  const mobileSecondaryRoutes = NAV_ROUTES.filter((route) => route.isMobileSecondary);
 
   // Find Day 1 as today's routine (Empuje Dinámico)
   const todaysRoutine = routines.find((r) => r.dayNumber === 1) || routines[0];
@@ -132,6 +135,28 @@ export const DashboardView: React.FC = () => {
             <p className="text-[10px] text-[#C0FF00] font-medium">
               {latestPr ? `+${latestPr.progressPercent}% nuevo récord` : 'Registra tu primera marca'}
             </p>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-[10px] text-white/40 uppercase tracking-wider font-bold px-1">
+            Explorar
+          </p>
+          <div className="bg-[#0A0A0A] border border-white/10 rounded-3xl divide-y divide-white/5 overflow-hidden">
+            {mobileSecondaryRoutes.map((route) => (
+              <button
+                key={route.id}
+                id={`mobile-quick-${route.id}`}
+                onClick={() => navigateTo(route.id)}
+                className="w-full p-4 flex items-center gap-3 bg-white/[0.03] hover:bg-white/[0.07] active:bg-white/10 transition-colors text-left"
+              >
+                <span className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                  <route.icon className="w-4 h-4 text-[#C0FF00]" />
+                </span>
+                <span className="flex-1 text-sm font-bold text-white">{route.label}</span>
+                <ChevronRight className="w-4 h-4 text-white/30" />
+              </button>
+            ))}
           </div>
         </div>
       </div>

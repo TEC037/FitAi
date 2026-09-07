@@ -130,4 +130,21 @@ describe('DashboardView (variante móvil)', () => {
     expect(screen.getByTestId('harness-workout')).toHaveTextContent('true');
     expect(screen.getByTestId('harness-screen')).toHaveTextContent('workout');
   });
+
+  it('muestra los accesos rápidos secundarios y navega a ellos', () => {
+    mockMobileViewport();
+    renderDashboard();
+
+    expect(screen.getByText('Explorar')).toBeInTheDocument();
+    expect(screen.getByText('Progreso')).toBeInTheDocument();
+    expect(screen.getByText('Historial')).toBeInTheDocument();
+    expect(screen.getByText('Coach IA')).toBeInTheDocument();
+    expect(screen.getByText('Perfil')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('Historial'));
+    expect(screen.getByTestId('harness-screen')).toHaveTextContent('history');
+
+    fireEvent.click(screen.getByText('Perfil'));
+    expect(screen.getByTestId('harness-screen')).toHaveTextContent('profile');
+  });
 });

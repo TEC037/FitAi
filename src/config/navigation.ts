@@ -18,6 +18,7 @@ export interface NavRoute {
   badge?: string;
   isMobileAction?: boolean;
   showInMobile?: boolean;
+  isMobileSecondary?: boolean;
 }
 
 export const NAV_ROUTES: NavRoute[] = [
@@ -38,8 +39,8 @@ export const NAV_ROUTES: NavRoute[] = [
     isMobileAction: true,
     showInMobile: true,
   },
-  { id: 'progress', label: 'Progreso', mobileLabel: 'Progreso', icon: TrendingUp, showInMobile: true },
-  { id: 'coach', label: 'Coach IA', icon: Bot, badge: 'IA', showInMobile: true },
-  { id: 'history', label: 'Historial', mobileLabel: 'Historial', icon: History, showInMobile: true },
-  { id: 'profile', label: 'Perfil', icon: User, showInMobile: true },
+  { id: 'progress', label: 'Progreso', mobileLabel: 'Progreso', icon: TrendingUp, isMobileSecondary: true },
+  { id: 'coach', label: 'Coach IA', icon: Bot, badge: 'IA', isMobileSecondary: true },
+  { id: 'history', label: 'Historial', mobileLabel: 'Historial', icon: History, isMobileSecondary: true },
+  { id: 'profile', label: 'Perfil', icon: User, isMobileSecondary: true },
 ];
