@@ -32,111 +32,124 @@ export const ProfileStep: React.FC<ProfileStepProps> = ({
     <div className="space-y-6 animate-fadeIn">
       <div>
         <p className="text-[10px] uppercase tracking-[0.2em] text-[#C0FF00] font-bold mb-1">
-          Paso 1 • Perfil Biométrico
+          Paso 1 • Tu Nombre
         </p>
-        <h2 className="text-2xl sm:text-3xl font-black">Cuéntanos sobre ti</h2>
+        <h2 className="text-2xl sm:text-3xl font-black">¿Cómo te llamas?</h2>
         <p className="text-xs text-white/50 mt-1">
-          La IA necesita estos datos para calcular gasto calórico, volumen base y sobrecarga
-          adecuada.
+          Solo necesitamos tu nombre para personalizar tu plan. El resto de datos es opcional y
+          puedes ajustarlos después desde tu perfil.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="sm:col-span-2">
-          <label
-            htmlFor="onboarding-name"
-            className="block text-xs font-semibold text-white/70 mb-1.5"
-          >
-            Nombre Completo
-          </label>
-          <input
-            id="onboarding-name"
-            type="text"
-            value={name}
-            onChange={(e) => onName(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C0FF00]"
-            placeholder="Tu nombre"
-          />
-        </div>
+      <div>
+        <label
+          htmlFor="onboarding-name"
+          className="block text-xs font-semibold text-white/70 mb-1.5"
+        >
+          Nombre <span className="text-[#C0FF00]">*</span>
+        </label>
+        <input
+          id="onboarding-name"
+          type="text"
+          value={name}
+          onChange={(e) => onName(e.target.value)}
+          autoFocus
+          placeholder="Escribe tu nombre aquí..."
+          className={`w-full bg-white/5 border rounded-xl px-4 py-4 text-base text-white focus:outline-none focus:border-[#C0FF00] ${
+            name.trim() ? 'border-white/10' : 'border-[#C0FF00]/50'
+          }`}
+        />
+        {!name.trim() && (
+          <p className="text-[11px] text-amber-400 mt-1.5">
+            Ingresa tu nombre para continuar.
+          </p>
+        )}
+      </div>
 
-        <div>
-          <label
-            htmlFor="onboarding-age"
-            className="block text-xs font-semibold text-white/70 mb-1.5"
-          >
-            Edad (Años)
-          </label>
-          <input
-            id="onboarding-age"
-            type="number"
-            value={age}
-            onChange={(e) => onAge(Number(e.target.value))}
-            min={14}
-            max={90}
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C0FF00]"
-          />
-        </div>
+      <div className="pt-4 border-t border-white/10">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-bold mb-3">
+          Datos opcionales
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label
+              htmlFor="onboarding-age"
+              className="block text-xs font-semibold text-white/70 mb-1.5"
+            >
+              Edad (Años)
+            </label>
+            <input
+              id="onboarding-age"
+              type="number"
+              value={age}
+              onChange={(e) => onAge(Number(e.target.value))}
+              min={14}
+              max={90}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C0FF00]"
+            />
+          </div>
 
-        <div>
-          <label
-            htmlFor="onboarding-gender"
-            className="block text-xs font-semibold text-white/70 mb-1.5"
-          >
-            Género (Opcional)
-          </label>
-          <select
-            id="onboarding-gender"
-            value={gender}
-            onChange={(e) => onGender(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C0FF00]"
-          >
-            <option value="Masculino" className="bg-[#111]">
-              Masculino
-            </option>
-            <option value="Femenino" className="bg-[#111]">
-              Femenino
-            </option>
-            <option value="Otro" className="bg-[#111]">
-              Prefiero no decir
-            </option>
-          </select>
-        </div>
+          <div>
+            <label
+              htmlFor="onboarding-gender"
+              className="block text-xs font-semibold text-white/70 mb-1.5"
+            >
+              Género (Opcional)
+            </label>
+            <select
+              id="onboarding-gender"
+              value={gender}
+              onChange={(e) => onGender(e.target.value)}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C0FF00]"
+            >
+              <option value="Masculino" className="bg-[#111]">
+                Masculino
+              </option>
+              <option value="Femenino" className="bg-[#111]">
+                Femenino
+              </option>
+              <option value="Otro" className="bg-[#111]">
+                Prefiero no decir
+              </option>
+            </select>
+          </div>
 
-        <div>
-          <label
-            htmlFor="onboarding-height"
-            className="block text-xs font-semibold text-white/70 mb-1.5"
-          >
-            Estatura (cm)
-          </label>
-          <input
-            id="onboarding-height"
-            type="number"
-            value={height}
-            onChange={(e) => onHeight(Number(e.target.value))}
-            min={120}
-            max={230}
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C0FF00]"
-          />
-        </div>
+          <div>
+            <label
+              htmlFor="onboarding-height"
+              className="block text-xs font-semibold text-white/70 mb-1.5"
+            >
+              Estatura (cm)
+            </label>
+            <input
+              id="onboarding-height"
+              type="number"
+              value={height}
+              onChange={(e) => onHeight(Number(e.target.value))}
+              min={120}
+              max={230}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C0FF00]"
+            />
+          </div>
 
-        <div>
-          <label
-            htmlFor="onboarding-weight"
-            className="block text-xs font-semibold text-white/70 mb-1.5"
-          >
-            Peso Corporal Actual (kg)
-          </label>
-          <input
-            id="onboarding-weight"
-            type="number"
-            step="0.1"
-            value={weight}
-            onChange={(e) => onWeight(Number(e.target.value))}
-            min={35}
-            max={200}
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C0FF00]"
-          />
+          <div>
+            <label
+              htmlFor="onboarding-weight"
+              className="block text-xs font-semibold text-white/70 mb-1.5"
+            >
+              Peso Corporal Actual (kg)
+            </label>
+            <input
+              id="onboarding-weight"
+              type="number"
+              step="0.1"
+              value={weight}
+              onChange={(e) => onWeight(Number(e.target.value))}
+              min={35}
+              max={200}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C0FF00]"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -539,7 +552,7 @@ export const OnboardingFlow: React.FC = () => {
   const totalSteps = 5;
 
   // Onboarding local form states
-  const [name, setName] = useState(user.name || 'Carlos Ramírez');
+  const [name, setName] = useState('');
   const [age, setAge] = useState(user.age || 28);
   const [gender, setGender] = useState(user.gender || 'Masculino');
   const [height, setHeight] = useState(user.height || 178);
@@ -579,6 +592,9 @@ export const OnboardingFlow: React.FC = () => {
   };
 
   const handleNext = () => {
+    if (step === 1 && !name.trim()) {
+      return;
+    }
     if (step < 4) {
       setStep((prev) => prev + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -736,7 +752,8 @@ export const OnboardingFlow: React.FC = () => {
             <button
               type="button"
               onClick={handleNext}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-black bg-[#C0FF00] text-black hover:bg-[#aee600] transition-transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(192,255,0,0.3)]"
+              disabled={step === 1 && !name.trim()}
+              className="flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-black bg-[#C0FF00] text-black hover:bg-[#aee600] transition-transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(192,255,0,0.3)] disabled:opacity-40 disabled:pointer-events-none"
             >
               <span>{step === 4 ? 'Generar Mi Rutina con IA' : 'Siguiente Paso'}</span>
               <ArrowRight className="w-4 h-4" />

@@ -2,11 +2,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Bot, Send, Sparkles, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useApp } from '../context/useApp';
 import { FREQUENT_COACH_QUESTIONS } from '../data/mockCoach';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 export const CoachAIView: React.FC = () => {
   const { chatMessages, sendCoachMessage, isCoachTyping, navigateTo, user } = useApp();
   const [inputText, setInputText] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -28,7 +30,11 @@ export const CoachAIView: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 p-4 sm:p-8 flex flex-col gap-6 max-w-4xl mx-auto w-full h-[calc(100vh-2rem)] relative">
+    <div
+      className={`flex-1 p-4 sm:p-8 flex flex-col gap-6 max-w-4xl mx-auto w-full relative ${
+        isMobile ? 'h-full p-3' : 'h-[calc(100vh-2rem)]'
+      }`}
+    >
       {/* Background glow */}
       <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-[#C0FF00]/10 blur-[130px] rounded-full pointer-events-none" />
 
@@ -45,9 +51,11 @@ export const CoachAIView: React.FC = () => {
                 Online
               </span>
             </div>
-            <p className="text-xs text-white/50">
-              Asistente de entrenamiento personal • Contexto: {user.name} ({user.primaryGoal})
-            </p>
+            {!isMobile && (
+              <p className="text-xs text-white/50">
+                Asistente de entrenamiento personal • Contexto: {user.name} ({user.primaryGoal})
+              </p>
+            )}
           </div>
         </div>
 
@@ -59,9 +67,11 @@ export const CoachAIView: React.FC = () => {
 
       {/* Suggestions / Prompt Chips Bar */}
       <div className="shrink-0 space-y-2">
-        <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold px-1">
-          Preguntas Rápidas Frecuentes
-        </p>
+        {!isMobile && (
+          <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold px-1">
+            Preguntas Rápidas Frecuentes
+          </p>
+        )}
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
           {FREQUENT_COACH_QUESTIONS.map((q, idx) => (
             <button

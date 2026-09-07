@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitForElementToBeRemoved } from '@testing-library/react';
 import { AppProvider } from '../context/AppContext';
 import { useApp } from '../context/useApp';
@@ -146,5 +146,47 @@ describe('CoachAIView', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /ver rutina de hoy/i }));
     expect(screen.getByTestId('harness-screen')).toHaveTextContent('routine');
+  });
+});
+
+describe('CoachAIView (variante móvil)', () => {
+  const originalMatchMedia = window.matchMedia;
+
+  beforeEach(() => {
+    localStorage.clear();
+    Element.prototype.scrollIntoView = () => {};
+    serverlessCoachReply.mockResolvedValue(null);
+  });
+
+  afterEach(() => {
+    if (originalMatchMedia === undefined) {
+      delete (window as unknown as { matchMedia?: unknown }).matchMedia;
+    } else {
+      window.matchMedia = originalMatchMedia;
+    }
+  });
+
+  function mockMobileViewport() {
+    window.matchMedia = vi.fn(() => ({
+      matches: true,
+      media: '(max-width: 768px)',
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })) as unknown as typeof matchMedia;
+  }
+
+  it('oculta la descripción del usuario y el label de preguntas en móvil', () => {
+    mockMobileViewport();
+    renderCoach();
+
+    expect(screen.getByText('FitAI Coach')).toBeInTheDocument();
+    expect(screen.queryByText(/Asistente de entrenamiento personal/)).not.toBeInTheDocument();
+    expect(screen.queryByText('Preguntas Rápidas Frecuentes')).not.toBeInTheDocument();
+    expect(FREQUENT_COACH_QUESTIONS[0]).toBeTruthy();
+    expect(screen.getByPlaceholderText(/Escribe tu consulta/)).toBeInTheDocument();
   });
 });
