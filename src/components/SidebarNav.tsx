@@ -61,6 +61,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({ onOpenSafetyModal }) => 
               </div>
               {item.badge && (
                 <span
+                  aria-hidden="true"
                   className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
                     item.badge === 'EN VIVO'
                       ? 'bg-red-500/20 text-red-400 border border-red-500/30 animate-pulse'

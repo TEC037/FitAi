@@ -107,14 +107,20 @@ describe('SidebarNav (navegación)', () => {
   });
 });
 
-describe('MobileNav (navegación)', () => {
+describe('MobileNav (navegación con 1 botón)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockApp();
   });
 
-  it('muestra las secciones principales', () => {
+  it('renderiza un único botón flotante y las secciones al abrirlo', () => {
     render(<MobileNav />);
+
+    expect(screen.getByRole('button', { name: 'Abrir menú' })).toBeInTheDocument();
+    expect(screen.queryByText('Inicio')).not.toBeInTheDocument();
+    expect(screen.queryByText('Entrenar')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir menú' }));
 
     expect(screen.getByText('Inicio')).toBeInTheDocument();
     expect(screen.getByText('Rutina')).toBeInTheDocument();
@@ -124,20 +130,24 @@ describe('MobileNav (navegación)', () => {
     expect(screen.getByText('Perfil')).toBeInTheDocument();
   });
 
-  it('navega al hacer clic en un enlace', () => {
+  it('navega al hacer clic en un enlace y cierra el menú', () => {
     render(<MobileNav />);
 
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir menú' }));
     fireEvent.click(screen.getByText('Rutina'));
     expect(navigateTo).toHaveBeenCalledWith('routine');
 
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir menú' }));
     fireEvent.click(screen.getByText('Coach IA'));
     expect(navigateTo).toHaveBeenCalledWith('coach');
+    expect(screen.queryByText('Coach IA')).not.toBeInTheDocument();
   });
 
   it('marca con aria-current el enlace activo', () => {
     mockApp({ currentScreen: 'coach' });
     render(<MobileNav />);
 
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir menú' }));
     expect(screen.getByText('Coach IA').closest('button')).toHaveAttribute('aria-current', 'page');
   });
 
@@ -145,20 +155,22 @@ describe('MobileNav (navegación)', () => {
     mockApp({ isWorkoutActive: true });
     render(<MobileNav />);
 
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir menú' }));
     expect(screen.getByText('En vivo')).toBeInTheDocument();
   });
 
-  it('renderiza el botón de entrenar como botón de acción flotante', () => {
+  it('el botón flotante navega a Entrenar como acción principal del menú', () => {
     render(<MobileNav />);
 
-    const actionBtn = screen.getByText('Entrenar').closest('button');
-    expect(actionBtn).toHaveClass('bg-[#C0FF00]');
-    expect(actionBtn).toHaveClass('rounded-full');
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir menú' }));
+    fireEvent.click(screen.getByText('Entrenar').closest('button')!);
+    expect(navigateTo).toHaveBeenCalledWith('workout');
   });
 
   it('navega al perfil al hacer clic en Perfil', () => {
     render(<MobileNav />);
 
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir menú' }));
     fireEvent.click(screen.getByText('Perfil'));
     expect(navigateTo).toHaveBeenCalledWith('profile');
   });

@@ -8,6 +8,7 @@ import {
 } from '../services/exerciseDatabaseService';
 import { computeDashboardStats, stripReps } from '../utils/dashboardStats';
 import { formatVolumeKg, formatNumber } from '../utils/format';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 export const DashboardView: React.FC = () => {
   const { user, routines, startWorkout, navigateTo, history, personalRecords, weightHistory } =
@@ -50,6 +51,8 @@ export const DashboardView: React.FC = () => {
 
   const latestPr = stats.latestPersonalRecord;
 
+  const isMobile = useIsMobile();
+
   // Find Day 1 as today's routine (Empuje Dinámico)
   const todaysRoutine = routines.find((r) => r.dayNumber === 1) || routines[0];
 
@@ -58,6 +61,78 @@ export const DashboardView: React.FC = () => {
       <div className="flex-1 p-4 sm:p-8 flex flex-col gap-8 max-w-[1600px] mx-auto w-full">
         <div className="bg-[#0A0A0A] border border-white/10 rounded-[32px] p-12 text-center text-white/60">
           Aún no tienes rutinas generadas. Completa tu onboarding para personalizar tu plan.
+        </div>
+      </div>
+    );
+  }
+
+  if (isMobile) {
+    return (
+      <div className="flex-1 px-4 pt-5 pb-6 flex flex-col gap-5 relative overflow-hidden max-w-md mx-auto w-full">
+        <div className="flex items-center justify-between relative z-10">
+          <div className="min-w-0">
+            <p className="text-[10px] text-white/40 uppercase tracking-wider font-bold">
+              Plan Activo • {user.primaryGoal.toUpperCase()}
+            </p>
+            <h1 className="text-xl font-black tracking-tight text-white truncate">
+              ¡Hola, {user.name.split(' ')[0]}!
+            </h1>
+          </div>
+          <div className="shrink-0 text-right">
+            <p className="text-[10px] text-white/40 uppercase tracking-wider font-bold">
+              Cumplimiento
+            </p>
+            <p className="font-black text-lg text-[#C0FF00]">{user.weeklyCompliance}%</p>
+          </div>
+        </div>
+
+        <button
+          id="btn-mobile-start-workout"
+          onClick={() => startWorkout(todaysRoutine.dayNumber)}
+          className="w-full py-8 rounded-3xl font-black text-xl text-black bg-[#C0FF00] shadow-[0_0_40px_rgba(192,255,0,0.35)] active:scale-[0.98] transition-transform flex items-center justify-center gap-3"
+        >
+          <Play className="w-7 h-7 fill-current" />
+          ENTRENAR
+        </button>
+
+        <div className="bg-[#0A0A0A] border border-white/10 rounded-3xl p-5">
+          <p className="text-[10px] text-[#C0FF00] uppercase font-bold tracking-wider mb-1">
+            Siguiente Sesión · Día {todaysRoutine.dayNumber}
+          </p>
+          <h2 className="text-xl font-black uppercase italic tracking-tight text-white">
+            {todaysRoutine.name}
+          </h2>
+          <p className="text-xs text-white/50 mt-1">
+            {todaysRoutine.exercises.length} ejercicios • {todaysRoutine.estimatedMinutes} min •
+            Enfoque: {todaysRoutine.focus}
+          </p>
+          <div className="flex flex-wrap gap-1.5 mt-3">
+            {todaysRoutine.targetMuscles.map((m) => (
+              <span
+                key={m}
+                className="px-2.5 py-0.5 rounded-lg bg-white/5 border border-white/10 text-[11px] text-white/70 font-medium"
+              >
+                {m}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-white/5 rounded-3xl border border-white/10 p-5 flex items-center gap-3">
+          <span className="text-2xl">🏆</span>
+          <div>
+            <p className="text-[10px] text-white/40 uppercase tracking-wider font-semibold">
+              PR Record
+            </p>
+            <p className="font-black text-base text-white">
+              {latestPr
+                ? `${latestPr.exerciseName} ${stripReps(latestPr.recordValue)}`
+                : '—'}
+            </p>
+            <p className="text-[10px] text-[#C0FF00] font-medium">
+              {latestPr ? `+${latestPr.progressPercent}% nuevo récord` : 'Registra tu primera marca'}
+            </p>
+          </div>
         </div>
       </div>
     );
