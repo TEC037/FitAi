@@ -9,3 +9,5 @@ script.py
 .env.*
 !.env.example
 !.env.test
+.dev.vars
+.wrangler/

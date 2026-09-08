@@ -22,6 +22,17 @@ const LLM_TIMEOUT_MS = 6000;
 const MAX_TOKENS = 220;
 const DEFAULT_MODEL = 'gpt-4o-mini';
 
+// Modelos :free de OpenRouter como respaldo. El modelo configurado vía
+// COACH_LLM_MODEL se intenta primero y, ante rate-limit (429) o indisponibilidad
+// (404/403/5xx) típica de la capa free, se prueba el siguiente hasta llegar al
+// motor local. Ordenados por fiabilidad para chat general en español.
+const FREE_FALLBACK_MODELS = [
+  'google/gemma-4-31b-it:free',
+  'google/gemma-4-26b-a4b-it:free',
+  'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',
+  'liquid/lfm-2.5-2.6b:free',
+];
+
 function buildCoachSystemPrompt(ctx: CoachContext): string {
   return [
     'Eres FitAI Coach, un entrenador personal científico y en español.',
@@ -33,18 +44,15 @@ function buildCoachSystemPrompt(ctx: CoachContext): string {
   ].join('\n');
 }
 
-export async function fetchLlmReply(
+async function tryModel(
+  url: string,
+  key: string,
+  model: string,
   question: string,
-  ctx: CoachContext,
-  env?: CoachLlmEnv | null
+  ctx: CoachContext
 ): Promise<string | null> {
-  const url = env?.COACH_LLM_API_URL?.trim();
-  const key = env?.COACH_LLM_API_KEY?.trim();
-  if (!url || !key) return null;
-
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), LLM_TIMEOUT_MS);
-
   try {
     const res = await fetch(url, {
       method: 'POST',
@@ -53,7 +61,7 @@ export async function fetchLlmReply(
         authorization: `Bearer ${key}`,
       },
       body: JSON.stringify({
-        model: env?.COACH_LLM_MODEL?.trim() || DEFAULT_MODEL,
+        model,
         messages: [
           { role: 'system', content: buildCoachSystemPrompt(ctx) },
           { role: 'user', content: question },
@@ -64,16 +72,45 @@ export async function fetchLlmReply(
       signal: controller.signal,
     });
 
-    if (!res.ok) return null;
+    if (!res.ok) {
+      // Cualquier fallo del proveedor (429/404/403/5xx...) → siguiente
+      // modelo; al agotarse la lista cae al motor local sin romperse.
+      return null;
+    }
 
     const data = (await res.json()) as {
       choices?: { message?: { content?: string } }[];
     };
     const text = data.choices?.[0]?.message?.content?.trim();
     return text && text.length > 0 ? text : null;
-  } catch {
-    return null;
+  } catch (e) {
+    if ((e as Error)?.name === 'AbortError') return null;
+    throw e;
   } finally {
     clearTimeout(timeout);
   }
+}
+
+export async function fetchLlmReply(
+  question: string,
+  ctx: CoachContext,
+  env?: CoachLlmEnv | null
+): Promise<string | null> {
+  const url = env?.COACH_LLM_API_URL?.trim();
+  const key = env?.COACH_LLM_API_KEY?.trim();
+  if (!url || !key) return null;
+
+  const configured = env?.COACH_LLM_MODEL?.trim() || DEFAULT_MODEL;
+  const candidates = [configured, ...FREE_FALLBACK_MODELS.filter((m) => m !== configured)];
+
+  for (const model of candidates) {
+    try {
+      const reply = await tryModel(url, key, model, question, ctx);
+      if (reply) return reply;
+    } catch {
+      // Error de red/infra → seguir con el siguiente candidato.
+    }
+  }
+  // Sin respuesta LLM → el handler usa el motor local (degradación silenciosa).
+  return null;
 }
