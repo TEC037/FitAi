@@ -14,7 +14,7 @@ export const SERVERLESS_COACH_URL: string =
 
 const SERVER_READ_TIMEOUT_MS = 5000;
 
-export interface ServerlessCoachPayload {
+interface ServerlessCoachPayload {
   /** pregunta del usuario */
   q: string;
   /** peso (kg) */
@@ -28,9 +28,9 @@ export interface ServerlessCoachPayload {
 }
 
 /** Origen de la respuesta según el servidor. */
-export type ServerCoachReplySource = 'llm' | 'engine';
+type ServerCoachReplySource = 'llm' | 'engine';
 
-export interface ServerCoachReply {
+interface ServerCoachReply {
   answer: string;
   source: ServerCoachReplySource;
 }

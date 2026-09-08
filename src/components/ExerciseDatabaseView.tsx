@@ -125,7 +125,7 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
     }
   }, [selectedCategory, selectedEquipment, selectedTarget]);
 
-  // Debounced search: filtra 1,324 ejercicios tras pausa de tipeo
+  // Debounced search: filtra los ejercicios tras pausa de tipeo
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 250);
 
   // Modal / Detail state
@@ -575,7 +575,7 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
 
 type ExerciseMeta = { id: string; label: string };
 
-export type ResultSortOrder = 'relevance' | 'name' | 'name-desc';
+type ResultSortOrder = 'relevance' | 'name' | 'name-desc';
 
 const SortSelect: React.FC<{
   sortOrder: ResultSortOrder;
@@ -631,7 +631,7 @@ interface ExerciseFilterBarProps {
   onReset: () => void;
 }
 
-export const ExerciseFilterBar: React.FC<ExerciseFilterBarProps> = ({
+const ExerciseFilterBar: React.FC<ExerciseFilterBarProps> = ({
   searchQuery,
   selectedCategory,
   selectedEquipment,
@@ -755,7 +755,7 @@ interface ExerciseLibraryCardProps {
   onAddToRoutine: (exercise: DatasetExercise, dayNumber: number) => void;
 }
 
-export const ExerciseLibraryCard: React.FC<ExerciseLibraryCardProps> = ({
+const ExerciseLibraryCard: React.FC<ExerciseLibraryCardProps> = ({
   exercise,
   routines,
   searchQuery,
@@ -906,7 +906,7 @@ interface ExerciseDetailModalProps {
   onAddToRoutine: (exercise: DatasetExercise) => void;
 }
 
-export const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
+const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
   exercise,
   onClose,
   onConsultCoach,

@@ -26,7 +26,7 @@ export interface CoachContext {
   allometric: AllometricProfile;
 }
 
-export interface CoachReply {
+interface CoachReply {
   text: string;
   category: ChatMessage['category'];
 }

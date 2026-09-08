@@ -20,9 +20,7 @@ import { useApp } from '../context/useApp';
 import { Exercise } from '../types';
 import { useGuidanceStep } from '../hooks/useGuidanceStep';
 
-// ---------------------------------------------------------------------------
-// Mesa de set activo más descanso: "entrenamiento unificado" dentro de Rutina.
-// ---------------------------------------------------------------------------
+// --- Mesa de set activo más descanso: "entrenamiento unificado" dentro de Rutina.
 const ActiveWorkoutCard: React.FC = () => {
   const {
     activeRoutine,
@@ -248,7 +246,6 @@ const ActiveWorkoutCard: React.FC = () => {
         </button>
       </div>
 
-      {/* Finalizar */}
       {showFinish && (
         <form onSubmit={handleFinish} className="bg-amber-50 border border-amber-200 rounded-2xl p-4 space-y-3 animate-sheet-fade">
           <p className="text-sm font-black text-slate-800">Resumen de la sesión</p>
@@ -295,9 +292,7 @@ const ActiveWorkoutCard: React.FC = () => {
   );
 };
 
-// ---------------------------------------------------------------------------
-// Panel Coach IA unificado en Rutina.
-// ---------------------------------------------------------------------------
+// --- Panel Coach IA unificado en Rutina.
 const FREQUENT_QUESTIONS = [
   '¿Cuántos días debo entrenar esta semana?',
   '¿Cómo evito el estancamiento en mis pesos?',
@@ -414,9 +409,7 @@ const CoachPanel: React.FC = () => {
   );
 };
 
-// ---------------------------------------------------------------------------
-// Rutina unificada: rutina + entrenamiento activo + consejos de IA.
-// ---------------------------------------------------------------------------
+// --- Rutina unificada: rutina + entrenamiento activo + consejos de IA.
 export const RoutineView: React.FC = () => {
   const {
     routines,
@@ -591,7 +584,7 @@ export const RoutineView: React.FC = () => {
               </div>
               <div className="text-left">
                 <p className="text-sm font-bold">Añadir ejercicio al Día {currentRoutine?.dayNumber}</p>
-                <p className="text-xs">Explora +1,324 ejercicios desde la Biblioteca</p>
+                <p className="text-xs">Explora todos los ejercicios de la Biblioteca</p>
               </div>
             </button>
           </div>
@@ -604,9 +597,7 @@ export const RoutineView: React.FC = () => {
   );
 };
 
-// ---------------------------------------------------------------------------
-// Fila de ejercicio: correcto y minimal, con detalles expandibles.
-// ---------------------------------------------------------------------------
+// --- Fila de ejercicio: correcto y minimal, con detalles expandibles.
 interface RoutineExerciseRowProps {
   exercise: Exercise;
   index: number;

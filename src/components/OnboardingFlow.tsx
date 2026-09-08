@@ -65,7 +65,7 @@ interface ProfileStepProps {
   onToggleAdvanced: () => void;
 }
 
-export const ProfileStep: React.FC<ProfileStepProps> = ({
+const ProfileStep: React.FC<ProfileStepProps> = ({
   name,
   age,
   gender,
@@ -399,7 +399,7 @@ interface GenerationStepProps {
   onFinish: () => void;
 }
 
-export const GenerationStep: React.FC<GenerationStepProps> = ({
+const GenerationStep: React.FC<GenerationStepProps> = ({
   isGenerating,
   generationProgress,
   daysPerWeek,

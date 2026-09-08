@@ -1,8 +1,6 @@
 import { DatasetExercise, Exercise } from '../types';
 export const DATASET_GITHUB_REPO = 'https://github.com/hasaneyldrm/exercises-dataset';
-export const DATASET_CDN_BASE = 'https://cdn.jsdelivr.net/gh/hasaneyldrm/exercises-dataset@main/';
-export const DATASET_RAW_BASE =
-  'https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/';
+const DATASET_CDN_BASE = 'https://cdn.jsdelivr.net/gh/hasaneyldrm/exercises-dataset@main/';
 
 export let EXERCISE_DATABASE: DatasetExercise[] = [];
 
@@ -26,7 +24,7 @@ export async function loadExerciseDatabase(): Promise<DatasetExercise[]> {
 }
 
 // Category translations
-export const CATEGORY_TRANSLATIONS: Record<string, string> = {
+const CATEGORY_TRANSLATIONS: Record<string, string> = {
   chest: 'Pecho',
   back: 'Espalda',
   'upper legs': 'Piernas (Cuádriceps e Isquios)',
@@ -40,7 +38,7 @@ export const CATEGORY_TRANSLATIONS: Record<string, string> = {
 };
 
 // Equipment translations
-export const EQUIPMENT_TRANSLATIONS: Record<string, string> = {
+const EQUIPMENT_TRANSLATIONS: Record<string, string> = {
   barbell: 'Barra',
   dumbbell: 'Mancuernas',
   'body weight': 'Peso Corporal',
@@ -65,7 +63,7 @@ export const EQUIPMENT_TRANSLATIONS: Record<string, string> = {
 };
 
 // Target muscle translations
-export const TARGET_TRANSLATIONS: Record<string, string> = {
+const TARGET_TRANSLATIONS: Record<string, string> = {
   pectorals: 'Pectorales',
   lats: 'Dorsal Ancho',
   delts: 'Deltoides',

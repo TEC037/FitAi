@@ -143,19 +143,23 @@ function loadWorkoutSnapshot(): PersistedWorkoutState | null {
   }
 }
 
-function serializeScreen(screen: AppScreen): string {
-  return screen;
-}
 function parseScreen(raw: string): AppScreen {
+  let value = raw;
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (typeof parsed === 'string') value = parsed;
+  } catch {
+    // Formato legado: SCREEN se guardaba como texto plano sin JSON. 
+  }
   if (
-    raw === 'landing' ||
-    raw === 'auth' ||
-    raw === 'onboarding' ||
-    raw === 'routine' ||
-    raw === 'exercises' ||
-    raw === 'profile'
+    value === 'landing' ||
+    value === 'auth' ||
+    value === 'onboarding' ||
+    value === 'routine' ||
+    value === 'exercises' ||
+    value === 'profile'
   ) {
-    return raw;
+    return value;
   }
   return 'routine';
 }
@@ -169,8 +173,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isHydrating, setIsHydrating] = useState<boolean>(isSupabaseEnabled);
   const [currentScreen, setCurrentScreen] = usePersistedState<AppScreen>(
     STORAGE_KEYS.SCREEN,
-    isSupabaseEnabled ? 'landing' : 'landing',
-    { serialize: serializeScreen, parse: parseScreen }
+    'landing',
+    { parse: parseScreen }
   );
   const [routines, setRoutines] = usePersistedState<DailyRoutine[]>(STORAGE_KEYS.ROUTINES, []);
   const [selectedDay, setSelectedDay] = useState<number>(1);
@@ -186,47 +190,50 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
   const hydratedRef = React.useRef(false);
 
-  // Active workout state (persistido para recuperar sesiones en curso tras recarga)
+  // Active workout state (persistido para recuperar sesiones en curso tras recarga).
+  // El snapshot se lee UNA sola vez; los estados iniciales comparten la misma lectura.
+  const [workoutSnapshot] = useState<PersistedWorkoutState | null>(() => loadWorkoutSnapshot());
+
   const [isWorkoutActive, setIsWorkoutActive] = useState<boolean>(() => {
-    const s = loadWorkoutSnapshot();
+    const s = workoutSnapshot;
     return s?.isWorkoutActive ?? false;
   });
   const [activeRoutine, setActiveRoutine] = useState<DailyRoutine | null>(() => {
-    const s = loadWorkoutSnapshot();
+    const s = workoutSnapshot;
     return s?.isWorkoutActive ? s.activeRoutine : null;
   });
   const [activeExerciseIndex, setActiveExerciseIndex] = useState<number>(() => {
-    const s = loadWorkoutSnapshot();
+    const s = workoutSnapshot;
     return s?.isWorkoutActive ? s.activeExerciseIndex : 0;
   });
   const [activeSetIndex, setActiveSetIndex] = useState<number>(() => {
-    const s = loadWorkoutSnapshot();
+    const s = workoutSnapshot;
     return s?.isWorkoutActive ? s.activeSetIndex : 1;
   });
   const [activeWorkoutSets, setActiveWorkoutSets] = useState<LoggedSet[]>(() => {
-    const s = loadWorkoutSnapshot();
+    const s = workoutSnapshot;
     return s?.isWorkoutActive ? s.activeWorkoutSets : [];
   });
   const [workoutStartedAt, setWorkoutStartedAt] = useState<number>(() => {
-    const s = loadWorkoutSnapshot();
+    const s = workoutSnapshot;
     return s?.isWorkoutActive && s.workoutStartedAt > 0 ? s.workoutStartedAt : 0;
   });
   const [workoutElapsedTime, setWorkoutElapsedTime] = useState<number>(() => {
-    const s = loadWorkoutSnapshot();
+    const s = workoutSnapshot;
     if (s?.isWorkoutActive && s.workoutStartedAt > 0) {
       return Math.floor((Date.now() - s.workoutStartedAt) / 1000);
     }
     return 0;
   });
   const [restTimerSeconds, setRestTimerSeconds] = useState<number>(() => {
-    const s = loadWorkoutSnapshot();
+    const s = workoutSnapshot;
     if (s?.isRestTimerActive && s.restTimerDeadline > 0) {
       return Math.max(0, Math.floor((s.restTimerDeadline - Date.now()) / 1000));
     }
     return 0;
   });
   const [isRestTimerActive, setIsRestTimerActive] = useState<boolean>(() => {
-    const s = loadWorkoutSnapshot();
+    const s = workoutSnapshot;
     if (!s?.isRestTimerActive) return false;
     return s.restTimerDeadline > Date.now();
   });
@@ -360,6 +367,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     void persistRecords(activeUserId, personalRecords);
   }, [personalRecords, isAuthenticated, activeUserId]);
 
+  // El historial de peso vive en memoria hasta fusionarse en las sesiones; se
+  // persiste por si la sesión se cierra antes de registrar un entrenamiento.
   useEffect(() => {
     if (!isSupabaseEnabled || !isAuthenticated || !activeUserId || !hydratedRef.current) return;
     void persistWeightHistory(activeUserId, weightHistory);

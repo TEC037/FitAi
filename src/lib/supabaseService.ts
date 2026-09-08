@@ -12,7 +12,7 @@ import { MOCK_ROUTINES } from '../data/mockRoutines';
 import { INITIAL_CHAT_MESSAGES } from '../data/mockCoach';
 import { MOCK_HISTORY, MOCK_PRS, MOCK_WEIGHT_HISTORY } from '../data/mockProgress';
 
-export interface HydratedData {
+interface HydratedData {
   profile: UserProfile | null;
   routines: DailyRoutine[];
   history: WorkoutSessionLog[];

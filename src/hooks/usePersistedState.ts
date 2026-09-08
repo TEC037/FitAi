@@ -1,7 +1,7 @@
 import { useState, useEffect, Dispatch, SetStateAction } from 'react';
 
 interface UsePersistedStateOptions<T> {
-  /** Custom serialization (default: JSON.stringify). 'currentScreen' guarda texto plano. */
+  /** Custom serialization (default: JSON.stringify). */
   serialize?: (value: T) => string;
   /** Custom parsing al restaurar (default: JSON.parse). */
   parse?: (raw: string) => T;

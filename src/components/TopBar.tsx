@@ -1,5 +1,5 @@
 import React from 'react';
-import { Zap, LogIn, Play } from 'lucide-react';
+import { Zap, Play } from 'lucide-react';
 import { useApp } from '../context/useApp';
 
 interface TopBarProps {
@@ -85,7 +85,5 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenNav }) => {
     </header>
   );
 };
-
-export const LoginPill = LogIn;
 
 export default TopBar;

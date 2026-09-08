@@ -23,12 +23,7 @@ export interface IllustratedFilterRowProps {
   activeTarget?: string;
 }
 
-/**
- * Fila de filtros ilustrados: cada opción muestra la foto real de un ejercicio
- * representativo del dataset (p. ej. la máquina, la pelota fitball o la barra)
- * junto a su etiqueta y el número de ejercicios, para que se entienda y se
- * encuentre lo que se busca en el gimnasio sin leer catálogos.
- */
+/** Fila de filtros ilustrados con la foto real de un ejercicio representativo del dataset. */
 export const IllustratedFilterRow: React.FC<IllustratedFilterRowProps> = ({
   id,
   title,

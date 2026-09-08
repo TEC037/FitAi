@@ -14,8 +14,6 @@ import { useApp } from '../context/useApp';
 export const AuthView: React.FC = () => {
   const { loginDemoUser, loginWithEmail, registerWithEmail } = useApp();
   const [tab, setTab] = useState<'login' | 'register' | 'forgot'>('login');
-
-  // Form states
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
