@@ -1,6 +1,7 @@
 import React from 'react';
 import { Activity, Trophy, TrendingUp, Clock, Flame, Scale, Dumbbell } from 'lucide-react';
 import { useApp } from '../context/useApp';
+import { computeDashboardStats } from '../utils/dashboardStats';
 
 /** Métricas de progreso integradas en el Perfil. */
 export const ProgressSummary: React.FC = () => {
@@ -8,6 +9,10 @@ export const ProgressSummary: React.FC = () => {
 
   const totalVolumeTonnes = (history.reduce((s, h) => s + h.totalVolumeKg, 0) / 1000).toFixed(1);
   const totalHours = (history.reduce((s, h) => s + h.durationMinutes, 0) / 60).toFixed(1);
+
+  const stats = computeDashboardStats(history, weightHistory, personalRecords);
+  const hasWeekVolume = stats.weeklyBuckets.some((b) => b.volumeKg > 0);
+  const maxWeekVolume = Math.max(...stats.weeklyBuckets.map((b) => b.volumeKg), 1);
 
   const kpis = [
     { label: 'Constancia', value: `${user.weeklyCompliance}%`, icon: Activity, tone: 'text-lime-600 bg-lime-100' },
@@ -98,6 +103,54 @@ export const ProgressSummary: React.FC = () => {
             </ul>
           )}
         </div>
+      </div>
+
+      {/* Volumen semanal (últimas 4 semanas) */}
+      <div className="bg-white/70 border border-black/5 rounded-2xl p-5">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Flame className="w-4 h-4 text-orange-500" />
+            <p className="text-sm font-black">Volumen semanal</p>
+          </div>
+          {stats.weeklyVolumeTrendPercent !== null && hasWeekVolume && (
+            <span
+              className={`text-[11px] font-black flex items-center gap-1 ${
+                stats.weeklyVolumeTrendPercent >= 0 ? 'text-lime-600' : 'text-red-500'
+              }`}
+            >
+              <TrendingUp
+                className={`w-3 h-3 ${stats.weeklyVolumeTrendPercent < 0 ? 'rotate-180' : ''}`}
+              />
+              {stats.weeklyVolumeTrendPercent >= 0 ? '+' : ''}
+              {Math.round(stats.weeklyVolumeTrendPercent)}%
+            </span>
+          )}
+        </div>
+        <div className="flex items-end gap-2 h-24">
+          {stats.weeklyBuckets.map((bucket, i) => {
+            const isCurrent = i === stats.weeklyBuckets.length - 1;
+            return (
+              <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                <div
+                  className={`w-full rounded-t-lg ${
+                    isCurrent
+                      ? 'bg-gradient-to-t from-orange-300 to-amber-300'
+                      : 'bg-gradient-to-t from-indigo-200 to-sky-300'
+                  }`}
+                  style={{ height: `${Math.max(6, (bucket.volumeKg / maxWeekVolume) * 100)}%` }}
+                />
+                <span className="text-[9px] text-slate-400 font-bold">
+                  {isCurrent ? 'ahora' : `${stats.weeklyBuckets.length - 1 - i}s`}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+        <p className="text-[11px] text-slate-500 mt-3 font-semibold">
+          {hasWeekVolume
+            ? `Última semana: ${Math.round(stats.latestWeekVolumeKg)} kg • ${stats.workoutsThisWeek} sesiones esta semana`
+            : 'Registra tus sesiones para ver tu volumen semanal.'}
+        </p>
       </div>
     </div>
   );

@@ -60,6 +60,31 @@ describe('ProfileView', () => {
     expect(screen.getByDisplayValue('carlos.ramirez@fitai.example')).toBeInTheDocument();
   });
 
+  it('muestra la tarjeta de volumen semanal vacía sin historial', () => {
+    render(
+      <AppProvider>
+        <ProfileView onOpenSafetyModal={() => {}} />
+      </AppProvider>
+    );
+
+    expect(screen.getByText('Volumen semanal')).toBeInTheDocument();
+    expect(screen.getByText(/Registra tus sesiones para ver tu volumen semanal/)).toBeInTheDocument();
+  });
+
+  it('deriva el volumen semanal del historial tras iniciar sesión', async () => {
+    render(
+      <AppProvider>
+        <LoginDemo>
+          <AuthHarness />
+        </LoginDemo>
+      </AppProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Última semana:.*kg/)).toBeInTheDocument();
+    });
+  });
+
   it('guarda un cambio de nombre en localStorage y muestra el mensaje de éxito', async () => {
     render(
       <AppProvider>

@@ -227,10 +227,3 @@ export const MOCK_WEIGHT_HISTORY = [
   { date: '28 Ago', weight: 78.1 },
   { date: '03 Sep', weight: 78.2 },
 ];
-
-export const MOCK_WEEKLY_VOLUME = [
-  { week: 'Sem 1', volumeKg: 10800, workouts: 3 },
-  { week: 'Sem 2', volumeKg: 11400, workouts: 4 },
-  { week: 'Sem 3', volumeKg: 12100, workouts: 4 },
-  { week: 'Sem 4 (Actual)', volumeKg: 12450, workouts: 3 },
-];
