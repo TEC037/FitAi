@@ -16,10 +16,12 @@ import {
   Flag,
   ArrowRight,
   Copy,
+  Share2,
 } from 'lucide-react';
 import { useApp } from '../context/useApp';
 import { Exercise } from '../types';
 import { useGuidanceStep } from '../hooks/useGuidanceStep';
+import { formatRoutineForSharing } from '../utils/routineShare';
 
 // --- Mesa de set activo más descanso: "entrenamiento unificado" dentro de Rutina.
 const ActiveWorkoutCard: React.FC = () => {
@@ -424,6 +426,27 @@ export const RoutineView: React.FC = () => {
   } = useApp();
   const guidance = useGuidanceStep();
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const handleShareRoutine = async () => {
+    const text = formatRoutineForSharing(routines);
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2500);
+    } catch {
+      setCopied(false);
+    }
+  };
 
   // Entrenamiento activo tiene prioridad absoluta dentro de Rutina.
   if (isWorkoutActive) {
@@ -451,6 +474,20 @@ export const RoutineView: React.FC = () => {
             Entrena, descansa y acumula consejos de IA en un solo paso.
           </p>
         </div>
+        {hasExercises && (
+          <button
+            onClick={() => void handleShareRoutine()}
+            aria-live="polite"
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold transition-all border ${
+              copied
+                ? 'bg-lime-100 text-[#547c08] border-lime-200'
+                : 'bg-white/70 text-slate-600 border-black/10 hover:bg-white'
+            }`}
+          >
+            <Share2 className="w-4 h-4" />
+            {copied ? '¡Rutina copiada!' : 'Compartir'}
+          </button>
+        )}
       </div>
 
       {/* Estado vacío (nuevo usuario) */}

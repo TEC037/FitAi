@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { RoutineView } from './RoutineView';
 import { DailyRoutine, Exercise, ExperienceLevel, WorkoutSessionLog } from '../types';
 
@@ -147,6 +147,22 @@ describe('RoutineView (vista unificada)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Duplicar este día de rutina' }));
     expect(useAppMock().duplicateRoutineDay).toHaveBeenCalledWith(1);
     expect(setSelectedDay).toHaveBeenCalledWith(3);
+  });
+
+  it('comparte la rutina y muestra la confirmación copiada', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true,
+    });
+    mockView();
+    render(<RoutineView />);
+
+    fireEvent.click(screen.getByRole('button', { name: /Compartir/ }));
+    await waitFor(() => {
+      expect(writeText).toHaveBeenCalled();
+      expect(screen.getByText('¡Rutina copiada!')).toBeInTheDocument();
+    });
   });
 
   it('abre el Coach IA y envía una pregunta', () => {
