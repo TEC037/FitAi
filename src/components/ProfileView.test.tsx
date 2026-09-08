@@ -69,6 +69,24 @@ describe('ProfileView', () => {
 
     expect(screen.getByText('Volumen semanal')).toBeInTheDocument();
     expect(screen.getByText(/Registra tus sesiones para ver tu volumen semanal/)).toBeInTheDocument();
+    expect(screen.getByText(/Termina tu primer entrenamiento y se guardará aquí/)).toBeInTheDocument();
+  });
+
+  it('lista las sesiones del historial tras iniciar sesión', async () => {
+    render(
+      <AppProvider>
+        <LoginDemo>
+          <AuthHarness />
+        </LoginDemo>
+      </AppProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Historial reciente')).toBeInTheDocument();
+    });
+    expect(screen.getByText('Empuje Dinámico')).toBeInTheDocument();
+    expect(screen.getByText('Tracción & Espalda Fuerte')).toBeInTheDocument();
+    expect(screen.getByText('02 sep 2026')).toBeInTheDocument();
   });
 
   it('deriva el volumen semanal del historial tras iniciar sesión', async () => {

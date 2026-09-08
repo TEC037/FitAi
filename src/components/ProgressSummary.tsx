@@ -1,7 +1,8 @@
 import React from 'react';
-import { Activity, Trophy, TrendingUp, Clock, Flame, Scale, Dumbbell } from 'lucide-react';
+import { Activity, Trophy, TrendingUp, Clock, Flame, Scale, Dumbbell, History } from 'lucide-react';
 import { useApp } from '../context/useApp';
 import { computeDashboardStats } from '../utils/dashboardStats';
+import { formatIsoDate } from '../utils/format';
 
 /** Métricas de progreso integradas en el Perfil. */
 export const ProgressSummary: React.FC = () => {
@@ -151,6 +152,43 @@ export const ProgressSummary: React.FC = () => {
             ? `Última semana: ${Math.round(stats.latestWeekVolumeKg)} kg • ${stats.workoutsThisWeek} sesiones esta semana`
             : 'Registra tus sesiones para ver tu volumen semanal.'}
         </p>
+      </div>
+
+      {/* Historial reciente */}
+      <div className="bg-white/70 border border-black/5 rounded-2xl p-5">
+        <div className="flex items-center gap-2 mb-3">
+          <History className="w-4 h-4 text-indigo-500" />
+          <p className="text-sm font-black">Historial reciente</p>
+        </div>
+        {history.length === 0 ? (
+          <p className="text-xs text-slate-400">
+            Termina tu primer entrenamiento y se guardará aquí.
+          </p>
+        ) : (
+          <ul className="space-y-2">
+            {history.slice(0, 5).map((session) => (
+              <li
+                key={session.id}
+                className="flex items-center justify-between gap-2 text-xs bg-white/60 border border-black/5 rounded-xl px-3 py-2"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-500 shrink-0">
+                    <Dumbbell className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-bold capitalize truncate">
+                      {session.routineName.split('(')[0].trim()}
+                    </p>
+                    <p className="text-slate-400 font-semibold">{formatIsoDate(session.date)}</p>
+                  </div>
+                </div>
+                <span className="text-slate-500 shrink-0">
+                  {session.totalSets} series • {Math.round(session.totalVolumeKg).toLocaleString()} kg
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );
