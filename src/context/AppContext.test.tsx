@@ -146,6 +146,19 @@ function FinishHarness() {
   );
 }
 
+function DuplicateHarness() {
+  const { routines, duplicateRoutineDay } = useApp();
+  const copy = routines.find((r) => r.dayNumber !== 1);
+  return (
+    <div>
+      <span data-testid="days">{routines.map((r) => r.dayNumber).join(',')}</span>
+      <span data-testid="copy-name">{copy?.name ?? 'none'}</span>
+      <span data-testid="copy-ex-id">{copy?.exercises[0]?.id ?? 'none'}</span>
+      <button onClick={() => duplicateRoutineDay(1)}>dup</button>
+    </div>
+  );
+}
+
 function readHistory(): WorkoutSessionLog[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.HISTORY);
@@ -308,6 +321,22 @@ describe('AppContext workout persistence', () => {
       expect(snapshot?.activeWorkoutSets).toHaveLength(1);
       expect(snapshot?.activeWorkoutSets[0].completedAt).toMatch(/^\d{2}:\d{2}$/);
     });
+  });
+
+  it('duplica un día de rutina reasignando dayNumber e ids de ejercicios', async () => {
+    render(
+      <AppProvider>
+        <DuplicateHarness />
+      </AppProvider>
+    );
+
+    fireEvent.click(screen.getByText('dup'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('days').textContent).toBe('1,2');
+    });
+    expect(screen.getByTestId('copy-name').textContent).toBe('Copia de Empuje Dinámico');
+    expect(screen.getByTestId('copy-ex-id').textContent).toMatch(/^ex1_dup_\d+_0$/);
   });
 
   it('guarda la sesión terminada con fecha local YYYY-MM-DD (sin sesgo UTC)', async () => {

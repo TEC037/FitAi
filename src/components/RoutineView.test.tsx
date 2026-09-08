@@ -70,6 +70,7 @@ function mockView(overrides: Record<string, unknown> = {}) {
     startWorkout: vi.fn(),
     navigateTo: vi.fn(),
     removeExerciseFromRoutine: vi.fn(),
+    duplicateRoutineDay: vi.fn(),
     isWorkoutActive: false,
     user,
     chatMessages: [],
@@ -135,6 +136,17 @@ describe('RoutineView (vista unificada)', () => {
 
     fireEvent.click(screen.getAllByRole('button', { name: 'Quitar de la rutina' })[0]);
     expect(useAppMock().removeExerciseFromRoutine).toHaveBeenCalledWith(1, 'e1');
+  });
+
+  it('duplica el día de rutina y selecciona la copia', () => {
+    const setSelectedDay = vi.fn();
+    mockView({ setSelectedDay });
+    useAppMock().duplicateRoutineDay.mockReturnValue(3);
+    render(<RoutineView />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Duplicar este día de rutina' }));
+    expect(useAppMock().duplicateRoutineDay).toHaveBeenCalledWith(1);
+    expect(setSelectedDay).toHaveBeenCalledWith(3);
   });
 
   it('abre el Coach IA y envía una pregunta', () => {

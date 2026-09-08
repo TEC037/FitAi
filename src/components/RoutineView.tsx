@@ -15,6 +15,7 @@ import {
   CheckCircle2,
   Flag,
   ArrowRight,
+  Copy,
 } from 'lucide-react';
 import { useApp } from '../context/useApp';
 import { Exercise } from '../types';
@@ -418,6 +419,7 @@ export const RoutineView: React.FC = () => {
     startWorkout,
     navigateTo,
     removeExerciseFromRoutine,
+    duplicateRoutineDay,
     isWorkoutActive,
   } = useApp();
   const guidance = useGuidanceStep();
@@ -531,19 +533,34 @@ export const RoutineView: React.FC = () => {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => startWorkout(currentRoutine.dayNumber)}
-                  className="relative shrink-0 inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#C0FF00] text-black font-black text-sm hover:bg-[#aee600] active:scale-95 transition-all"
-                >
-                  {guidance.step === 'routine' && (
-                    <span
-                      className="absolute -inset-1 rounded-full border-2 border-amber-400 animate-gold-ring"
-                      aria-hidden="true"
-                    />
+<div className="flex items-center gap-2 shrink-0">
+                  {routines.length > 1 && (
+                    <button
+                      onClick={() => {
+                        const newDay = duplicateRoutineDay(currentRoutine.dayNumber);
+                        if (newDay) setSelectedDay(newDay);
+                      }}
+                      className="p-3.5 rounded-full bg-white/70 border border-black/10 text-slate-500 hover:text-[#547c08] hover:border-lime-300 transition-all flex items-center justify-center"
+                      title="Duplicar este día de rutina"
+                      aria-label="Duplicar este día de rutina"
+                    >
+                      <Copy className="w-4 h-4" />
+                    </button>
                   )}
-                  <Play className="w-4 h-4 fill-current" />
-                  Iniciar Entrenamiento
-                </button>
+                  <button
+                    onClick={() => startWorkout(currentRoutine.dayNumber)}
+                    className="relative inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#C0FF00] text-black font-black text-sm hover:bg-[#aee600] active:scale-95 transition-all"
+                  >
+                    {guidance.step === 'routine' && (
+                      <span
+                        className="absolute -inset-1 rounded-full border-2 border-amber-400 animate-gold-ring"
+                        aria-hidden="true"
+                      />
+                    )}
+                    <Play className="w-4 h-4 fill-current" />
+                    Iniciar Entrenamiento
+                  </button>
+                </div>
               </div>
             </div>
           )}

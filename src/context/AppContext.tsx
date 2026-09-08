@@ -118,6 +118,7 @@ export interface AppContextType {
   replaceRoutineExercise: (dayNumber: number, oldExerciseId: string, newExercise: Exercise) => void;
   removeExerciseFromRoutine: (dayNumber: number, exerciseId: string) => void;
   resetRoutines: () => void;
+  duplicateRoutineDay: (dayNumber: number) => number | undefined;
 
   // Coach AI Actions
   sendCoachMessage: (text: string) => void;
@@ -528,6 +529,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setRoutines(MOCK_ROUTINES);
   };
 
+  const duplicateRoutineDay = (dayNumber: number): number | undefined => {
+    const source = routines.find((r) => r.dayNumber === dayNumber);
+    if (!source) return undefined;
+    let nextDay = 1;
+    const taken = new Set(routines.map((r) => r.dayNumber));
+    while (taken.has(nextDay)) nextDay += 1;
+    const stamp = Date.now();
+    const copy: DailyRoutine = {
+      ...source,
+      dayNumber: nextDay,
+      name: `Copia de ${source.name}`,
+      exercises: source.exercises.map((ex, i) => ({
+        ...ex,
+        id: `${ex.id}_dup_${stamp}_${i}`,
+      })),
+    };
+    setRoutines((prev) => [...prev, copy].sort((a, b) => a.dayNumber - b.dayNumber));
+    return nextDay;
+  };
+
   const updateUserProfile = (updates: Partial<UserProfile>) => {
     setUser((prev) => ({ ...prev, ...updates }));
     if (updates.weight) {
@@ -828,6 +849,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         replaceRoutineExercise,
         removeExerciseFromRoutine,
         resetRoutines,
+        duplicateRoutineDay,
 
         sendCoachMessage,
       }}
