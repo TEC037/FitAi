@@ -102,12 +102,27 @@ describe('RoundNav (navegación circular)', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it('cierra con doble confirmación de logout', () => {
+  it('abre un modal centrado al pulsar Cerrar Sesión', () => {
     renderNav();
     fireEvent.click(screen.getByRole('button', { name: /Cerrar Sesión/ }));
-    expect(screen.getByRole('button', { name: /¿Seguro\?/ })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: /¿Seguro\?/ }));
+    expect(screen.getByRole('dialog', { name: /Cerrar sesión/ })).toBeInTheDocument();
+  });
+
+  it('confirma el logout desde el modal y cierra el menú', () => {
+    const { onClose } = renderNav();
+    fireEvent.click(screen.getByRole('button', { name: /Cerrar Sesión/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Sí, cerrar sesión/ }));
     expect(useApp().logout).toHaveBeenCalledTimes(1);
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('cancelar cierra el modal sin cerrar la sesión', () => {
+    const { onClose } = renderNav();
+    fireEvent.click(screen.getByRole('button', { name: /Cerrar Sesión/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
+    expect(useApp().logout).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.queryByRole('dialog', { name: /Cerrar sesión/ })).not.toBeInTheDocument();
   });
 });
 

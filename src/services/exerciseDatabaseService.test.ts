@@ -93,6 +93,27 @@ describe('searchExercises', () => {
     expect(r.total).toBeGreaterThan(0);
   });
 
+  it('encuentra "bench press" escribiendo "press banca" en español', () => {
+    const r = searchExercises({ query: 'press banca', limit: 50 });
+    expect(r.total).toBeGreaterThan(0);
+    const benchNames = r.items.map((e) => e.name.toLowerCase());
+    expect(benchNames.some((n) => n.includes('bench press'))).toBe(true);
+  });
+
+  it('encuentra "squat" escribiendo "sentadilla" en español', () => {
+    const r = searchExercises({ query: 'sentadilla', limit: 50 });
+    expect(r.total).toBeGreaterThan(0);
+    const names = r.items.map((e) => e.name.toLowerCase());
+    expect(names.some((n) => n.includes('squat'))).toBe(true);
+  });
+
+  it('encuentra "dips" escribiendo "fondos" en español', () => {
+    const r = searchExercises({ query: 'fondos', limit: 50 });
+    expect(r.total).toBeGreaterThan(0);
+    const names = r.items.map((e) => e.name.toLowerCase());
+    expect(names.some((n) => n.includes('dip'))).toBe(true);
+  });
+
   it('ordena por nombre A-Z y Z-A', () => {
     const asc = searchExercises({ sort: 'name', limit: 100 });
     const names = asc.items.map((e) => e.name);

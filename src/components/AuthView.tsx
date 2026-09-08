@@ -10,6 +10,10 @@ import {
   Loader2,
 } from 'lucide-react';
 import { useApp } from '../context/useApp';
+import { isValidEmail, isStrongPassword, sanitizeEmail } from '../utils/validation';
+import { translateAuthError } from '../utils/authErrors';
+import { resetPassword } from '../lib/supabaseService';
+import { isSupabaseEnabled } from '../lib/supabaseClient';
 
 export const AuthView: React.FC = () => {
   const { loginDemoUser, loginWithEmail, registerWithEmail } = useApp();
@@ -24,41 +28,70 @@ export const AuthView: React.FC = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
+    const cleanEmail = sanitizeEmail(email);
+    if (!cleanEmail || !password) {
       setError('Por favor ingresa tu correo y contraseña.');
+      return;
+    }
+    if (!isValidEmail(cleanEmail)) {
+      setError('Por favor ingresa un correo electrónico válido.');
       return;
     }
     setError('');
     setIsSubmitting(true);
-    const { error: authError } = await loginWithEmail(email, password);
+    const { error: authError } = await loginWithEmail(cleanEmail, password);
     setIsSubmitting(false);
-    if (authError) setError(authError);
+    if (authError) setError(translateAuthError(authError));
   };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !email || !password) {
+    const cleanEmail = sanitizeEmail(email);
+    if (!name || !cleanEmail || !password) {
       setError('Por favor completa todos los campos para registrarte.');
       return;
     }
-    if (password.length < 6) {
-      setError('La contraseña debe contener al menos 6 caracteres.');
+    if (!isValidEmail(cleanEmail)) {
+      setError('Por favor ingresa un correo electrónico válido.');
+      return;
+    }
+    const pwCheck = isStrongPassword(password);
+    if (!pwCheck.valid) {
+      setError(pwCheck.message);
       return;
     }
     setError('');
     setIsSubmitting(true);
-    const { error: registerError } = await registerWithEmail(email, password, name);
+    const { error: registerError } = await registerWithEmail(cleanEmail, password, name);
     setIsSubmitting(false);
-    if (registerError) setError(registerError);
+    if (registerError) setError(translateAuthError(registerError));
   };
 
-  const handleForgot = (e: React.FormEvent) => {
+  const handleForgot = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) {
+    const cleanEmail = sanitizeEmail(email);
+    if (!cleanEmail) {
       setError('Por favor ingresa tu correo electrónico registrado.');
       return;
     }
+    if (!isValidEmail(cleanEmail)) {
+      setError('Por favor ingresa un correo electrónico válido.');
+      return;
+    }
     setError('');
+    setIsSubmitting(true);
+    
+    if (isSupabaseEnabled) {
+      const { error } = await resetPassword(cleanEmail);
+      setIsSubmitting(false);
+      if (error) {
+        setError(translateAuthError(error));
+        return;
+      }
+    } else {
+      setIsSubmitting(false);
+    }
+    
     setRecoverySent(true);
   };
 

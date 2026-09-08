@@ -93,9 +93,20 @@ export const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
             <p className="text-sm font-bold text-white capitalize">
               {translateTarget(exercise.target)} ({exercise.target})
             </p>
-            <p className="text-xs text-white/50 mt-1">
-              Equipamiento: {translateEquipment(exercise.equipment)}
-            </p>
+            <div className="text-xs text-white/50 mt-1 space-y-0.5">
+              <p>
+                Región corporal:{' '}
+                <span className="text-white/80 font-medium capitalize">
+                  {translateCategory(exercise.body_part)}
+                </span>
+              </p>
+              <p>
+                Equipamiento:{' '}
+                <span className="text-white/80 font-medium">
+                  {translateEquipment(exercise.equipment)}
+                </span>
+              </p>
+            </div>
           </div>
 
           <div>

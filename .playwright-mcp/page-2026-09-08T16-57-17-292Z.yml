@@ -1,0 +1,53 @@
+- generic [ref=e196]:
+  - banner [ref=e197]:
+    - generic [ref=e198]:
+      - button "FitAI Coach" [ref=e199]:
+        - generic [ref=e203]:
+          - generic [ref=e204]: FitAI Coach
+          - generic [ref=e205]: PaaS Gym AI
+      - generic [ref=e206]:
+        - generic [ref=e207]:
+          - paragraph [ref=e208]: Carlos Ramírez
+          - paragraph [ref=e209]: Nivel intermedio
+        - button "Abrir menú de navegación" [ref=e210]: CA
+  - main [ref=e212]:
+    - generic [ref=e3149]:
+      - generic [ref=e3150]:
+        - generic [ref=e3151]:
+          - generic [ref=e3152]: Entrenamiento en vivo
+          - heading "Empuje Dinámico" [level=2] [ref=e3154]
+          - paragraph [ref=e3155]: Día 1 • Pecho y Tríceps
+        - button "Finalizar" [ref=e3156]
+      - generic [ref=e3172]:
+        - paragraph [ref=e3173]: Ejercicio 1 de 6
+        - heading "Press de Banca con Barra" [level=3] [ref=e3174]
+        - paragraph [ref=e3175]:
+          - strong [ref=e3176]: 4 series
+          - text: × 8-10 reps • 82.5 kg • descanso 90s
+        - paragraph [ref=e3177]: 💡 Retrae las escápulas, apoya los pies firmes y desciende con control hacia el esternón medio.
+      - generic [ref=e3178]:
+        - paragraph [ref=e3179]: Serie 2 de 4
+        - generic [ref=e3180]:
+          - generic [ref=e3181]:
+            - text: Peso (kg)
+            - spinbutton "Peso (kg)" [ref=e3182]: "82.5"
+          - generic [ref=e3183]:
+            - text: Reps
+            - spinbutton "Reps" [ref=e3184]
+          - generic [ref=e3185]:
+            - text: RPE
+            - spinbutton "RPE" [ref=e3186]: "8"
+        - button "Registrar Serie" [active] [ref=e3187]
+        - paragraph [ref=e3191]: "Series registradas hoy: 1 • Volumen total: 825 kg"
+      - generic [ref=e3192]:
+        - generic [ref=e3193]: 01:30
+        - generic [ref=e3194]:
+          - paragraph [ref=e3195]: Temporizador de descanso
+          - button "Pausar" [ref=e3207]
+          - generic [ref=e3200]:
+            - button "−15s" [ref=e3201]
+            - button "+15s" [ref=e3202]
+      - generic [ref=e3203]:
+        - button "← Anterior" [disabled] [ref=e3204]
+        - button "Siguiente →" [ref=e3205]
+      - button "Cancelar entrenamiento" [ref=e3206]

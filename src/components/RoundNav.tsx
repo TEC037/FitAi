@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Dumbbell,
   BookOpen,
@@ -7,10 +8,14 @@ import {
   Play,
   LogOut,
   Sparkles,
+  AlertTriangle,
 } from 'lucide-react';
 import { useApp } from '../context/useApp';
 import { AppScreen } from '../types';
 import { useGuidanceStep } from '../hooks/useGuidanceStep';
+
+const FOCUSABLE_SELECTOR =
+  'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
 const RING_RADIUS = 118;
 
@@ -44,7 +49,56 @@ interface RoundNavProps {
 export const RoundNav: React.FC<RoundNavProps> = ({ isOpen, onClose }) => {
   const { currentScreen, navigateTo, user, isWorkoutActive, logout } = useApp();
   const guidance = useGuidanceStep();
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
+  const logoutDialogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isLogoutConfirmOpen) return;
+
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const focusables = () =>
+      Array.from(
+        logoutDialogRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR) ?? []
+      ).filter((el) => !el.hasAttribute('disabled'));
+
+    const firstFocusable = focusables()[0];
+    firstFocusable?.focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setIsLogoutConfirmOpen(false);
+        return;
+      }
+
+      // Trampa de foco: Tab envuelve entre el primer y último elemento del diálogo
+      if (event.key === 'Tab') {
+        const items = focusables();
+        if (items.length === 0) return;
+
+        const first = items[0];
+        const last = items[items.length - 1];
+        const active = document.activeElement as HTMLElement | null;
+
+        if (event.shiftKey) {
+          if (active === first || !logoutDialogRef.current?.contains(active)) {
+            event.preventDefault();
+            last.focus();
+          }
+        } else if (active === last || !logoutDialogRef.current?.contains(active)) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      previouslyFocused?.focus();
+    };
+  }, [isLogoutConfirmOpen]);
 
   if (!isOpen) return null;
 
@@ -63,14 +117,13 @@ export const RoundNav: React.FC<RoundNavProps> = ({ isOpen, onClose }) => {
   };
 
   const handleLogout = () => {
-    if (showLogoutConfirm) {
-      onClose();
-      setShowLogoutConfirm(false);
-      void logout();
-      return;
-    }
-    setShowLogoutConfirm(true);
-    setTimeout(() => setShowLogoutConfirm(false), 2500);
+    setIsLogoutConfirmOpen(true);
+  };
+
+  const confirmLogout = () => {
+    setIsLogoutConfirmOpen(false);
+    onClose();
+    void logout();
   };
 
   return (
@@ -185,15 +238,66 @@ export const RoundNav: React.FC<RoundNavProps> = ({ isOpen, onClose }) => {
           id="roundnav-logout"
           type="button"
           onClick={handleLogout}
-          className={`pointer-events-auto flex items-center gap-2 text-xs font-bold rounded-full px-4 py-2 transition-all ${
-            showLogoutConfirm
-              ? 'bg-red-500 text-white'
-              : 'bg-white/70 text-slate-600 border border-black/10 hover:bg-white'
-          }`}
+          className={`pointer-events-auto flex items-center gap-2 text-xs font-bold rounded-full px-4 py-2 transition-all bg-white/70 text-slate-600 border border-black/10 hover:bg-white`}
         >
           <LogOut className="w-3.5 h-3.5" />
-          {showLogoutConfirm ? '¿Seguro?' : 'Cerrar Sesión'}
+          Cerrar Sesión
         </button>
+
+        {/* Modal de confirmación de cierre de sesión (portal al body: sin ancestros
+            con transform, el position fixed se ancla al viewport y queda centrado) */}
+        {isLogoutConfirmOpen &&
+          createPortal(
+            <div
+              className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/20 backdrop-blur-xl animate-sheet-fade"
+              onMouseDown={(e) => {
+                if (e.target === e.currentTarget) setIsLogoutConfirmOpen(false);
+              }}
+              role="presentation"
+            >
+              <div
+                ref={logoutDialogRef}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="logout-modal-title"
+                className="bg-white border border-black/10 rounded-[28px] max-w-sm w-full p-6 shadow-2xl relative"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-500">
+                    <AlertTriangle className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 id="logout-modal-title" className="text-lg font-bold text-slate-900">
+                      ¿Cerrar sesión?
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      Saldrás del acceso de {user.name.split(' ')[0]}
+                    </p>
+                  </div>
+                </div>
+
+                <p className="text-sm text-slate-600 leading-relaxed mb-6">
+                  Podrás volver a entrar cuando quieras y tus rutinas y progreso se conservarán.
+                </p>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setIsLogoutConfirmOpen(false)}
+                    className="flex-1 py-3 rounded-xl bg-white text-slate-700 border border-black/10 font-bold text-sm hover:bg-slate-50 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={confirmLogout}
+                    className="flex-1 py-3 rounded-xl bg-red-500 text-white font-bold text-sm hover:bg-red-600 transition-colors shadow-lg"
+                  >
+                    Sí, cerrar sesión
+                  </button>
+                </div>
+              </div>
+            </div>,
+            document.body
+          )}
       </div>
     </div>
   );

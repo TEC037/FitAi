@@ -265,6 +265,15 @@ export async function signOutSession() {
   await client.auth.signOut();
 }
 
+export async function resetPassword(email: string) {
+  const client = await getSupabaseClient();
+  if (!client) return { error: 'Supabase no configurado' };
+  const { error } = await client.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/?type=recovery`,
+  });
+  return { error: error?.message ?? null };
+}
+
 export async function getSessionUserId(): Promise<string | null> {
   const client = await getSupabaseClient();
   if (!client) return null;
@@ -327,26 +336,35 @@ export async function persistProfile(user: UserProfile) {
 export async function persistRoutines(userId: string, routines: DailyRoutine[]) {
   const client = await getSupabaseClient();
   if (!client) return;
-  await client.from('routines').delete().eq('user_id', userId);
-  if (routines.length === 0) return;
+  if (routines.length === 0) {
+    await client.from('routines').delete().eq('user_id', userId);
+    return;
+  }
   const rows = routines.map((r, i) => routineToRow(userId, r, i));
-  await client.from('routines').insert(rows);
+  await client.from('routines').upsert(rows, { onConflict: 'user_id,day_number' });
+  // Remove stale days that no longer exist in the plan
+  const activeDays = routines.map((r) => r.dayNumber);
+  await client.from('routines').delete().eq('user_id', userId).not('day_number', 'in', `(${activeDays.join(',')})`);
 }
 
 export async function persistHistory(userId: string, history: WorkoutSessionLog[]) {
   const client = await getSupabaseClient();
   if (!client) return;
-  await client.from('workout_sessions').delete().eq('user_id', userId);
   if (history.length === 0) return;
-  await client.from('workout_sessions').insert(history.map((s) => sessionToRow(userId, s)));
+  await client.from('workout_sessions').upsert(
+    history.map((s) => sessionToRow(userId, s)),
+    { onConflict: 'id' }
+  );
 }
 
 export async function persistRecords(userId: string, prs: PersonalRecord[]) {
   const client = await getSupabaseClient();
   if (!client) return;
-  await client.from('personal_records').delete().eq('user_id', userId);
   if (prs.length === 0) return;
-  await client.from('personal_records').insert(prs.map((pr) => prToRow(userId, pr)));
+  await client.from('personal_records').upsert(
+    prs.map((pr) => prToRow(userId, pr)),
+    { onConflict: 'id' }
+  );
 }
 
 export async function persistWeightHistory(
@@ -355,17 +373,21 @@ export async function persistWeightHistory(
 ) {
   const client = await getSupabaseClient();
   if (!client) return;
-  await client.from('weight_history').delete().eq('user_id', userId);
   if (weightHistory.length === 0) return;
-  await client.from('weight_history').insert(weightHistory.map((w) => weightToRow(userId, w)));
+  await client.from('weight_history').upsert(
+    weightHistory.map((w) => weightToRow(userId, w)),
+    { onConflict: 'user_id,date' }
+  );
 }
 
 export async function persistChat(userId: string, messages: ChatMessage[]) {
   const client = await getSupabaseClient();
   if (!client) return;
-  await client.from('chat_messages').delete().eq('user_id', userId);
   if (messages.length === 0) return;
-  await client.from('chat_messages').insert(messages.map((m) => chatToRow(userId, m)));
+  await client.from('chat_messages').upsert(
+    messages.map((m) => chatToRow(userId, m)),
+    { onConflict: 'id' }
+  );
 }
 
 /** Si el usuario (típicamente la demo) no tiene rutinas, sembra los datos demo. */

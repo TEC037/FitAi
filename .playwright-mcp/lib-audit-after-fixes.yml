@@ -1,0 +1,85 @@
+- generic [ref=f3e2]:
+  - banner [ref=f3e15]:
+    - generic [ref=f3e16]:
+      - button "FitAI Coach" [ref=f3e17]:
+        - generic [ref=f3e21]:
+          - generic [ref=f3e22]: FitAI Coach
+          - generic [ref=f3e23]: PaaS Gym AI
+      - generic [ref=f3e24]:
+        - button "Iniciar Sesión" [ref=f3e25]
+        - button "Probar la demo" [ref=f3e26]
+  - generic [ref=f3e29]:
+    - generic [ref=f3e30]:
+      - generic [ref=f3e31]: Plataforma PaaS de Entrenamiento Inteligente
+      - heading "Tu entrenador inteligente para entrenar mejor, medir tu progreso y alcanzar tus objetivos." [level=1] [ref=f3e36]
+      - paragraph [ref=f3e37]: Supera el estancamiento en el gimnasio con rutinas hiper-personalizadas por IA, cálculo dinámico de sobrecarga progresiva y un asistente virtual que adapta cada serie en tiempo real.
+      - generic [ref=f3e38]:
+        - button "Crear Mi Rutina con IA" [ref=f3e39]
+        - button "Explorar Prototipo (Carlos R.)" [ref=f3e43]
+      - generic [ref=f3e49]:
+        - generic [ref=f3e50]:
+          - text: Rutina Generada por FitAI
+          - heading "EMPUJE DINÁMICO" [level=2] [ref=f3e51]
+          - paragraph [ref=f3e52]: Diseñada específicamente para hipertrofia de pectoral y tríceps con protección del manguito rotador y descansos óptimos de 90s.
+          - generic [ref=f3e53]:
+            - generic [ref=f3e54]: 6 Ejercicios
+            - generic [ref=f3e57]: •
+            - generic [ref=f3e58]: 65 Minutos
+            - generic [ref=f3e59]: •
+            - generic [ref=f3e60]: RPE 8 Óptimo
+        - generic [ref=f3e61]:
+          - generic [ref=f3e62]:
+            - generic [ref=f3e63]: Ejercicio Actual
+            - generic [ref=f3e64]: Serie 2 de 4
+          - paragraph [ref=f3e65]: Press de Banca con Barra
+          - generic [ref=f3e66]:
+            - generic [ref=f3e67]:
+              - paragraph [ref=f3e68]: Carga Sugerida
+              - paragraph [ref=f3e69]: 82.5 kg
+            - generic [ref=f3e70]:
+              - paragraph [ref=f3e71]: Rango Objetivo
+              - paragraph [ref=f3e72]: 8-10 reps
+          - paragraph [ref=f3e73]: 💡 "Ajuste de +2.5 kg aplicado por tu buen RPE de ayer."
+    - generic [ref=f3e74]:
+      - generic [ref=f3e75]:
+        - paragraph [ref=f3e76]: Paso a Paso
+        - heading "¿Cómo funciona FitAI Coach?" [level=2] [ref=f3e77]
+      - generic [ref=f3e78]:
+        - generic [ref=f3e79]:
+          - generic [ref=f3e80]: "01"
+          - heading "1. Perfil & Objetivos" [level=3] [ref=f3e81]
+          - paragraph [ref=f3e82]: Indica tu experiencia, días disponibles, equipo en tu gimnasio y si tienes limitaciones o lesiones previas para proteger tus articulaciones.
+        - generic [ref=f3e83]:
+          - generic [ref=f3e84]: "02"
+          - heading "2. Rutina Adaptativa con IA" [level=3] [ref=f3e85]
+          - paragraph [ref=f3e86]: El motor algorítmico genera una planificación balanceada con selección de ejercicios, repeticiones, pesos iniciales y tiempos de descanso óptimos.
+        - generic [ref=f3e87]:
+          - generic [ref=f3e88]: "03"
+          - heading "3. Registro en Vivo & Feedback" [level=3] [ref=f3e89]
+          - paragraph [ref=f3e90]: Usa el modo entrenamiento activo en el gimnasio. Registra series, usa el cronómetro de descanso y recibe ajustes inmediatos para la próxima sesión.
+    - generic [ref=f3e91]:
+      - generic [ref=f3e92]:
+        - paragraph [ref=f3e93]: Ventajas Clave
+        - heading "¿Por qué entrenar con FitAI Coach?" [level=2] [ref=f3e94]
+      - generic [ref=f3e95]:
+        - generic [ref=f3e96]:
+          - heading "Sobrecarga Progresiva" [level=4] [ref=f3e110]
+          - paragraph [ref=f3e111]: Cálculo automático de cuándo subir peso o repeticiones evitando el estancamiento muscular.
+        - generic [ref=f3e112]:
+          - heading "Prevención de Lesiones" [level=4] [ref=f3e117]
+          - paragraph [ref=f3e118]: Cues técnicos y alternativas inmediatas si sientes molestias articulares o fatiga extrema.
+        - generic [ref=f3e119]:
+          - heading "Métricas y Récords (PRs)" [level=4] [ref=f3e124]
+          - paragraph [ref=f3e125]: Visualiza el volumen levantado, evolución de peso y récords históricos en gráficos limpios.
+        - generic [ref=f3e126]:
+          - heading "Coach en tu Bolsillo 24/7" [level=4] [ref=f3e131]
+          - paragraph [ref=f3e132]: Pregunta dudas de biomecánica, tiempos o alternativas en el gimnasio sin esperar a nadie.
+    - generic [ref=f3e134]:
+      - heading "¿Listo para llevar tu entrenamiento al siguiente nivel?" [level=2] [ref=f3e135]
+      - paragraph [ref=f3e136]: Únete a la plataforma que combina la ciencia de la hipertrofia con la precisión de la inteligencia artificial.
+      - generic [ref=f3e137]:
+        - button "Comenzar Onboarding Gratis" [ref=f3e138]
+        - button "Probar Prototipo con Datos Demo" [ref=f3e139]
+    - contentinfo [ref=f3e140]:
+      - paragraph [ref=f3e141]: © 2026 FitAI Coach. Prototipo PaaS de entrenamiento con Inteligencia Artificial.
+      - paragraph [ref=f3e142]: "Aviso: Las recomendaciones son orientativas y no reemplazan la valoración de un profesional de la salud."

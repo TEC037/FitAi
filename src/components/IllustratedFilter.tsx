@@ -86,16 +86,16 @@ export const IllustratedFilterRow: React.FC<IllustratedFilterRowProps> = ({
   }, [kind, options, activeCategory, activeEquipment, activeTarget]);
 
   // Total del chip "Todo": otras dimensiones activas con esta dimensión en "todas".
-  const allCount = useMemo(
-    () =>
-      searchExercises({
-        category: kind === 'category' ? 'all' : (activeCategory ?? 'all'),
-        equipment: kind === 'equipment' ? 'all' : (activeEquipment ?? 'all'),
-        target: kind === 'target' ? 'all' : (activeTarget ?? 'all'),
-        limit: 0,
-      }).total,
-    [kind, activeCategory, activeEquipment, activeTarget]
-  );
+  // Se calcula en cada render (sin memo): tras la carga asíncrona del dataset el
+  // padre actualiza `options`, el componente re-renderiza y el conteo se recalcula
+  // con EXERCISE_DATABASE ya poblado (el dataset es una mutación del módulo y no
+  // dispara re-render por sí sola).
+  const allCount = searchExercises({
+    category: kind === 'category' ? 'all' : (activeCategory ?? 'all'),
+    equipment: kind === 'equipment' ? 'all' : (activeEquipment ?? 'all'),
+    target: kind === 'target' ? 'all' : (activeTarget ?? 'all'),
+    limit: 0,
+  }).total;
 
   const hasMore = typeof visibleLimit === 'number' && options.length > visibleLimit;
   const displayOptions = showAll || !hasMore ? options : options.slice(0, visibleLimit);

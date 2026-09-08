@@ -1,0 +1,116 @@
+- generic [ref=f1e185]:
+  - banner [ref=f1e186]:
+    - generic [ref=f1e187]:
+      - button "FitAI Coach" [ref=f1e188]:
+        - generic [ref=f1e192]:
+          - generic [ref=f1e193]: FitAI Coach
+          - generic [ref=f1e194]: PaaS Gym AI
+      - generic [ref=f1e195]:
+        - generic [ref=f1e196]:
+          - paragraph [ref=f1e197]: Carlos Ramírez
+          - paragraph [ref=f1e198]: Nivel intermedio
+        - button "Abrir menú de navegación" [ref=f1e199]: CA
+  - main [ref=f1e201]:
+    - generic [ref=f1e202]:
+      - generic [ref=f1e203]:
+        - generic [ref=f1e204]:
+          - generic [ref=f1e205]: Planificado por tu Coach IA
+          - heading "Mi Rutina" [level=1] [ref=f1e209]
+          - paragraph [ref=f1e210]: Entrena, descansa y acumula consejos de IA en un solo paso.
+        - generic [ref=f1e211]:
+          - button "Cargar rutina" [ref=f1e212]
+          - button "Compartir" [ref=f1e218]
+      - generic [ref=f1e225]:
+        - button [ref=f1e226]:
+          - paragraph [ref=f1e227]: Día 1
+          - paragraph [ref=f1e228]: Pecho y Tríceps
+          - paragraph [ref=f1e229]: 6 ejercicios • 65 min
+        - button [ref=f1e230]:
+          - paragraph [ref=f1e231]: Día 2
+          - paragraph [ref=f1e232]: Espalda y Bíceps
+          - paragraph [ref=f1e233]: 5 ejercicios • 60 min
+        - button [ref=f1e234]:
+          - paragraph [ref=f1e235]: Día 3
+          - paragraph [ref=f1e236]: Recuperación y Flexibilidad
+          - paragraph [ref=f1e237]: 4 ejercicios • 35 min
+        - button [ref=f1e238]:
+          - paragraph [ref=f1e239]: Día 4
+          - paragraph [ref=f1e240]: Piernas y Glúteos
+          - paragraph [ref=f1e241]: 5 ejercicios • 65 min
+        - button [ref=f1e242]:
+          - paragraph [ref=f1e243]: Día 5
+          - paragraph [ref=f1e244]: Hombros y Abdomen
+          - paragraph [ref=f1e245]: 5 ejercicios • 55 min
+      - generic [ref=f1e247]:
+        - generic [ref=f1e248]:
+          - paragraph [ref=f1e249]: Día 1 • intermedio
+          - heading "Empuje Dinámico" [level=2] [ref=f1e250]
+          - paragraph [ref=f1e251]: Enfoque en tensión mecánica pectoral, estabilidad escapular y sobrecarga progresiva en tríceps.
+          - generic [ref=f1e252]:
+            - generic [ref=f1e253]: Pectoral mayor
+            - generic [ref=f1e254]: Pectoral clavicular
+            - generic [ref=f1e255]: Tríceps braquial
+            - generic [ref=f1e256]: Deltoides anterior
+        - generic [ref=f1e257]:
+          - button "Duplicar este día de rutina" [ref=f1e258]
+          - button "Iniciar Entrenamiento" [ref=f1e262]
+      - generic [ref=f1e266]:
+        - generic [ref=f1e267]:
+          - heading "Ejercicios (6)" [level=3] [ref=f1e268]
+          - button "Añadir" [ref=f1e273]
+        - generic [ref=f1e277]:
+          - generic [ref=f1e278]: "1"
+          - generic [ref=f1e279]:
+            - heading "Press de Banca con Barra" [level=4] [ref=f1e280]
+            - paragraph [ref=f1e281]: 4 × 8-10 • 82.5 kg • descanso 90s • Pecho
+          - generic [ref=f1e282]:
+            - button "Detalles" [ref=f1e283]
+            - button "Quitar de la rutina" [ref=f1e286]
+        - generic [ref=f1e291]:
+          - generic [ref=f1e292]: "2"
+          - generic [ref=f1e293]:
+            - heading "Press Inclinado con Mancuernas" [level=4] [ref=f1e294]
+            - paragraph [ref=f1e295]: 3 × 10-12 • 28 kg • descanso 75s • Pecho superior
+          - generic [ref=f1e296]:
+            - button "Detalles" [ref=f1e297]
+            - button "Quitar de la rutina" [ref=f1e300]
+        - generic [ref=f1e305]:
+          - generic [ref=f1e306]: "3"
+          - generic [ref=f1e307]:
+            - heading "Cruces en Polea Media" [level=4] [ref=f1e308]
+            - paragraph [ref=f1e309]: 3 × 12-15 • 17.5 kg • descanso 60s • Pecho
+          - generic [ref=f1e310]:
+            - button "Detalles" [ref=f1e311]
+            - button "Quitar de la rutina" [ref=f1e314]
+        - generic [ref=f1e319]:
+          - generic [ref=f1e320]: "4"
+          - generic [ref=f1e321]:
+            - heading "Fondos en Paralelas (o Asistidos)" [level=4] [ref=f1e322]
+            - paragraph [ref=f1e323]: 3 × 10-12 • 0 kg • descanso 75s • Tríceps
+          - generic [ref=f1e324]:
+            - button "Detalles" [ref=f1e325]
+            - button "Quitar de la rutina" [ref=f1e328]
+        - generic [ref=f1e333]:
+          - generic [ref=f1e334]: "5"
+          - generic [ref=f1e335]:
+            - heading "Extensiones de Tríceps en Polea Alta" [level=4] [ref=f1e336]
+            - paragraph [ref=f1e337]: 3 × 12-15 • 25 kg • descanso 60s • Tríceps
+          - generic [ref=f1e338]:
+            - button "Detalles" [ref=f1e339]
+            - button "Quitar de la rutina" [ref=f1e342]
+        - generic [ref=f1e347]:
+          - generic [ref=f1e348]: "6"
+          - generic [ref=f1e349]:
+            - heading "Press Francés con Mancuernas" [level=4] [ref=f1e350]
+            - paragraph [ref=f1e351]: 3 × 12 • 12 kg • descanso 60s • Tríceps
+          - generic [ref=f1e352]:
+            - button "Detalles" [ref=f1e353]
+            - button "Quitar de la rutina" [ref=f1e356]
+        - button [ref=f1e360] [cursor=pointer]:
+          - generic [ref=f1e363]:
+            - paragraph [ref=f1e364]: Añadir ejercicio al Día 1
+            - paragraph [ref=f1e365]: Explora todos los ejercicios de la Biblioteca
+      - button [ref=f1e366]:
+        - generic [ref=f1e372]:
+          - paragraph [ref=f1e373]: Coach IA
+          - paragraph [ref=f1e374]: Consejos de técnica, series y descansos en un solo lugar.

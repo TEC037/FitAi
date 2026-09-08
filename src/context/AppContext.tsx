@@ -57,6 +57,8 @@ import {
   onAuthStateChange,
 } from '../lib/supabaseService';
 
+import { translateAuthError } from '../utils/authErrors';
+
 export interface AppContextType {
   user: UserProfile;
   isAuthenticated: boolean;
@@ -430,7 +432,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return { error: null };
     }
     const { userId, error } = await signInWithEmail(email, password);
-    if (error || !userId) return { error: error ?? 'No se pudo iniciar sesión.' };
+    if (error || !userId) return { error: translateAuthError(error ?? 'No se pudo iniciar sesión.') };
     await applyHydration(userId);
     navigateTo('routine');
     return { error: null };
@@ -445,7 +447,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return { error: null };
     }
     const { userId, error } = await signUpWithEmail(email, password, name);
-    if (error) return { error };
+    if (error) return { error: translateAuthError(error) };
     if (userId) {
       await applyHydration(userId);
       navigateTo('onboarding');

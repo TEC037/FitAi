@@ -15,7 +15,7 @@ function baseAnswers(overrides: Partial<SurveyAnswers> = {}): SurveyAnswers {
   };
 }
 
-const NO_DATABASE = [];
+const NO_DATABASE: any[] = [];
 
 describe('generateRoutineFromSurvey', () => {
   it('genera la división para 3 días con volumen de hipertrofia', () => {

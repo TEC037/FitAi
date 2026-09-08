@@ -1,0 +1,19 @@
+[     237ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=d6875c41:14335
+[   52992ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:5173/:0
+[   64414ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://qwdfqyattichetaiwlbk.supabase.co/auth/v1/token?grant_type=password:0
+[  262334ms] ReferenceError: showLogoutConfirm is not defined
+    at RoundNav (http://localhost:5173/src/components/RoundNav.tsx?t=1788887037930:276:120)
+    at Object.react_stack_bottom_frame (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=d6875c41:12866:12)
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=d6875c41:4213:19)
+    at updateFunctionComponent (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=d6875c41:5569:16)
+    at beginWork (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=d6875c41:6140:20)
+    at runWithFiberInDEV (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=d6875c41:851:66)
+    at performUnitOfWork (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=d6875c41:8429:92)
+    at workLoopSync (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=d6875c41:8325:37)
+    at renderRootSync (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=d6875c41:8309:6)
+    at performWorkOnRoot (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=d6875c41:7994:27)
+[  262306ms] [WARNING] %s
+
+%s
+ An error occurred in the <RoundNav> component. Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries. @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=d6875c41:5257

@@ -243,18 +243,22 @@ export function searchExercises(options: {
 
   if (query && query.trim()) {
     const q = query.toLowerCase().trim();
+    const variants = expandSpanishQuery(q);
     results = results.filter((e) => {
-      const nameMatch = e.name.toLowerCase().includes(q);
-      const catMatch =
-        translateCategory(e.category).toLowerCase().includes(q) ||
-        e.category.toLowerCase().includes(q);
-      const eqMatch =
-        translateEquipment(e.equipment).toLowerCase().includes(q) ||
-        e.equipment.toLowerCase().includes(q);
-      const targetMatch =
-        translateTarget(e.target).toLowerCase().includes(q) || e.target.toLowerCase().includes(q);
-      const secMatch = e.secondary_muscles?.some((m) => m.toLowerCase().includes(q));
-      return nameMatch || catMatch || eqMatch || targetMatch || secMatch;
+      return variants.some((variant) => {
+        const nameMatch = e.name.toLowerCase().includes(variant);
+        const catMatch =
+          translateCategory(e.category).toLowerCase().includes(variant) ||
+          e.category.toLowerCase().includes(variant);
+        const eqMatch =
+          translateEquipment(e.equipment).toLowerCase().includes(variant) ||
+          e.equipment.toLowerCase().includes(variant);
+        const targetMatch =
+          translateTarget(e.target).toLowerCase().includes(variant) ||
+          e.target.toLowerCase().includes(variant);
+        const secMatch = e.secondary_muscles?.some((m) => m.toLowerCase().includes(variant));
+        return nameMatch || catMatch || eqMatch || targetMatch || secMatch;
+      });
     });
   }
 
@@ -267,6 +271,115 @@ export function searchExercises(options: {
   const items = results.slice(offset, offset + limit);
 
   return { items, total };
+}
+
+// Mapa español → inglés para términos comunes de ejercicios. Permite que un
+// usuario hispanohablante encuentre ejercicios cuyo nombre en el dataset está
+// sólo en inglés (p. ej. "press banca" → "bench press").
+const SEARCH_ES_TO_EN: [string, string][] = [
+  ['press de banca', 'bench press'],
+  ['press banca', 'bench press'],
+  ['press de pecho', 'bench press'],
+  ['press inclinado', 'incline press'],
+  ['press militar', 'overhead press'],
+  ['press de hombros', 'shoulder press'],
+  ['press frances', 'skull crusher'],
+  ['sentadilla', 'squat'],
+  ['peso muerto', 'deadlift'],
+  ['dominadas', 'pull up'],
+  ['dominada', 'pull up'],
+  ['flexiones', 'push up'],
+  ['lagartijas', 'push up'],
+  ['remada', 'row'],
+  ['remadoras', 'row'],
+  ['jalon', 'pulldown'],
+  ['jalon al pecho', 'pulldown'],
+  ['apertura', 'fly'],
+  ['aperturas', 'fly'],
+  ['fondos', 'dip'],
+  ['elevaciones', 'raise'],
+  ['elevacion lateral', 'lateral raise'],
+  ['prensa', 'press'],
+  ['zancada', 'lunge'],
+  ['zancadas', 'lunge'],
+  ['estocada', 'lunge'],
+  ['estocadas', 'lunge'],
+  ['gemelos', 'calf'],
+  ['pantorrilla', 'calf'],
+  ['pantorrillas', 'calf'],
+  ['curl de bicep', 'bicep curl'],
+  ['curl bicep', 'bicep curl'],
+  ['curl de biceps', 'bicep curl'],
+  ['curl biceps', 'bicep curl'],
+  ['extension de tricep', 'tricep extension'],
+  ['extension de triceps', 'tricep extension'],
+  ['patada de tricep', 'tricep kickback'],
+  ['patada de triceps', 'tricep kickback'],
+  ['aereo', 'overhead'],
+  ['aereos', 'overhead'],
+  ['pajarito', 'reverse fly'],
+  ['banca', 'bench'],
+  ['banco', 'bench'],
+  ['mancuerna', 'dumbbell'],
+  ['mancuernas', 'dumbbell'],
+  ['mancuernillas', 'dumbbell'],
+  ['barra', 'barbell'],
+  ['polea', 'cable'],
+  ['poleas', 'cable'],
+  ['cuerda', 'rope'],
+  ['bicep', 'bicep'],
+  ['biceps', 'bicep'],
+  ['tricep', 'tricep'],
+  ['triceps', 'tricep'],
+  ['espalda', 'back'],
+  ['pecho', 'chest'],
+  ['hombro', 'shoulder'],
+  ['hombros', 'shoulder'],
+  ['pierna', 'leg'],
+  ['piernas', 'leg'],
+  ['abdominal', 'ab'],
+  ['abdominales', 'ab'],
+  ['core', 'core'],
+];
+
+function expandSpanishQuery(q: string): string[] {
+  const variants = new Set<string>([q]);
+  const normalized = q
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+
+  for (const [es, en] of SEARCH_ES_TO_EN) {
+    const esNorm = es
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
+    if (normalized.includes(esNorm)) {
+      const replaced = q.replace(es, en);
+      if (replaced !== q) variants.add(replaced);
+    }
+  }
+
+  // Busca también cada token del query por separado (cubre combinaciones
+  // parciales como "press banca" → tokens "press" + "banca"→"bench").
+  const tokens = q.split(/\s+/).filter(Boolean);
+  if (tokens.length > 1) {
+    for (const token of tokens) {
+      const tokenNorm = normalizeName(token);
+      for (const [es, en] of SEARCH_ES_TO_EN) {
+        const esNorm = es
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase();
+        if (esNorm === tokenNorm) {
+          variants.add(token.replace(token, en));
+          variants.add(q.replace(token, en));
+        }
+      }
+    }
+  }
+
+  return Array.from(variants);
 }
 
 /**

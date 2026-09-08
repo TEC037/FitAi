@@ -113,7 +113,14 @@ export const ExerciseLibraryCard: React.FC<ExerciseLibraryCardProps> = ({
           </div>
 
           <h4 className="text-sm font-bold text-white capitalize line-clamp-2 title-case group-hover:text-[#C0FF00] transition-colors">
-            <Highlight text={exercise.name} query={searchQuery} />
+            <button
+              type="button"
+              onClick={() => onInspect(exercise)}
+              aria-label={`Ver detalles de ${exercise.name}`}
+              className="text-left hover:text-[#C0FF00] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C0FF00]/60 focus-visible:rounded"
+            >
+              <Highlight text={exercise.name} query={searchQuery} />
+            </button>
           </h4>
 
           <p className="text-[11px] text-white/40 mt-1">

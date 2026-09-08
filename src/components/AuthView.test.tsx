@@ -102,12 +102,10 @@ describe('AuthView', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: /Continuar al Onboarding/ }));
 
-    expect(
-      screen.getByText('La contraseña debe contener al menos 6 caracteres.')
-    ).toBeInTheDocument();
+    expect(screen.getByText('La contraseña debe tener al menos 8 caracteres.')).toBeInTheDocument();
 
     fireEvent.change(screen.getByPlaceholderText('Mínimo 6 caracteres'), {
-      target: { value: 'lucia.2026' },
+      target: { value: 'Lucia.2026' },
     });
     fireEvent.click(screen.getByRole('button', { name: /Continuar al Onboarding/ }));
 

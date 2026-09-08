@@ -1,0 +1,125 @@
+- generic [ref=e196]:
+  - banner [ref=e197]:
+    - generic [ref=e198]:
+      - button "FitAI Coach" [ref=e199]:
+        - generic [ref=e203]:
+          - generic [ref=e204]: FitAI Coach
+          - generic [ref=e205]: PaaS Gym AI
+      - generic [ref=e206]:
+        - generic [ref=e207]:
+          - paragraph [ref=e208]: Carlos Ramírez
+          - paragraph [ref=e209]: Nivel intermedio
+        - button "Abrir menú de navegación" [ref=e210]: CA
+  - main [ref=e212]:
+    - generic [ref=e2749]:
+      - generic [ref=e2751]:
+        - generic [ref=e2752]: Configuración de Cuenta & Atleta
+        - heading "Perfil y Preferencias" [level=1] [ref=e2757]
+        - paragraph [ref=e2758]: Ajusta tus parámetros biométricos, objetivos y recordatorios de entrenamiento.
+      - generic [ref=e2759]:
+        - generic [ref=e2763]:
+          - heading "Aviso Médico y Consideraciones de Salud" [level=3] [ref=e2764]
+          - paragraph [ref=e2765]: FitAI Coach es una herramienta de orientación y seguimiento. Las rutinas generadas son estimaciones algorítmicas y no sustituyen el diagnóstico de un médico ni de un fisioterapeuta. Si experimentas dolor agudo o mareos, interrumpe el ejercicio.
+        - button "Ver Normas Médicas" [ref=e2766]
+      - region "Mi progreso" [ref=e2767]:
+        - generic [ref=e2768]: Mis Métricas
+        - generic [ref=e2772]:
+          - generic [ref=e2773]:
+            - generic [ref=e2774]:
+              - paragraph [ref=e2778]: 75%
+              - paragraph [ref=e2779]: Constancia
+            - generic [ref=e2780]:
+              - paragraph [ref=e2784]: 0.0 t
+              - paragraph [ref=e2785]: Volumen total
+            - generic [ref=e2786]:
+              - paragraph [ref=e2791]: 0.0 h
+              - paragraph [ref=e2792]: Horas entrenadas
+            - generic [ref=e2793]:
+              - paragraph [ref=e2801]: "0"
+              - paragraph [ref=e2802]: Sesiones
+          - generic [ref=e2803]:
+            - generic [ref=e2804]:
+              - paragraph [ref=e2810]: Evolución de peso
+              - generic [ref=e2812]:
+                - generic [ref=e2813]: —
+                - generic [ref=e2814]: 78.2 kg
+            - generic [ref=e2815]:
+              - paragraph [ref=e2823]: Récords personales
+              - paragraph [ref=e2824]: "Entrena y registra tus mejores marcas: aparecerán aquí."
+          - generic [ref=e2825]:
+            - paragraph [ref=e2830]: Volumen semanal
+            - generic [ref=e2831]:
+              - generic [ref=e2832]: 3s
+              - generic [ref=e2834]: 2s
+              - generic [ref=e2836]: 1s
+              - generic [ref=e2838]: ahora
+            - paragraph [ref=e2840]: Registra tus sesiones para ver tu volumen semanal.
+          - generic [ref=e2841]:
+            - paragraph [ref=e2847]: Historial reciente
+            - paragraph [ref=e2848]: Termina tu primer entrenamiento y se guardará aquí.
+      - generic [ref=e2849]:
+        - generic [ref=e2850]:
+          - heading "Datos Biométricos" [level=3] [ref=e2851]
+          - generic [ref=e2856]:
+            - generic [ref=e2857]:
+              - generic [ref=e2858]: Nombre Completo
+              - textbox [ref=e2859]: Carlos Ramírez
+            - generic [ref=e2860]:
+              - generic [ref=e2861]: Correo Electrónico
+              - textbox [ref=e2862]: carlos.ramirez@fitai.example
+            - generic [ref=e2863]:
+              - generic [ref=e2864]: Edad (Años)
+              - spinbutton [ref=e2865]: "28"
+            - generic [ref=e2866]:
+              - generic [ref=e2867]: Estatura (cm)
+              - spinbutton [ref=e2868]: "178"
+            - generic [ref=e2869]:
+              - generic [ref=e2870]: Peso Actual (kg)
+              - spinbutton [ref=e2871]: "78.2"
+            - generic [ref=e2872]:
+              - generic [ref=e2873]: Sistema de Unidades
+              - generic [ref=e2874]:
+                - button "Métrico (kg / cm)" [ref=e2875]
+                - button "Imperial (lbs / in)" [ref=e2876]
+        - generic [ref=e2877]:
+          - heading "Objetivos y Programación" [level=3] [ref=e2878]
+          - generic [ref=e2886]:
+            - generic [ref=e2887]:
+              - generic [ref=e2888]: Objetivo Principal
+              - combobox [ref=e2889]:
+                - option "Ganar Masa Muscular (Hipertrofia)" [selected]
+                - option "Perder Grasa / Definición"
+                - option "Aumentar Fuerza Máxima"
+                - option "Mejorar Resistencia Muscular"
+                - option "Condición Física General"
+            - generic [ref=e2890]:
+              - generic [ref=e2891]: Nivel de Experiencia
+              - combobox [ref=e2892]:
+                - option "Principiante (< 1 año)"
+                - option "Intermedio (1 a 3 años)" [selected]
+                - option "Avanzado (3+ años)"
+            - generic [ref=e2893]:
+              - generic [ref=e2894]: Días por Semana
+              - spinbutton [ref=e2895]: "4"
+            - generic [ref=e2896]:
+              - generic [ref=e2897]: Duración Sesión (min)
+              - spinbutton [ref=e2898]: "60"
+            - generic [ref=e2899]:
+              - generic [ref=e2900]: Restricciones físicas o lesiones declaradas
+              - textbox [ref=e2901]: Molestia ocasional en manguito rotador derecho si se sobrecarga el press militar detrás de la cabeza.
+        - generic [ref=e2902]:
+          - heading "Notificaciones y Sonidos" [level=3] [ref=e2903]
+          - generic [ref=e2908]:
+            - generic [ref=e2909] [cursor=pointer]:
+              - generic [ref=e2910]: Recordatorios de días de entrenamiento
+              - checkbox "Recordatorios de días de entrenamiento" [checked] [ref=e2911]
+            - generic [ref=e2912] [cursor=pointer]:
+              - generic [ref=e2913]: Consejos y adaptaciones del Coach IA
+              - checkbox "Consejos y adaptaciones del Coach IA" [checked] [ref=e2914]
+            - generic [ref=e2915] [cursor=pointer]:
+              - generic [ref=e2916]: Aviso sonoro al terminar el temporizador de descanso
+              - checkbox "Aviso sonoro al terminar el temporizador de descanso" [checked] [ref=e2917]
+        - generic [ref=e2918]:
+          - button "Guardar Cambios de Perfil" [ref=e2919]
+          - button "Restablecer Datos Demo (Carlos)" [ref=e2925]
+          - button "Cerrar Sesión" [ref=e2930]

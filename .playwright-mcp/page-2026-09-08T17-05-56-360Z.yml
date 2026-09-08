@@ -1,0 +1,32 @@
+- generic [ref=f2e2]:
+  - banner [ref=f2e15]:
+    - generic [ref=f2e16]:
+      - button "FitAI Coach" [ref=f2e17]:
+        - generic [ref=f2e21]:
+          - generic [ref=f2e22]: FitAI Coach
+          - generic [ref=f2e23]: PaaS Gym AI
+      - generic [ref=f2e24]:
+        - button "Iniciar Sesión" [active] [ref=f2e25]
+        - button "Probar la demo" [ref=f2e26]
+  - generic [ref=f2e144]:
+    - generic [ref=f2e145]:
+      - heading "FitAI Coach" [level=1] [ref=f2e149]
+      - paragraph [ref=f2e150]: Plataforma PaaS para entrenamiento inteligente
+    - generic [ref=f2e151]:
+      - button "Iniciar Sesión" [ref=f2e152]
+      - button "Crear Cuenta" [ref=f2e153]
+    - generic [ref=f2e154]:
+      - generic [ref=f2e155]:
+        - generic [ref=f2e156]: Correo Electrónico
+        - textbox "carlos.ramirez@ejemplo.com" [ref=f2e161]
+      - generic [ref=f2e162]:
+        - generic [ref=f2e163]:
+          - generic [ref=f2e164]: Contraseña
+          - button "¿Olvidaste tu contraseña?" [ref=f2e165]
+        - textbox "••••••••" [ref=f2e170]
+      - generic [ref=f2e172] [cursor=pointer]:
+        - checkbox "Recordarme en este dispositivo" [checked] [ref=f2e173]
+        - generic [ref=f2e174]: Recordarme en este dispositivo
+      - button "Iniciar Sesión" [ref=f2e175]
+      - generic [ref=f2e176]: Acceso Rápido Prototipo
+      - button "Acceder con Carlos Ramírez (Usuario Demo)" [ref=f2e179]

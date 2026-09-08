@@ -370,6 +370,15 @@ describe('ExerciseDatabaseView (DOM)', () => {
     expect(screen.getByText(/Flexiona las rodillas/)).toBeInTheDocument();
   });
 
+  it('abre el modal de detalle al hacer clic en el nombre del ejercicio', () => {
+    renderView();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ver detalles de Squat' }));
+
+    expect(screen.getByText(/Flexiona las rodillas/)).toBeInTheDocument();
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
+
   it('hace visible el overlay de técnica con el foco de teclado', () => {
     renderView();
 

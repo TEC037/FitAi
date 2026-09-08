@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { User, Bell, Save, Dumbbell, ChevronDown, RotateCcw, LogOut } from 'lucide-react';
 import { useApp } from '../context/useApp';
 import { FitnessGoal, ExperienceLevel } from '../types';
+import { isValidEmail, sanitizeEmail } from '../utils/validation';
 
 interface ProfileFormProps {
   variant: 'mobile' | 'desktop';
   onSaved: () => void;
 }
+
 
 const inputClass = {
   base: 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#C0FF00]',
@@ -148,9 +150,14 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ variant, onSaved }) =>
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    const cleanEmail = sanitizeEmail(email);
+    if (cleanEmail && !isValidEmail(cleanEmail)) {
+      window.alert('Por favor ingresa un correo electrónico válido.');
+      return;
+    }
     updateUserProfile({
       name,
-      email,
+      email: cleanEmail,
       age: Number(age),
       height: Number(height),
       weight: Number(weight),

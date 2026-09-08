@@ -102,7 +102,7 @@ describe('App', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Abrir menú de navegación' }));
     fireEvent.click(screen.getByRole('button', { name: /Cerrar Sesión/ }));
-    fireEvent.click(screen.getByRole('button', { name: /¿Seguro\?/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Sí, cerrar sesión/ }));
 
     await waitFor(
       () => expect(screen.getByText('¿Cómo funciona FitAI Coach?')).toBeInTheDocument(),
