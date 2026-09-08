@@ -13,9 +13,8 @@ describe('useApp', () => {
   it('expone el estado inicial y las acciones del contexto', () => {
     const { result } = renderHook(() => useApp(), { wrapper: AppProvider });
 
-    expect(result.current.isAuthenticated).toBe(true);
-    expect(result.current.user).toBeTruthy();
-    expect(result.current.currentScreen).toBeTruthy();
+    expect(result.current.isAuthenticated).toBe(false);
+    expect(result.current.currentScreen).toBe('landing');
     expect(typeof result.current.navigateTo).toBe('function');
     expect(typeof result.current.loginDemoUser).toBe('function');
     expect(typeof result.current.logout).toBe('function');
@@ -24,14 +23,14 @@ describe('useApp', () => {
     expect(typeof result.current.sendCoachMessage).toBe('function');
   });
 
-  it('desloguea al usuario y permite el re-logueo del demo', () => {
+  it('desloguea al usuario y permite el re-logueo del demo', async () => {
     const { result } = renderHook(() => useApp(), { wrapper: AppProvider });
 
-    act(() => result.current.logout());
-    expect(result.current.isAuthenticated).toBe(false);
-
-    act(() => result.current.loginDemoUser());
+    await act(async () => result.current.loginDemoUser());
     expect(result.current.isAuthenticated).toBe(true);
     expect(result.current.user).toBeTruthy();
+
+    await act(async () => result.current.logout());
+    expect(result.current.isAuthenticated).toBe(false);
   });
 });

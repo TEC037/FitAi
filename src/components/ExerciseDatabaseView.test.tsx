@@ -396,7 +396,7 @@ describe('ExerciseDatabaseView (DOM)', () => {
 
     expect(sendCoachMessage).toHaveBeenCalledTimes(1);
     expect(sendCoachMessage).toHaveBeenCalledWith(expect.stringContaining('Squat'));
-    expect(navigateTo).toHaveBeenCalledWith('coach');
+    expect(navigateTo).toHaveBeenCalledWith('routine');
   });
 
   it('agrega la rutina desde el modal sin callback externo', () => {

@@ -233,7 +233,7 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
     sendCoachMessage(
       `¿Cómo debo ejecutar correctamente "${exercise.name}" y qué consejos biomecánicos me das para evitar lesiones?`
     );
-    navigateTo('coach');
+    navigateTo('routine');
   };
 
   if (isMobile && !isModalMode) {

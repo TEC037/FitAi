@@ -38,10 +38,28 @@ import { buildServerlessPayload, fetchServerlessCoachReply } from '../lib/server
 import { withMinDelay } from '../utils/withMinDelay';
 import { formatClock, getLocalDateStamp } from '../utils/format';
 import { usePersistedState } from '../hooks/usePersistedState';
+import { isSupabaseEnabled } from '../lib/supabaseClient';
+import {
+  getSessionUserId,
+  hydrateAll,
+  persistProfile,
+  persistRoutines,
+  persistHistory,
+  persistRecords,
+  persistWeightHistory,
+  persistChat,
+  signInDemo,
+  signInWithEmail,
+  signUpWithEmail,
+  signOutSession,
+  ensureDemoData,
+  onAuthStateChange,
+} from '../lib/supabaseService';
 
 export interface AppContextType {
   user: UserProfile;
   isAuthenticated: boolean;
+  isHydrating: boolean;
   currentScreen: AppScreen;
   routines: DailyRoutine[];
   selectedDay: number;
@@ -67,8 +85,14 @@ export interface AppContextType {
   // Actions
   navigateTo: (screen: AppScreen) => void;
   setSelectedDay: (day: number) => void;
-  loginDemoUser: () => void;
-  logout: () => void;
+  loginDemoUser: () => Promise<void>;
+  loginWithEmail: (email: string, password: string) => Promise<{ error: string | null }>;
+  registerWithEmail: (
+    email: string,
+    password: string,
+    name: string
+  ) => Promise<{ error: string | null }>;
+  logout: () => Promise<void>;
   resetToDemoData: () => void;
   updateUserProfile: (updates: Partial<UserProfile>) => void;
   completeOnboarding: (newProfileData: Partial<UserProfile>) => void;
@@ -119,41 +143,48 @@ function loadWorkoutSnapshot(): PersistedWorkoutState | null {
   }
 }
 
-// currentScreen se guarda como texto plano (no JSON.stringify). Funciones estables
-// a nivel de módulo para que el efecto de persistencia no se re-ejecute por render.
 function serializeScreen(screen: AppScreen): string {
   return screen;
 }
 function parseScreen(raw: string): AppScreen {
-  return raw as AppScreen;
+  if (
+    raw === 'landing' ||
+    raw === 'auth' ||
+    raw === 'onboarding' ||
+    raw === 'routine' ||
+    raw === 'exercises' ||
+    raw === 'profile'
+  ) {
+    return raw;
+  }
+  return 'routine';
 }
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Estado persistido (hidrata desde localStorage al montar y escribe en cada cambio)
   const [user, setUser] = usePersistedState<UserProfile>(STORAGE_KEYS.USER, INITIAL_USER);
-  const [isAuthenticated, setIsAuthenticated] = usePersistedState<boolean>(STORAGE_KEYS.AUTH, true); // Default true: el prototipo se ve rico de inmediato
+  const [isAuthenticated, setIsAuthenticated] = usePersistedState<boolean>(
+    STORAGE_KEYS.AUTH,
+    false
+  );
+  const [isHydrating, setIsHydrating] = useState<boolean>(isSupabaseEnabled);
   const [currentScreen, setCurrentScreen] = usePersistedState<AppScreen>(
     STORAGE_KEYS.SCREEN,
-    'dashboard',
+    isSupabaseEnabled ? 'landing' : 'landing',
     { serialize: serializeScreen, parse: parseScreen }
   );
-  const [routines, setRoutines] = usePersistedState<DailyRoutine[]>(
-    STORAGE_KEYS.ROUTINES,
-    MOCK_ROUTINES
-  );
+  const [routines, setRoutines] = usePersistedState<DailyRoutine[]>(STORAGE_KEYS.ROUTINES, []);
   const [selectedDay, setSelectedDay] = useState<number>(1);
-  const [history, setHistory] = usePersistedState<WorkoutSessionLog[]>(
-    STORAGE_KEYS.HISTORY,
-    MOCK_HISTORY
-  );
-  const [personalRecords, setPersonalRecords] = useState<PersonalRecord[]>(MOCK_PRS);
-  const [weightHistory, setWeightHistory] =
-    useState<{ date: string; weight: number }[]>(MOCK_WEIGHT_HISTORY);
+  const [history, setHistory] = usePersistedState<WorkoutSessionLog[]>(STORAGE_KEYS.HISTORY, []);
+  const [personalRecords, setPersonalRecords] = useState<PersonalRecord[]>([]);
+  const [weightHistory, setWeightHistory] = useState<{ date: string; weight: number }[]>([]);
   const [chatMessages, setChatMessages] = usePersistedState<ChatMessage[]>(
     STORAGE_KEYS.CHAT,
-    INITIAL_CHAT_MESSAGES
+    []
   );
   const [isCoachTyping, setIsCoachTyping] = useState<boolean>(false);
+
+  const [activeUserId, setActiveUserId] = useState<string | null>(null);
+  const hydratedRef = React.useRef(false);
 
   // Active workout state (persistido para recuperar sesiones en curso tras recarga)
   const [isWorkoutActive, setIsWorkoutActive] = useState<boolean>(() => {
@@ -200,7 +231,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return s.restTimerDeadline > Date.now();
   });
 
-  // Workout snapshot persistido (estado compuesto con derivación al recargar)
+  // Workout snapshot persistido
   useEffect(() => {
     const snapshot: PersistedWorkoutState = {
       isWorkoutActive,
@@ -256,20 +287,159 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
   }, [isRestTimerActive, restTimerSeconds]);
 
+  // Sincronización con Supabase: sesión inicial + cambios de auth
+  const applyHydration = useCallback(async (userId: string) => {
+    setIsHydrating(true);
+    const data = await hydrateAll(userId);
+    if (data.profile) setUser(data.profile);
+    setRoutines(data.routines);
+    setHistory(data.history);
+    setPersonalRecords(data.personalRecords);
+    setWeightHistory(data.weightHistory);
+    setChatMessages(data.chatMessages);
+    setActiveUserId(userId);
+    hydratedRef.current = true;
+    setIsAuthenticated(true);
+    setCurrentScreen((prev) => (prev === 'landing' || prev === 'auth' ? 'routine' : prev));
+    setIsHydrating(false);
+  }, [setUser, setRoutines, setHistory, setChatMessages, setCurrentScreen, setIsAuthenticated]);
+
+  useEffect(() => {
+    if (!isSupabaseEnabled) {
+      return;
+    }
+
+    let active = true;
+    getSessionUserId().then((userId) => {
+      if (!active) return;
+      if (userId) {
+        void applyHydration(userId);
+      } else {
+        setIsHydrating(false);
+        setCurrentScreen((prev) => (prev === 'routine' ? 'landing' : prev));
+      }
+    });
+
+    const unsubscribe = onAuthStateChange((userId) => {
+      if (!active) return;
+      if (userId) {
+        void applyHydration(userId);
+      } else {
+        setActiveUserId(null);
+        hydratedRef.current = false;
+        setIsAuthenticated(false);
+        setIsHydrating(false);
+        setCurrentScreen('landing');
+      }
+    });
+
+    return () => {
+      active = false;
+      unsubscribe?.();
+    };
+  }, [applyHydration, setCurrentScreen, setIsAuthenticated]);
+
+  // Write-through: cada entidad se persiste tras hidratar la sesión
+  useEffect(() => {
+    if (!isSupabaseEnabled || !isAuthenticated || !activeUserId || !hydratedRef.current) return;
+    void persistProfile(user);
+  }, [user, isAuthenticated, activeUserId]);
+
+  useEffect(() => {
+    if (!isSupabaseEnabled || !isAuthenticated || !activeUserId || !hydratedRef.current) return;
+    void persistRoutines(activeUserId, routines);
+  }, [routines, isAuthenticated, activeUserId]);
+
+  useEffect(() => {
+    if (!isSupabaseEnabled || !isAuthenticated || !activeUserId || !hydratedRef.current) return;
+    void persistHistory(activeUserId, history);
+  }, [history, isAuthenticated, activeUserId]);
+
+  useEffect(() => {
+    if (!isSupabaseEnabled || !isAuthenticated || !activeUserId || !hydratedRef.current) return;
+    void persistRecords(activeUserId, personalRecords);
+  }, [personalRecords, isAuthenticated, activeUserId]);
+
+  useEffect(() => {
+    if (!isSupabaseEnabled || !isAuthenticated || !activeUserId || !hydratedRef.current) return;
+    void persistWeightHistory(activeUserId, weightHistory);
+  }, [weightHistory, isAuthenticated, activeUserId]);
+
+  useEffect(() => {
+    if (!isSupabaseEnabled || !isAuthenticated || !activeUserId || !hydratedRef.current) return;
+    void persistChat(activeUserId, chatMessages);
+  }, [chatMessages, isAuthenticated, activeUserId]);
+
   const navigateTo = (screen: AppScreen) => {
     setCurrentScreen(screen);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const loginDemoUser = () => {
+  const loginDemoUser = async () => {
+    if (isSupabaseEnabled) {
+      setIsHydrating(true);
+      const { userId, error } = await signInDemo();
+      if (!error && userId) {
+        await ensureDemoData(userId);
+        await applyHydration(userId);
+        navigateTo('routine');
+      } else {
+        // Fallback: demo local si Supabase falla
+        setUser(INITIAL_USER);
+        setRoutines(MOCK_ROUTINES);
+        setIsAuthenticated(true);
+        navigateTo('routine');
+      }
+      setIsHydrating(false);
+      return;
+    }
     setUser(INITIAL_USER);
+    setRoutines(MOCK_ROUTINES);
+    setHistory(MOCK_HISTORY);
+    setPersonalRecords(MOCK_PRS);
+    setWeightHistory(MOCK_WEIGHT_HISTORY);
+    setChatMessages(INITIAL_CHAT_MESSAGES);
     setIsAuthenticated(true);
-    navigateTo('dashboard');
+    navigateTo('routine');
   };
 
-  const logout = () => {
+  const loginWithEmail = async (email: string, password: string) => {
+    if (!isSupabaseEnabled) {
+      setUser(INITIAL_USER);
+      setIsAuthenticated(true);
+      navigateTo('routine');
+      return { error: null };
+    }
+    const { userId, error } = await signInWithEmail(email, password);
+    if (error || !userId) return { error: error ?? 'No se pudo iniciar sesión.' };
+    await applyHydration(userId);
+    navigateTo('routine');
+    return { error: null };
+  };
+
+  const registerWithEmail = async (email: string, password: string, name: string) => {
+    if (!isSupabaseEnabled) {
+      setUser({ ...INITIAL_USER, name, email });
+      setRoutines([]);
+      setIsAuthenticated(true);
+      navigateTo('onboarding');
+      return { error: null };
+    }
+    const { userId, error } = await signUpWithEmail(email, password, name);
+    if (error) return { error };
+    if (userId) {
+      await applyHydration(userId);
+      navigateTo('onboarding');
+    }
+    return { error: null };
+  };
+
+  const logout = async () => {
+    if (isSupabaseEnabled) await signOutSession();
+    setActiveUserId(null);
+    hydratedRef.current = false;
     setIsAuthenticated(false);
-    navigateTo('landing');
+    setCurrentScreen('landing');
   };
 
   const resetToDemoData = () => {
@@ -288,7 +458,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setWorkoutStartedAt(0);
     setRestTimerSeconds(0);
     setIsRestTimerActive(false);
-    navigateTo('dashboard');
+    navigateTo('routine');
   };
 
   const addExerciseToRoutine = (dayNumber: number, exercise: Exercise) => {
@@ -344,7 +514,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const resetRoutines = () => {
     setRoutines(MOCK_ROUTINES);
-    localStorage.removeItem(STORAGE_KEYS.ROUTINES);
   };
 
   const updateUserProfile = (updates: Partial<UserProfile>) => {
@@ -368,7 +537,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
     setUser(mergedUser);
     setIsAuthenticated(true);
-    navigateTo('dashboard');
+    navigateTo('routine');
   };
 
   // Workout management
@@ -384,7 +553,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setRestTimerSeconds(0);
     setIsRestTimerActive(false);
     setIsWorkoutActive(true);
-    navigateTo('workout');
   };
 
   const cancelWorkout = () => {
@@ -394,7 +562,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setWorkoutStartedAt(0);
     setRestTimerSeconds(0);
     setIsRestTimerActive(false);
-    navigateTo('dashboard');
+    navigateTo('routine');
   };
 
   const logActiveSet = (weightKg: number, reps: number, rpe: number, sensation: string) => {
@@ -415,13 +583,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     setActiveWorkoutSets((prev) => [...prev, newSet]);
 
-    // Advance set or exercise
     if (activeSetIndex < currentEx.sets) {
       setActiveSetIndex((prev) => prev + 1);
-      // Trigger rest timer based on exercise recommendation
       startRestTimer(currentEx.restSeconds || DEFAULT_REST_SECONDS);
     } else {
-      // Last set of exercise
       if (activeExerciseIndex < activeRoutine.exercises.length - 1) {
         setActiveExerciseIndex((prev) => prev + 1);
         setActiveSetIndex(1);
@@ -458,7 +623,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setIsRestTimerActive(false);
   };
 
-  // Perfil Alométrico memoizado del usuario (PAL derivado de daysPerWeek + objetivo)
   const allometricProfile = useMemo(
     () =>
       calculateAllometricProfile(
@@ -484,13 +648,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const routine = activeRoutine || routines[0];
     const durationMin = Math.max(MIN_DURATION_REPORT_MIN, Math.round(workoutElapsedTime / 60));
 
-    // Calculate volume
     const totalVolume = activeWorkoutSets.reduce(
       (acc, s) => acc + (s.weightKg > 0 ? s.weightKg * s.reps : 0),
       0
     );
 
-    // Cálculo Alométrico de Calorías y Potencia (Escala de 3/4 - Ley de Kleiber)
     const { allometricCalories, metabolicPowerWatts } = calculateAllometricWorkoutCalories(
       user.weight,
       durationMin,
@@ -498,7 +660,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       activeWorkoutSets.length || FALLBACK_TOTAL_SETS
     );
 
-    // Ritmo Cardíaco Alométrico
     const finalAvgHr =
       customAvgHr ||
       Math.round(allometricProfile.allometricRestingHr + allometricProfile.heartRateReserve * 0.68);
@@ -511,7 +672,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         )
       );
 
-    // AI feedback generator based on performance & allometric scaling
     let feedback = `¡Gran trabajo, ${user.name.split(' ')[0]}! Has completado ${activeWorkoutSets.length} series de ${routine?.focus ?? 'entrenamiento'}. `;
     feedback += `Gasto metabólico alométrico: ${allometricCalories} kcal (según escala M^(3/4) de Kleiber, ${metabolicPowerWatts} W de potencia media). `;
     feedback += `Tu ritmo cardíaco promedio fue de ${finalAvgHr} bpm (pico: ${finalMaxHr} bpm) calibrado con tu basal alométrico (${allometricProfile.allometricRestingHr} bpm). `;
@@ -553,7 +713,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setRestTimerSeconds(0);
     setIsRestTimerActive(false);
 
-    // Increase compliance slightly
     setUser((prev) => ({
       ...prev,
       weeklyCompliance: Math.min(100, prev.weeklyCompliance + COMPLIANCE_INCREMENT_PER_WORKOUT),
@@ -562,9 +721,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return newSession;
   };
 
-  // AI Coach Simulator / Knowledge base
-  // useCallback: el cierre captura el contexto del render actual (usuario +
-  // perfil alométrico) para evitar estado stale en el flujo asíncrono.
   const sendCoachMessage = useCallback(
     (text: string) => {
       const userMsg: ChatMessage = {
@@ -615,6 +771,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       value={{
         user,
         isAuthenticated,
+        isHydrating,
         currentScreen,
         routines,
         selectedDay,
@@ -638,6 +795,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         navigateTo,
         setSelectedDay,
         loginDemoUser,
+        loginWithEmail,
+        registerWithEmail,
         logout,
         resetToDemoData,
         updateUserProfile,

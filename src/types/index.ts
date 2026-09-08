@@ -128,7 +128,7 @@ export interface ChatMessage {
   source?: 'llm' | 'engine' | 'local';
   suggestedAction?: {
     label: string;
-    screen: 'routine' | 'workout' | 'progress' | 'profile' | 'exercises';
+    screen: 'routine' | 'profile' | 'exercises';
   };
 }
 
@@ -136,11 +136,6 @@ export type AppScreen =
   | 'landing'
   | 'auth'
   | 'onboarding'
-  | 'dashboard'
   | 'routine'
-  | 'workout'
-  | 'progress'
-  | 'coach'
-  | 'history'
-  | 'profile'
-  | 'exercises';
+  | 'exercises'
+  | 'profile';

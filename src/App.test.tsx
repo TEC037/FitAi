@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import App from './App';
 
 // Test de integración: monta la app completa con lazy imports (toda la UI)
@@ -7,11 +7,17 @@ import App from './App';
 // el presupuesto por defecto (5s) resulta corto.
 vi.setConfig({ testTimeout: 15000 });
 
-async function mountApp() {
+async function mountLanding() {
   render(<App />);
   expect(
-    await screen.findByText('Recomendación del Coach', {}, { timeout: 5000 })
+    await screen.findByText('¿Cómo funciona FitAI Coach?', {}, { timeout: 5000 })
   ).toBeInTheDocument();
+}
+
+/** Abre el menú circular y entra a una pantalla autenticada. */
+async function openNavTo(label: string) {
+  fireEvent.click(screen.getByRole('button', { name: 'Abrir menú de navegación' }));
+  fireEvent.click(screen.getByRole('button', { name: label }));
 }
 
 describe('App', () => {
@@ -20,90 +26,61 @@ describe('App', () => {
     Element.prototype.scrollIntoView = vi.fn();
   });
 
-  it('renderiza el dashboard autenticado por defecto (lazy)', async () => {
-    await mountApp();
-  });
-
-  it('navega a Mi Rutina desde la barra lateral', async () => {
-    await mountApp();
-
-    fireEvent.click(screen.getByRole('button', { name: 'Mi Rutina' }));
+  it('muestra la landing no autenticada por defecto', async () => {
+    await mountLanding();
     expect(
-      await screen.findByText('Mi Rutina Personalizada', {}, { timeout: 5000 })
+      screen.getByRole('heading', { level: 1, name: /Tu entrenador inteligente/ })
     ).toBeInTheDocument();
   });
 
-  it('navega a Progreso y a Perfil desde la barra lateral', async () => {
-    await mountApp();
+  it('entra en la demo desde el botón circular de la barra superior y aterriza en Rutina', async () => {
+    await mountLanding();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Progreso' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Probar la demo' }));
     expect(
-      await screen.findByText('Seguimiento del Progreso', {}, { timeout: 5000 })
+      await screen.findByRole('heading', { name: 'Mi Rutina' }, { timeout: 5000 })
     ).toBeInTheDocument();
+    expect(screen.getAllByText(/Carlos Ramírez/).length).toBeGreaterThan(0);
+  });
 
-    fireEvent.click(screen.getAllByRole('button', { name: 'Perfil' })[0]);
+  it('navega a Perfil y Progreso desde el menú circular', async () => {
+    await mountLanding();
+    fireEvent.click(screen.getByRole('button', { name: 'Probar la demo' }));
+    await screen.findByRole('heading', { name: 'Mi Rutina' }, { timeout: 5000 });
+
+    await openNavTo('Perfil');
     expect(
-      await screen.findByText('Perfil y Preferencias', {}, { timeout: 5000 })
+      await screen.findByRole('heading', { name: 'Perfil y Preferencias' }, { timeout: 5000 })
     ).toBeInTheDocument();
   });
 
   it('navega a la Biblioteca de Ejercicios', async () => {
-    await mountApp();
+    await mountLanding();
+    fireEvent.click(screen.getByRole('button', { name: 'Probar la demo' }));
+    await screen.findByRole('heading', { name: 'Mi Rutina' }, { timeout: 5000 });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Biblioteca' }));
+    await openNavTo('Biblioteca');
     expect(
       await screen.findByText('Biblioteca de Ejercicios', {}, { timeout: 5000 })
     ).toBeInTheDocument();
   });
 
-  it('navega a Entrenamiento (historial) desde la barra lateral', async () => {
-    await mountApp();
+  it('abre el modal de seguridad desde el Perfil', async () => {
+    await mountLanding();
+    fireEvent.click(screen.getByRole('button', { name: 'Probar la demo' }));
+    await screen.findByRole('heading', { name: 'Mi Rutina' }, { timeout: 5000 });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Historial' }));
+    await openNavTo('Perfil');
+    await screen.findByRole('heading', { name: 'Perfil y Preferencias' }, { timeout: 5000 });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ver Normas Médicas' }));
     expect(
-      await screen.findByText('Historial de Entrenamientos', {}, { timeout: 5000 })
-    ).toBeInTheDocument();
-  });
-
-  it('navega al Coach IA y muestra el contexto del usuario', async () => {
-    await mountApp();
-
-    fireEvent.click(screen.getAllByRole('button', { name: 'Coach IA' })[0]);
-    expect(
-      await screen.findByText(/Asistente de entrenamiento personal/, {}, { timeout: 5000 })
-    ).toBeInTheDocument();
-    expect(screen.getAllByText(/Carlos Ramírez/).length).toBeGreaterThan(0);
-  });
-
-  it('vuelve al dashboard al pulsar el logo', async () => {
-    await mountApp();
-
-    fireEvent.click(screen.getByRole('button', { name: 'Biblioteca' }));
-    await screen.findByText('Biblioteca de Ejercicios', {}, { timeout: 5000 });
-
-    fireEvent.click(screen.getByText('FitAI'));
-    expect(
-      await screen.findByText('Recomendación del Coach', {}, { timeout: 5000 })
-    ).toBeInTheDocument();
-  });
-
-  it('explora el prototipo demo desde la landing no autenticada', async () => {
-    await mountApp();
-
-    fireEvent.click(screen.getByRole('button', { name: 'Cerrar Sesión' }));
-    await screen.findByText('¿Cómo funciona FitAI Coach?', {}, { timeout: 5000 });
-
-    fireEvent.click(screen.getByRole('button', { name: 'Explorar Prototipo (Carlos R.)' }));
-    expect(
-      await screen.findByText('Recomendación del Coach', {}, { timeout: 5000 })
+      await screen.findByRole('heading', { name: 'Consideraciones de Seguridad y Salud' })
     ).toBeInTheDocument();
   });
 
   it('inicia sesión desde la pantalla de autenticación', async () => {
-    await mountApp();
-
-    fireEvent.click(screen.getByRole('button', { name: 'Cerrar Sesión' }));
-    await screen.findByText('¿Cómo funciona FitAI Coach?', {}, { timeout: 5000 });
+    await mountLanding();
 
     fireEvent.click(screen.getByRole('button', { name: 'Iniciar Sesión' }));
     expect(
@@ -114,25 +91,22 @@ describe('App', () => {
       screen.getByRole('button', { name: 'Acceder con Carlos Ramírez (Usuario Demo)' })
     );
     expect(
-      await screen.findByText('Recomendación del Coach', {}, { timeout: 5000 })
+      await screen.findByRole('heading', { name: 'Mi Rutina' }, { timeout: 5000 })
     ).toBeInTheDocument();
   });
 
-  it('abre el modal de seguridad desde la barra lateral', async () => {
-    await mountApp();
+  it('cierra sesión y vuelve a la landing', async () => {
+    await mountLanding();
+    fireEvent.click(screen.getByRole('button', { name: 'Probar la demo' }));
+    await screen.findByRole('heading', { name: 'Mi Rutina' }, { timeout: 5000 });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Avisos Médicos y Seguridad' }));
-    expect(
-      await screen.findByText(/Recomendaciones orientativas:/, {}, { timeout: 5000 })
-    ).toBeInTheDocument();
-  });
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir menú de navegación' }));
+    fireEvent.click(screen.getByRole('button', { name: /Cerrar Sesión/ }));
+    fireEvent.click(screen.getByRole('button', { name: /¿Seguro\?/ }));
 
-  it('cierra sesión y vuelve a la landing no autenticada', async () => {
-    await mountApp();
-
-    fireEvent.click(screen.getByRole('button', { name: 'Cerrar Sesión' }));
-    expect(
-      await screen.findByText('¿Cómo funciona FitAI Coach?', {}, { timeout: 5000 })
-    ).toBeInTheDocument();
+    await waitFor(
+      () => expect(screen.getByText('¿Cómo funciona FitAI Coach?')).toBeInTheDocument(),
+      { timeout: 5000 }
+    );
   });
 });

@@ -1,130 +1,191 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { AppProvider } from '../context/AppContext';
-import { useApp } from '../context/useApp';
 import { RoutineView } from './RoutineView';
+import { DailyRoutine, Exercise, ExperienceLevel, WorkoutSessionLog } from '../types';
 
-function renderRoutine() {
-  return render(
-    <AppProvider>
-      <RoutineView />
-    </AppProvider>
-  );
+const { useAppMock } = vi.hoisted(() => ({ useAppMock: vi.fn() }));
+vi.mock('../context/useApp', () => ({ useApp: useAppMock }));
+
+const user = {
+  id: 'u1',
+  name: 'Carlos Ramírez',
+  email: 'carlos@fitai.app',
+  experience: 'intermedio' as const,
+  weight: 82,
+  height: 178,
+  birthYear: 1990,
+  fitnessGoal: 'hipertrofia-y-tonificacion' as const,
+  weeklyCompliance: 80,
+  primaryGoal: 'Hipertrofia',
+  unit: 'metric' as const,
+  notifications: { coachTips: true },
+};
+
+const exercise: Exercise = {
+  id: 'e1',
+  name: 'Press de Banca con Barra',
+  primaryMuscle: 'Pecho',
+  sets: 4,
+  reps: '8-10',
+  suggestedWeightKg: 80,
+  restSeconds: 90,
+  rpe: 8,
+  targetMuscles: ['Pectoral'],
+  technicalCue: 'Mantén los pies firmes y el pecho abierto',
+  fullInstructions: ['Posición inicial en banco', 'Baja controlado hasta el pecho'],
+  commonMistakes: ['Rebotar la barra en el pecho', 'Despegar los glúteos'],
+  equipment: 'barra',
+  difficulty: 'intermedio' as ExperienceLevel,
+  iconType: 'barbell',
+};
+
+const routines: DailyRoutine[] = [
+  {
+    dayNumber: 1,
+    focus: 'Pecho',
+    name: 'Empuje Dinámico (Día 1)',
+    difficulty: 'intermedio',
+    description: 'Hipertrofia de pectoral y tríceps',
+    targetMuscles: ['Pectoral', 'Tríceps'],
+    estimatedMinutes: 45,
+    exercises: [exercise],
+  },
+  {
+    dayNumber: 2,
+    focus: 'Espalda',
+    name: 'Tirón Potente (Día 2)',
+    difficulty: 'intermedio',
+    description: 'Espalda y bíceps',
+    targetMuscles: ['Dorsal'],
+    estimatedMinutes: 45,
+    exercises: [],
+  },
+];
+
+function mockView(overrides: Record<string, unknown> = {}) {
+  useAppMock.mockReturnValue({
+    routines,
+    selectedDay: 1,
+    setSelectedDay: vi.fn(),
+    startWorkout: vi.fn(),
+    navigateTo: vi.fn(),
+    removeExerciseFromRoutine: vi.fn(),
+    isWorkoutActive: false,
+    user,
+    chatMessages: [],
+    sendCoachMessage: vi.fn(),
+    isCoachTyping: false,
+    ...overrides,
+  });
 }
 
-function Harness() {
-  const { isWorkoutActive } = useApp();
-  return (
-    <>
-      <RoutineView />
-      <span data-testid="harness-workout">{String(isWorkoutActive)}</span>
-    </>
-  );
-}
-
-describe('RoutineView', () => {
+describe('RoutineView (vista unificada)', () => {
   beforeEach(() => {
-    localStorage.clear();
+    vi.clearAllMocks();
   });
 
-  it('muestra el plan semanal, las píldoras de día y la lista de ejercicios', () => {
-    renderRoutine();
+  it('muestra el encabezado Mi Rutina, el selector de días y el botón de entrenar', () => {
+    mockView();
+    render(<RoutineView />);
 
-    expect(screen.getByText('Mi Rutina Personalizada')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Mi Rutina' })).toBeInTheDocument();
     expect(screen.getByText('Día 1')).toBeInTheDocument();
-    expect(screen.getByText('Lista de Ejercicios', { exact: false })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Iniciar Entrenamiento/ })).toBeInTheDocument();
+    expect(screen.getByText(/Press de Banca con Barra/)).toBeInTheDocument();
   });
 
-  it('marca un ejercicio como completado y lo desmarca', () => {
-    renderRoutine();
+  it('muestra el estado vacío con CTA a Biblioteca cuando no hay ejercicios', () => {
+    mockView({ routines: [] });
+    render(<RoutineView />);
 
-    const complete = screen.getAllByRole('button', { name: 'Marcar como completado' })[0];
-    fireEvent.click(complete);
-
-    expect(screen.getByText('Completado')).toBeInTheDocument();
-
-    fireEvent.click(screen.getAllByRole('button', { name: 'Desmarcar' })[0]);
-    expect(screen.queryByText('Completado')).not.toBeInTheDocument();
+    expect(screen.getByText('Tu rutina te está esperando')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Ir a la Biblioteca/ }));
+    expect(useAppMock().navigateTo).toHaveBeenCalledWith('exercises');
   });
 
-  it('abre la ficha técnica biomecánica desde los detalles del ejercicio', () => {
-    renderRoutine();
+  it('inicia el entrenamiento del día seleccionado', () => {
+    mockView();
+    render(<RoutineView />);
 
-    fireEvent.click(screen.getAllByTitle('Haz clic para ver animación GIF')[0]);
-
-    expect(screen.getByText('Ficha Técnica Biomecánica')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Iniciar Entrenamiento/ }));
+    expect(useAppMock().startWorkout).toHaveBeenCalledWith(1);
   });
 
-  it('cambia de día seleccionando otra píldora del plan', () => {
-    renderRoutine();
+  it('cambia de día con el selector', () => {
+    mockView();
+    render(<RoutineView />);
 
-    const day2 = screen.getByRole('button', {
-      name: (accessName) => /día 2/i.test(accessName ?? '') && /ejercicios/.test(accessName ?? ''),
+    fireEvent.click(screen.getByRole('button', { name: /Día 2/ }));
+    expect(useAppMock().setSelectedDay).toHaveBeenCalledWith(2);
+  });
+
+  it('expande los detalles técnicos del ejercicio', () => {
+    mockView();
+    render(<RoutineView />);
+
+    fireEvent.click(screen.getByRole('button', { name: /Detalles/ }));
+    expect(screen.getByText(/Cue del Coach/)).toBeInTheDocument();
+    expect(screen.getByText('Baja controlado hasta el pecho')).toBeInTheDocument();
+    expect(screen.getByText('Rebotar la barra en el pecho')).toBeInTheDocument();
+  });
+
+  it('quita un ejercicio de la rutina', () => {
+    mockView({ routines: [{ ...routines[0], exercises: [exercise, { ...exercise, id: 'e2' }] }] });
+    render(<RoutineView />);
+
+    fireEvent.click(screen.getAllByRole('button', { name: 'Quitar de la rutina' })[0]);
+    expect(useAppMock().removeExerciseFromRoutine).toHaveBeenCalledWith(1, 'e1');
+  });
+
+  it('abre el Coach IA y envía una pregunta', () => {
+    mockView();
+    render(<RoutineView />);
+
+    fireEvent.click(screen.getByRole('button', { name: /Consejos de técnica/i }));
+    fireEvent.change(screen.getByPlaceholderText('Escribe tu pregunta…'), {
+      target: { value: '¿Cómo mejoro mi press?' },
     });
-    expect(day2.className).not.toContain('bg-[#C0FF00]');
+    fireEvent.click(screen.getByRole('button', { name: /Enviar al Coach/ }));
 
-    fireEvent.click(day2);
-
-    expect(
-      screen.getByRole('button', {
-        name: (accessName) =>
-          /día 2/i.test(accessName ?? '') && /ejercicios/.test(accessName ?? ''),
-      }).className
-    ).toContain('bg-[#C0FF00]');
-  });
-});
-
-describe('RoutineView (variante móvil)', () => {
-  const originalMatchMedia = window.matchMedia;
-
-  beforeEach(() => {
-    localStorage.clear();
+    expect(useAppMock().sendCoachMessage).toHaveBeenCalledWith('¿Cómo mejoro mi press?');
   });
 
-  afterEach(() => {
-    if (originalMatchMedia === undefined) {
-      delete (window as unknown as { matchMedia?: unknown }).matchMedia;
-    } else {
-      window.matchMedia = originalMatchMedia;
-    }
-  });
+  it('renderiza el entrenamiento en vivo cuando está activo', () => {
+    mockView({
+      isWorkoutActive: true,
+      activeRoutine: routines[0],
+      activeExerciseIndex: 0,
+      activeSetIndex: 0,
+      activeWorkoutSets: [],
+      logActiveSet: vi.fn(),
+      goToNextExercise: vi.fn(),
+      goToPreviousExercise: vi.fn(),
+      restTimerSeconds: 90,
+      isRestTimerActive: false,
+      pauseRestTimer: vi.fn(),
+      adjustRestTimer: vi.fn(),
+      startRestTimer: vi.fn(),
+      finishWorkout: vi.fn((): WorkoutSessionLog => ({
+          id: 's1',
+          date: '2026-09-08',
+          routineName: 'Empuje Dinámico',
+          durationMinutes: 45,
+          totalVolumeKg: 2560,
+          exercisesCompleted: 1,
+          totalSets: 4,
+          averageRpe: 8,
+          caloriesBurned: 260,
+          userObservations: 'bien',
+          aiCoachFeedback: 'Buen trabajo.',
+          completedSets: [],
+        })
+      ),
+      cancelWorkout: vi.fn(),
+    });
+    render(<RoutineView />);
 
-  function mockMobileViewport() {
-    window.matchMedia = vi.fn(() => ({
-      matches: true,
-      media: '(max-width: 768px)',
-      onchange: null,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    })) as unknown as typeof matchMedia;
-  }
-
-  it('muestra solo la sesión de hoy con lista compacta y UN botón ENTRENAR', () => {
-    mockMobileViewport();
-    render(
-      <AppProvider>
-        <Harness />
-      </AppProvider>
-    );
-
-    expect(screen.queryByText('Mi Rutina Personalizada')).not.toBeInTheDocument();
-    expect(screen.queryByText('Día 1')).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /entrenar/i })).toBeInTheDocument();
-    expect(screen.getByText('Press de Banca con Barra')).toBeInTheDocument();
-  });
-
-  it('inicia la sesión de hoy con el botón único', () => {
-    mockMobileViewport();
-    render(
-      <AppProvider>
-        <Harness />
-      </AppProvider>
-    );
-
-    fireEvent.click(screen.getByRole('button', { name: /entrenar/i }));
-    expect(screen.getByTestId('harness-workout')).toHaveTextContent('true');
+    expect(screen.getByText('Entrenamiento en vivo')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Registrar Serie/ })).toBeInTheDocument();
+    expect(screen.getByText('Temporizador de descanso')).toBeInTheDocument();
   });
 });

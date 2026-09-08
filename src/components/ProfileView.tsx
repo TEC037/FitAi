@@ -10,10 +10,12 @@ import {
   Save,
   Dumbbell,
   ChevronDown,
+  TrendingUp,
 } from 'lucide-react';
 import { useApp } from '../context/useApp';
 import { FitnessGoal, ExperienceLevel } from '../types';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { ProgressSummary } from './ProgressSummary';
 
 interface ProfileViewProps {
   onOpenSafetyModal: () => void;
@@ -70,16 +72,18 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenSafetyModal }) =
 
   if (isMobile) {
     return (
-      <div className="flex-1 px-4 pt-5 pb-6 flex flex-col gap-4 max-w-md mx-auto w-full">
-        <div>
-          <p className="text-[10px] text-white/40 uppercase tracking-wider font-bold">Perfil</p>
-          <h1 className="text-2xl font-black tracking-tight text-white">{user.name}</h1>
-          <p className="text-xs text-white/50 mt-0.5">
-            Nivel {user.experience} • Objetivo: {user.primaryGoal}
-          </p>
-        </div>
+<div className="flex-1 px-4 pt-5 pb-6 flex flex-col gap-4 max-w-md mx-auto w-full">
+          <div>
+            <p className="text-[10px] text-white/40 uppercase tracking-wider font-bold">Perfil</p>
+            <h1 className="text-2xl font-black tracking-tight text-white">{user.name}</h1>
+            <p className="text-xs text-white/50 mt-0.5">
+              Nivel {user.experience} • Objetivo: {user.primaryGoal}
+            </p>
+          </div>
 
-        {savedSuccess && (
+          <ProgressSummary />
+
+          {savedSuccess && (
           <p className="px-4 py-2 rounded-xl bg-[#C0FF00]/20 border border-[#C0FF00] text-[#C0FF00] text-xs font-bold flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4" />
             ¡Cambios guardados!
@@ -354,6 +358,15 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenSafetyModal }) =
           Ver Normas Médicas
         </button>
       </div>
+
+      {/* Progreso unificado dentro del Perfil */}
+      <section aria-label="Mi progreso">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 border border-black/10 text-amber-600 text-[10px] font-black uppercase tracking-wider mb-4">
+          <TrendingUp className="w-3.5 h-3.5" />
+          Mis Métricas
+        </div>
+        <ProgressSummary />
+      </section>
 
       <form onSubmit={handleSave} className="space-y-6">
         {/* Section 1: Datos Personales */}

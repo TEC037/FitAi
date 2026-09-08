@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import React, { useEffect } from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { AppProvider } from '../context/AppContext';
 import { useApp } from '../context/useApp';
@@ -13,6 +14,18 @@ function readUser(): UserProfile | null {
   } catch {
     return null;
   }
+}
+
+/** Inicia sesión como demo una sola vez para llegar al Perfil autenticado. */
+function LoginDemo({ children }: { children: React.ReactNode }) {
+  const { loginDemoUser } = useApp();
+  const booted = React.useRef(false);
+  useEffect(() => {
+    if (booted.current) return;
+    booted.current = true;
+    void loginDemoUser();
+  }, [loginDemoUser]);
+  return <>{children}</>;
 }
 
 function AuthHarness({ onOpenSafetyModal = () => {} }: { onOpenSafetyModal?: () => void }) {
@@ -148,14 +161,16 @@ describe('ProfileView', () => {
     });
   });
 
-  it('cierra sesión desde el perfil', () => {
+  it('cierra sesión desde el perfil', async () => {
     render(
       <AppProvider>
-        <AuthHarness />
+        <LoginDemo>
+          <AuthHarness />
+        </LoginDemo>
       </AppProvider>
     );
 
-    expect(screen.getByTestId('harness-is-auth')).toHaveTextContent('true');
+    await waitFor(() => expect(screen.getByTestId('harness-is-auth')).toHaveTextContent('true'));
     fireEvent.click(screen.getByRole('button', { name: /Cerrar Sesión/ }));
     expect(screen.getByTestId('harness-is-auth')).toHaveTextContent('false');
   });
@@ -217,19 +232,21 @@ describe('ProfileView (variante móvil)', () => {
     expect(screen.getByText('Datos Biométricos')).toBeInTheDocument();
   });
 
-  it('abre el modal médico y cierra sesión desde la vista móvil', () => {
+  it('abre el modal médico y cierra sesión desde la vista móvil', async () => {
     const onOpenSafetyModal = vi.fn();
     mockMobileViewport();
     render(
       <AppProvider>
-        <AuthHarness onOpenSafetyModal={onOpenSafetyModal} />
+        <LoginDemo>
+          <AuthHarness onOpenSafetyModal={onOpenSafetyModal} />
+        </LoginDemo>
       </AppProvider>
     );
 
+    await waitFor(() => expect(screen.getByTestId('harness-is-auth')).toHaveTextContent('true'));
     fireEvent.click(screen.getByRole('button', { name: /Avisos Médicos y Seguridad/ }));
     expect(onOpenSafetyModal).toHaveBeenCalledTimes(1);
 
-    expect(screen.getByTestId('harness-is-auth')).toHaveTextContent('true');
     fireEvent.click(screen.getByRole('button', { name: /Cerrar Sesión/ }));
     expect(screen.getByTestId('harness-is-auth')).toHaveTextContent('false');
   });
