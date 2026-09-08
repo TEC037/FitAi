@@ -5,376 +5,418 @@ import {
   Layers,
   Plus,
   Dumbbell,
-  Info,
-  ArrowLeftRight,
   Trash2,
-  CheckCircle2,
+  ChevronDown,
+  Bot,
+  Send,
   X,
-  AlertCircle,
+  Timer,
+  Pause,
+  CheckCircle2,
+  Flag,
+  ArrowRight,
 } from 'lucide-react';
 import { useApp } from '../context/useApp';
-import { Exercise, DatasetExercise } from '../types';
-import {
-  datasetToRoutineExercise,
-  getExerciseImageUrl,
-  getExerciseGifUrl,
-} from '../services/exerciseDatabaseService';
-import { ExerciseDatabaseView } from './ExerciseDatabaseView';
-import { useModalAccessibility } from '../hooks/useModalAccessibility';
-import { useIsMobile } from '../hooks/useIsMobile';
+import { Exercise } from '../types';
+import { useGuidanceStep } from '../hooks/useGuidanceStep';
 
-interface RoutineExerciseRowProps {
-  exercise: Exercise;
-  index: number;
-  isDone: boolean;
-  canRemove: boolean;
-  onToggleComplete: () => void;
-  onShowDetails: () => void;
-  onSwap: () => void;
-  onRemove: () => void;
-}
+// ---------------------------------------------------------------------------
+// Mesa de set activo más descanso: "entrenamiento unificado" dentro de Rutina.
+// ---------------------------------------------------------------------------
+const ActiveWorkoutCard: React.FC = () => {
+  const {
+    activeRoutine,
+    activeExerciseIndex,
+    activeWorkoutSets,
+    logActiveSet,
+    goToNextExercise,
+    goToPreviousExercise,
+    restTimerSeconds,
+    isRestTimerActive,
+    pauseRestTimer,
+    adjustRestTimer,
+    startRestTimer,
+    finishWorkout,
+    cancelWorkout,
+    user,
+  } = useApp();
 
-export const RoutineExerciseRow: React.FC<RoutineExerciseRowProps> = ({
-  exercise: ex,
-  index,
-  isDone,
-  canRemove,
-  onToggleComplete,
-  onShowDetails,
-  onSwap,
-  onRemove,
-}) => {
-  const imageUrl = getExerciseImageUrl(ex.image || ex.gifUrl);
-  const gifUrl = getExerciseGifUrl(ex.gifUrl || ex.image);
+  const [weight, setWeight] = useState<string>('');
+  const [reps, setReps] = useState<string>('');
+  const [rpe, setRpe] = useState<string>('8');
+  const [showFinish, setShowFinish] = useState(false);
+  const [notes, setNotes] = useState('');
+  const [avgRpe, setAvgRpe] = useState<string>('8');
+  const [completed, setCompleted] = useState<ReturnType<typeof finishWorkout> | null>(null);
+
+  const current = activeRoutine?.exercises[activeExerciseIndex];
+  const doneForExercise = activeWorkoutSets.filter((s) => s.exerciseId === current?.id);
+
+  if (!activeRoutine || !current || completed) {
+    return null;
+  }
+
+  const remainingSets = Math.max(0, current.sets - doneForExercise.length);
+
+  const handleLog = (e: React.FormEvent) => {
+    e.preventDefault();
+    logActiveSet(
+      Number(weight) || current.suggestedWeightKg,
+      Number(reps) || 10,
+      Number(rpe) || 8,
+      'normal'
+    );
+    if (!weight) {
+      const next = Number(current.suggestedWeightKg) || 0;
+      setWeight(next > 0 ? String(next) : '');
+    }
+    setReps('');
+  };
+
+  const handleFinish = (e: React.FormEvent) => {
+    e.preventDefault();
+    const session = finishWorkout(notes, Number(avgRpe) || 8);
+    setCompleted(session);
+  };
+
+  const mmss = (s: number) =>
+    `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 
   return (
-    <div
-      className={`p-5 rounded-[24px] border transition-all ${
-        isDone
-          ? 'bg-white/5 border-[#C0FF00]/40 opacity-75'
-          : 'bg-[#0A0A0A] border-white/10 hover:border-white/20'
-      }`}
-    >
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        {/* Left Column: Index, Media Thumbnail, Name, Technical Cue */}
-        <div className="flex items-start sm:items-center gap-3.5 flex-1">
-          <div className="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center font-black text-xs text-[#C0FF00] shrink-0">
-            {index + 1}
+    <div className="metal-card rounded-[28px] p-5 sm:p-7 space-y-5">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-lime-100 text-[#547c08] text-[10px] font-black uppercase tracking-wider">
+            <span className="w-1.5 h-1.5 rounded-full bg-lime-500 animate-pulse" />
+            Entrenamiento en vivo
           </div>
-
-          {/* Dataset visual thumbnail */}
-          <div
-            onClick={onShowDetails}
-            className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-white/5 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center cursor-pointer group hover:border-[#C0FF00]/50 transition-colors"
-            title="Haz clic para ver animación GIF"
-          >
-            {ex.image || ex.gifUrl ? (
-              <img
-                src={imageUrl}
-                alt={ex.name}
-                loading="lazy"
-                className="w-full h-full object-contain p-1 group-hover:scale-110 transition-transform"
-                onError={(e) => {
-                  if (ex.gifUrl && e.currentTarget.src !== gifUrl) {
-                    e.currentTarget.src = gifUrl;
-                  }
-                }}
-              />
-            ) : (
-              <Dumbbell className="w-6 h-6 text-white/40" />
-            )}
-            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-              <Play className="w-4 h-4 text-[#C0FF00] fill-current" />
-            </div>
-          </div>
-
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <h4 className="text-base sm:text-lg font-bold text-white capitalize truncate">
-                {ex.name}
-              </h4>
-              <span className="px-2 py-0.5 rounded bg-white/5 text-[10px] uppercase font-bold text-white/60 shrink-0">
-                {ex.primaryMuscle}
-              </span>
-              {isDone && (
-                <span className="px-2 py-0.5 rounded bg-[#C0FF00]/10 text-[#C0FF00] text-[10px] font-bold shrink-0">
-                  Completado
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-white/60 leading-relaxed line-clamp-2">
-              <strong className="text-white/80">Cue:</strong> {ex.technicalCue}
-            </p>
-          </div>
+          <h2 className="text-2xl font-black mt-1.5">
+            {activeRoutine.name.split('(')[0].trim()}
+          </h2>
+          <p className="text-sm text-slate-500">
+            Día {activeRoutine.dayNumber} • {activeRoutine.focus}
+          </p>
         </div>
+        <button
+          onClick={() => setShowFinish((v) => !v)}
+          className="px-4 py-2.5 rounded-full bg-[#C0FF00] text-black text-xs font-black hover:bg-[#aee600] active:scale-95 transition-all flex items-center gap-2"
+        >
+          <Flag className="w-4 h-4" />
+          Finalizar
+        </button>
+      </div>
 
-        {/* Middle specs: Series, Reps, Weight, Rest */}
-        <div className="grid grid-cols-4 gap-2 bg-white/5 p-3 rounded-2xl border border-white/5 text-center shrink-0">
-          <div className="px-2">
-            <p className="text-[9px] uppercase text-white/40 font-bold">Series</p>
-            <p className="text-sm sm:text-base font-black text-white">{ex.sets}</p>
+      {/* Progress */}
+      <div className="flex items-center gap-3">
+        {activeRoutine.exercises.map((ex, i) => (
+          <div key={ex.id} className="flex items-center gap-1.5 flex-1">
+            <div
+              className={`h-2 rounded-full flex-1 transition-colors ${
+                i < activeExerciseIndex ? 'bg-lime-500' : i === activeExerciseIndex ? 'bg-amber-400' : 'bg-slate-200'
+              }`}
+            />
           </div>
-          <div className="px-2">
-            <p className="text-[9px] uppercase text-white/40 font-bold">Reps</p>
-            <p className="text-sm sm:text-base font-black text-white">{ex.reps}</p>
-          </div>
-          <div className="px-2">
-            <p className="text-[9px] uppercase text-white/40 font-bold">Carga</p>
-            <p className="text-sm sm:text-base font-black text-[#C0FF00]">
-              {ex.suggestedWeightKg} kg
-            </p>
-          </div>
-          <div className="px-2">
-            <p className="text-[9px] uppercase text-white/40 font-bold">Descanso</p>
-            <p className="text-sm sm:text-base font-black text-white">{ex.restSeconds}s</p>
-          </div>
+        ))}
+      </div>
+
+      {/* Ejercicio actual */}
+      <div className="bg-white/70 border border-black/5 rounded-2xl p-4">
+        <p className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">
+          Ejercicio {activeExerciseIndex + 1} de {activeRoutine.exercises.length}
+        </p>
+        <h3 className="text-xl font-black capitalize mt-0.5">{current.name}</h3>
+        <p className="text-xs text-slate-500 mt-0.5">
+          <strong className="text-slate-700">{current.sets} series</strong> × {current.reps} reps •{' '}
+          {current.suggestedWeightKg} kg • descanso {current.restSeconds}s
+        </p>
+        <p className="text-xs italic text-slate-500 mt-1.5">
+          💡 {current.technicalCue}
+        </p>
+      </div>
+
+      {/* Registrador de series */}
+      <form onSubmit={handleLog} className="bg-white/70 border border-black/5 rounded-2xl p-4 space-y-3">
+        <p className="text-xs font-bold text-slate-600">
+          Serie {doneForExercise.length + 1} de {current.sets}
+          {remainingSets === 0 && (
+            <span className="text-lime-600 font-bold"> — Serie final de la técnica ✓</span>
+          )}
+        </p>
+        <div className="grid grid-cols-3 gap-2.5">
+          <label className="block">
+            <span className="text-[10px] font-bold text-slate-400 uppercase">Peso (kg)</span>
+            <input
+              type="number"
+              min={0}
+              value={weight}
+              onChange={(e) => setWeight(e.target.value)}
+              placeholder={String(current.suggestedWeightKg)}
+              className="w-full mt-1 rounded-xl bg-white border border-black/10 px-3 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-amber-300"
+            />
+          </label>
+          <label className="block">
+            <span className="text-[10px] font-bold text-slate-400 uppercase">Reps</span>
+            <input
+              type="number"
+              min={1}
+              value={reps}
+              onChange={(e) => setReps(e.target.value)}
+              placeholder={current.reps}
+              className="w-full mt-1 rounded-xl bg-white border border-black/10 px-3 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-amber-300"
+            />
+          </label>
+          <label className="block">
+            <span className="text-[10px] font-bold text-slate-400 uppercase">RPE</span>
+            <input
+              type="number"
+              min={1}
+              max={10}
+              value={rpe}
+              onChange={(e) => setRpe(e.target.value)}
+              className="w-full mt-1 rounded-xl bg-white border border-black/10 px-3 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-amber-300"
+            />
+          </label>
         </div>
+        <button
+          type="submit"
+          className="w-full py-3 rounded-2xl bg-[#C0FF00] text-black font-black text-sm hover:bg-[#aee600] active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
+        >
+          <CheckCircle2 className="w-4 h-4" />
+          Registrar Serie
+        </button>
+        <p className="text-[11px] text-slate-400 text-center">
+          Series registradas hoy: {activeWorkoutSets.length} • Volumen total:{' '}
+          {activeWorkoutSets.reduce((a, s) => a + s.weightKg * s.reps, 0).toLocaleString()} kg
+        </p>
+      </form>
 
-        {/* Right Actions: Details, Swap, Remove, Complete */}
-        <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
-          <button
-            onClick={onShowDetails}
-            className="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-semibold text-white/80 transition-colors flex items-center gap-1"
-            title="Ver ficha biomecánica y animación GIF"
-          >
-            <Info className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Detalles</span>
-          </button>
-
-          <button
-            onClick={onSwap}
-            className="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 hover:text-[#C0FF00] text-xs font-semibold text-white/70 transition-colors flex items-center gap-1 border border-white/5"
-            title="Sustituir por otro ejercicio del dataset"
-          >
-            <ArrowLeftRight className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Sustituir</span>
-          </button>
-
-          {canRemove && (
+      {/* Descanso */}
+      <div className="bg-white/70 border border-black/5 rounded-2xl p-4 flex items-center gap-4">
+        <div className="flex items-center justify-center w-20 h-20 rounded-full border-4 border-amber-300 text-lg font-black shrink-0 bg-white">
+          {mmss(restTimerSeconds)}
+        </div>
+        <div className="flex-1">
+          <p className="text-sm font-bold text-slate-700">Temporizador de descanso</p>
+          {isRestTimerActive ? (
             <button
-              onClick={onRemove}
-              className="p-2 rounded-xl bg-white/5 hover:bg-red-500/10 text-white/40 hover:text-red-400 transition-colors border border-white/5"
-              title="Quitar de la rutina"
+              onClick={pauseRestTimer}
+              className="mt-2 px-3 py-1.5 rounded-full bg-slate-800 text-white text-xs font-bold flex items-center gap-1.5"
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              <Pause className="w-3.5 h-3.5" /> Pausar
+            </button>
+          ) : (
+            <button
+              onClick={() => startRestTimer(current.restSeconds || 90)}
+              className="mt-2 px-3 py-1.5 rounded-full bg-amber-400 text-black text-xs font-black flex items-center gap-1.5"
+            >
+              <Timer className="w-3.5 h-3.5" /> Reiniciar 90s
             </button>
           )}
-
-          <button
-            onClick={onToggleComplete}
-            className={`p-2 rounded-xl border transition-colors ${
-              isDone
-                ? 'bg-[#C0FF00] text-black border-[#C0FF00]'
-                : 'bg-white/5 text-white/40 border-white/10 hover:text-white'
-            }`}
-            title={isDone ? 'Desmarcar' : 'Marcar como completado'}
-          >
-            <CheckCircle2 className="w-4 h-4" />
-          </button>
+          <div className="flex gap-1.5 mt-2">
+            <button
+              onClick={() => adjustRestTimer(-15)}
+              className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold"
+            >
+              −15s
+            </button>
+            <button
+              onClick={() => adjustRestTimer(15)}
+              className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold"
+            >
+              +15s
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Navegación */}
+      <div className="flex items-center justify-between gap-3">
+        <button
+          onClick={goToPreviousExercise}
+          disabled={activeExerciseIndex === 0}
+          className="px-4 py-2.5 rounded-full bg-white border border-black/10 text-slate-600 text-xs font-bold disabled:opacity-40"
+        >
+          ← Anterior
+        </button>
+        <button
+          onClick={goToNextExercise}
+          disabled={activeExerciseIndex === activeRoutine.exercises.length - 1}
+          className="px-4 py-2.5 rounded-full bg-white border border-black/10 text-slate-600 text-xs font-bold disabled:opacity-40"
+        >
+          Siguiente →
+        </button>
+      </div>
+
+      {/* Finalizar */}
+      {showFinish && (
+        <form onSubmit={handleFinish} className="bg-amber-50 border border-amber-200 rounded-2xl p-4 space-y-3 animate-sheet-fade">
+          <p className="text-sm font-black text-slate-800">Resumen de la sesión</p>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="¿Cómo te sentiste? (opcional)"
+            rows={2}
+            className="w-full rounded-xl bg-white border border-black/10 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300"
+          />
+          <label className="block">
+            <span className="text-[10px] font-bold text-slate-500 uppercase">RPE medio</span>
+            <select
+              value={avgRpe}
+              onChange={(e) => setAvgRpe(e.target.value)}
+              className="w-full mt-1 rounded-xl bg-white border border-black/10 px-3 py-2.5 text-sm font-bold"
+            >
+              {[6, 7, 8, 9, 10].map((v) => (
+                <option key={v} value={v}>
+                  {v} — {v === 6 ? 'Fácil' : v === 10 ? 'Máximo' : 'Moderado'}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            type="submit"
+            className="w-full py-3 rounded-2xl bg-slate-800 text-white text-xs font-black hover:bg-slate-900 transition-colors"
+          >
+            Terminar y Guardar Sesión
+          </button>
+          <p className="text-[11px] text-slate-500 text-center">
+            Bien hecho, {user.name.split(' ')[0]}. {activeWorkoutSets.length} series completadas.
+          </p>
+        </form>
+      )}
+
+      <button
+        onClick={cancelWorkout}
+        className="w-full py-2 text-xs font-bold text-slate-400 hover:text-red-500 transition-colors"
+      >
+        Cancelar entrenamiento
+      </button>
     </div>
   );
 };
 
-interface RoutineExerciseDetailModalProps {
-  exercise: Exercise;
-  onClose: () => void;
-  onAskCoach: () => void;
-  onStartWorkout: () => void;
-}
+// ---------------------------------------------------------------------------
+// Panel Coach IA unificado en Rutina.
+// ---------------------------------------------------------------------------
+const FREQUENT_QUESTIONS = [
+  '¿Cuántos días debo entrenar esta semana?',
+  '¿Cómo evito el estancamiento en mis pesos?',
+  '¿Qué hago si siento dolor en una articulación?',
+];
 
-export const RoutineExerciseDetailModal: React.FC<RoutineExerciseDetailModalProps> = ({
-  exercise,
-  onClose,
-  onAskCoach,
-  onStartWorkout,
-}) => {
-  const { dialogRef, handleBackdropClick } = useModalAccessibility(true, onClose);
+const CoachPanel: React.FC = () => {
+  const { chatMessages, sendCoachMessage, isCoachTyping, user } = useApp();
+  const [open, setOpen] = useState(false);
+  const [input, setInput] = useState('');
+
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="w-full metal-card rounded-[24px] p-5 flex items-center justify-between gap-3 hover:scale-[1.005] transition-transform"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-2xl bg-lime-100 flex items-center justify-center text-[#547c08]">
+            <Bot className="w-6 h-6" />
+          </div>
+          <div className="text-left">
+            <p className="text-sm font-black">Coach IA</p>
+            <p className="text-xs text-slate-500">
+              Consejos de técnica, series y descansos en un solo lugar.
+            </p>
+          </div>
+        </div>
+        <ChevronDown className="w-5 h-5 text-slate-400" />
+      </button>
+    );
+  }
+
+  const handleSend = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+    sendCoachMessage(input.trim());
+    setInput('');
+  };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn"
-      role="presentation"
-      onClick={handleBackdropClick}
-    >
-      <div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="routine-exercise-modal-title"
-        className="bg-[#0A0A0A] border border-white/15 rounded-[32px] max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[85vh] overflow-y-auto"
-      >
-        <button
-          onClick={onClose}
-          aria-label="Cerrar ficha del ejercicio"
-          className="absolute top-5 right-5 p-2 rounded-xl text-white/50 hover:text-white hover:bg-white/10 transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
-        <div className="mb-4">
-          <span className="px-3 py-1 bg-[#C0FF00]/10 text-[#C0FF00] text-[10px] font-bold uppercase rounded-full tracking-wider border border-[#C0FF00]/20">
-            Ficha Técnica Biomecánica
-          </span>
-          <h3
-            id="routine-exercise-modal-title"
-            className="text-2xl font-black text-white mt-2 capitalize"
-          >
-            {exercise.name}
-          </h3>
-          <p className="text-xs text-white/50 mt-1">
-            Equipo requerido: <span className="text-white/80">{exercise.equipment}</span> •
-            Dificultad: <span className="capitalize text-white/80">{exercise.difficulty}</span>
-          </p>
+    <div className="metal-card rounded-[24px] p-5 space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="w-10 h-10 rounded-2xl bg-lime-100 flex items-center justify-center text-[#547c08]">
+            <Bot className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-sm font-black">Coach IA</p>
+            <p className="text-[11px] text-slate-500">Contexto: {user.name} · {user.primaryGoal}</p>
+          </div>
         </div>
+        <button
+          onClick={() => setOpen(false)}
+          className="p-2 rounded-full bg-slate-100 text-slate-500"
+          aria-label="Cerrar Coach IA"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      </div>
 
-        {/* Visual Animated GIF Demo Player */}
-        {(exercise.gifUrl || exercise.image) && (
-          <div className="relative w-full bg-[#121212] border border-white/10 rounded-2xl overflow-hidden mb-6 flex items-center justify-center min-h-[220px] max-h-[320px]">
-            <img
-              src={getExerciseGifUrl(exercise.gifUrl || exercise.image)}
-              alt={exercise.name}
-              className="w-full h-full max-h-[320px] object-contain p-2"
-            />
-            <div className="absolute bottom-2.5 left-2.5 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10 text-[10px] text-white/70 flex items-center gap-1.5">
-              <Play className="w-3 h-3 text-[#C0FF00] fill-current" />
-              <span>Demostración técnica en bucle</span>
+      <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+        {FREQUENT_QUESTIONS.map((q) => (
+          <button
+            key={q}
+            onClick={() => sendCoachMessage(q)}
+            className="px-3 py-1.5 rounded-full bg-white border border-black/10 text-[11px] font-bold text-slate-600 whitespace-nowrap hover:border-amber-300 transition-colors"
+          >
+            {q}
+          </button>
+        ))}
+      </div>
+
+      <div className="bg-white/70 border border-black/5 rounded-2xl p-3 h-48 overflow-y-auto space-y-2">
+        {chatMessages.length === 0 && (
+          <p className="text-xs text-slate-400 text-center pt-6">
+            Pregúntale al Coach IA lo que necesites sobre tu entrenamiento.
+          </p>
+        )}
+        {chatMessages.slice(-20).map((m) => (
+          <div key={m.id} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+            <div
+              className={`max-w-[85%] px-3 py-2 rounded-2xl text-xs leading-relaxed ${
+                m.sender === 'user'
+                  ? 'bg-[#C0FF00] text-black font-semibold rounded-br-sm'
+                  : 'bg-white border border-black/5 text-slate-700 rounded-bl-sm'
+              }`}
+            >
+              {m.text}
             </div>
           </div>
+        ))}
+        {isCoachTyping && (
+          <div className="text-xs text-slate-400 italic">El Coach IA está pensando…</div>
         )}
-
-        {/* Target & Cue highlight */}
-        <div className="p-4 rounded-2xl bg-[#C0FF00]/5 border border-[#C0FF00]/20 mb-6">
-          <p className="text-[11px] uppercase tracking-wider font-bold text-[#C0FF00] mb-1">
-            Cue del Coach IA
-          </p>
-          <p className="text-xs text-white/80 leading-relaxed font-medium">
-            "{exercise.technicalCue}"
-          </p>
-        </div>
-
-        {/* Step-by-step instructions */}
-        <div className="mb-6">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-white/50 mb-3">
-            Instrucciones Paso a Paso
-          </h4>
-          <div className="space-y-2.5">
-            {exercise.fullInstructions.map((instruction, idx) => (
-              <div key={idx} className="flex items-start gap-3 text-xs text-white/70">
-                <span className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
-                  {idx + 1}
-                </span>
-                <p className="pt-0.5">{instruction}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Common Mistakes */}
-        <div className="mb-6">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-3 flex items-center gap-1.5">
-            <AlertCircle className="w-4 h-4" />
-            <span>Errores Comunes a Evitar</span>
-          </h4>
-          <ul className="space-y-2">
-            {exercise.commonMistakes.map((mistake, idx) => (
-              <li key={idx} className="flex items-start gap-2.5 text-xs text-white/60">
-                <span className="text-red-400 font-bold">•</span>
-                <span>{mistake}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Attribution footer */}
-        <div className="text-[11px] text-white/40 border-t border-white/10 pt-3 mb-2 flex items-center justify-between">
-          <span>
-            {exercise.attribution ||
-              '© Gym visual — Distribuido con licencia MIT en hasaneyldrm/exercises-dataset'}
-          </span>
-        </div>
-
-        {/* Modal Bottom Actions */}
-        <div className="pt-2 border-t border-white/10 flex flex-col sm:flex-row gap-3">
-          <button
-            onClick={onAskCoach}
-            className="flex-1 py-3 px-4 bg-white/10 hover:bg-white/15 text-white text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-2 border border-white/10"
-          >
-            <Sparkles className="w-4 h-4 text-[#C0FF00]" />
-            <span>Consultar Dudas con el Coach IA</span>
-          </button>
-          <button
-            onClick={onStartWorkout}
-            className="flex-1 py-3 px-4 bg-[#C0FF00] text-black text-xs font-black rounded-xl hover:bg-[#aee600] transition-colors flex items-center justify-center gap-2"
-          >
-            <Play className="w-4 h-4 fill-current" />
-            <span>Entrenar Este Ejercicio Ahora</span>
-          </button>
-        </div>
       </div>
+
+      <form onSubmit={handleSend} className="flex items-center gap-2">
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Escribe tu pregunta…"
+          className="flex-1 rounded-full bg-white border border-black/10 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300"
+        />
+        <button
+          type="submit"
+          className="w-10 h-10 rounded-full bg-[#C0FF00] text-black flex items-center justify-center active:scale-90 transition-transform"
+          aria-label="Enviar al Coach"
+        >
+          <Send className="w-4 h-4" />
+        </button>
+      </form>
     </div>
   );
 };
 
-interface DatasetPickerModalProps {
-  badge: string;
-  title: string;
-  subtitle: string;
-  onClose: () => void;
-  onSelect: (item: DatasetExercise) => void;
-}
-
-export const DatasetPickerModal: React.FC<DatasetPickerModalProps> = ({
-  badge,
-  title,
-  subtitle,
-  onClose,
-  onSelect,
-}) => {
-  const { dialogRef, handleBackdropClick } = useModalAccessibility(true, onClose);
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-black/85 backdrop-blur-md animate-fadeIn"
-      role="presentation"
-      onClick={handleBackdropClick}
-    >
-      <div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="dataset-picker-modal-title"
-        className="bg-[#0A0A0A] border border-white/15 rounded-[32px] max-w-6xl w-full max-h-[92vh] overflow-y-auto p-4 sm:p-6 shadow-2xl relative"
-      >
-        <div className="flex items-center justify-between p-3 border-b border-white/10 mb-2">
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#C0FF00] px-2.5 py-1 rounded bg-[#C0FF00]/10 border border-[#C0FF00]/20">
-              {badge}
-            </span>
-            <h3
-              id="dataset-picker-modal-title"
-              className="text-xl sm:text-2xl font-black text-white mt-1"
-            >
-              {title}
-            </h3>
-            <p className="text-xs text-white/50">{subtitle}</p>
-          </div>
-          <button
-            onClick={onClose}
-            aria-label="Cerrar"
-            className="p-2.5 rounded-xl text-white/50 hover:text-white hover:bg-white/10"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        <ExerciseDatabaseView isModalMode onCloseModal={onClose} onSelectForRoutine={onSelect} />
-      </div>
-    </div>
-  );
-};
-
+// ---------------------------------------------------------------------------
+// Rutina unificada: rutina + entrenamiento activo + consejos de IA.
+// ---------------------------------------------------------------------------
 export const RoutineView: React.FC = () => {
   const {
     routines,
@@ -382,310 +424,282 @@ export const RoutineView: React.FC = () => {
     setSelectedDay,
     startWorkout,
     navigateTo,
-    sendCoachMessage,
-    replaceRoutineExercise,
-    addExerciseToRoutine,
     removeExerciseFromRoutine,
+    isWorkoutActive,
   } = useApp();
+  const guidance = useGuidanceStep();
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
-  const [completedExercises, setCompletedExercises] = useState<Record<string, boolean>>({});
+  // Entrenamiento activo tiene prioridad absoluta dentro de Rutina.
+  if (isWorkoutActive) {
+    return (
+      <div className="mx-auto max-w-2xl pt-2">
+        <ActiveWorkoutCard />
+      </div>
+    );
+  }
 
-  // Dataset swap / add modals
-  const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
-  const [exerciseToSwap, setExerciseToSwap] = useState<Exercise | null>(null);
-
+  const hasExercises = routines.some((r) => r.exercises.length > 0);
   const currentRoutine = routines.find((r) => r.dayNumber === selectedDay) || routines[0];
 
-  const isMobile = useIsMobile();
-
-  if (!currentRoutine) {
-    return (
-      <div className="flex-1 p-4 sm:p-8 flex flex-col gap-8 max-w-[1600px] mx-auto w-full">
-        <div className="bg-[#0A0A0A] border border-white/10 rounded-[32px] p-12 text-center text-white/60">
-          Aún no tienes rutinas generadas. Completa tu onboarding para personalizar tu plan.
-        </div>
-      </div>
-    );
-  }
-
-  if (isMobile) {
-    const todayRoutine = routines.find((r) => r.dayNumber === 1) || currentRoutine;
-
-    return (
-      <div className="flex-1 px-4 pt-5 pb-6 flex flex-col gap-4 max-w-md mx-auto w-full">
-        <div className="relative z-10">
-          <p className="text-[10px] text-white/40 uppercase tracking-wider font-bold">
-            Mi Rutina • Día {todayRoutine.dayNumber} • {todayRoutine.focus.toUpperCase()}
-          </p>
-          <h1 className="text-2xl font-black tracking-tight text-white">{todayRoutine.name}</h1>
-          <p className="text-xs text-white/50 mt-0.5">
-            {todayRoutine.exercises.length} ejercicios • {todayRoutine.estimatedMinutes} min
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-2 relative z-10">
-          {todayRoutine.exercises.map((ex, idx) => (
-            <div
-              key={ex.id}
-              className="flex items-center gap-3 bg-[#0A0A0A] border border-white/10 rounded-2xl px-4 py-3"
-            >
-              <span className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center font-black text-xs text-[#C0FF00] shrink-0">
-                {idx + 1}
-              </span>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-white capitalize truncate">{ex.name}</p>
-                <p className="text-[11px] text-white/50">
-                  {ex.sets} × {ex.reps} • {ex.suggestedWeightKg} kg • descanso {ex.restSeconds}s
-                </p>
-              </div>
-              <span className="px-2 py-0.5 rounded bg-white/5 text-[10px] uppercase font-bold text-white/50 shrink-0">
-                {ex.primaryMuscle}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        <div className="flex-1" />
-
-        <button
-          id="btn-mobile-routine-start"
-          onClick={() => startWorkout(todayRoutine.dayNumber)}
-          className="w-full py-6 rounded-3xl font-black text-lg text-black bg-[#C0FF00] shadow-[0_0_40px_rgba(192,255,0,0.35)] active:scale-[0.98] transition-transform flex items-center justify-center gap-3"
-        >
-          <Play className="w-6 h-6 fill-current" />
-          ENTRENAR
-        </button>
-      </div>
-    );
-  }
-
-  const toggleComplete = (exId: string) => {
-    setCompletedExercises((prev) => ({
-      ...prev,
-      [exId]: !prev[exId],
-    }));
-  };
-
-  const handleAskCoachAboutExercise = (ex: Exercise) => {
-    sendCoachMessage(`¿Cómo puedo optimizar mi técnica y rango de movimiento en ${ex.name}?`);
-    setSelectedExercise(null);
-    navigateTo('coach');
-  };
-
-  const handleSelectSwap = (datasetItem: DatasetExercise) => {
-    if (!exerciseToSwap) return;
-    const newEx = datasetToRoutineExercise(datasetItem, {
-      sets: exerciseToSwap.sets,
-      reps: exerciseToSwap.reps,
-      suggestedWeightKg: exerciseToSwap.suggestedWeightKg,
-      restSeconds: exerciseToSwap.restSeconds,
-    });
-    replaceRoutineExercise(currentRoutine.dayNumber, exerciseToSwap.id, newEx);
-    setExerciseToSwap(null);
-  };
-
-  const handleSelectAdd = (datasetItem: DatasetExercise) => {
-    const newEx = datasetToRoutineExercise(datasetItem);
-    addExerciseToRoutine(currentRoutine.dayNumber, newEx);
-    setIsAddModalOpen(false);
-  };
-
   return (
-    <div className="flex-1 p-4 sm:p-8 flex flex-col gap-8 max-w-[1600px] mx-auto w-full relative">
-      {/* Top Banner & Day selector tabs */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-6 pt-1">
+      {/* Header */}
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C0FF00]/10 text-[#C0FF00] text-xs font-bold uppercase tracking-wider mb-2 border border-[#C0FF00]/20">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 border border-black/10 text-[#547c08] text-[10px] font-black uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Plan Semanal Hipertrofia & Rendimiento</span>
+            Planificado por tu Coach IA
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black text-white">Mi Rutina Personalizada</h1>
-          <p className="text-sm text-white/60 mt-1">
-            Programación periodizada por el Coach IA con descansos calculados y sobrecarga técnica.
+          <h1 className="text-3xl font-black tracking-tight mt-2">Mi Rutina</h1>
+          <p className="text-sm text-slate-500 mt-1">
+            Entrena, descansa y acumula consejos de IA en un solo paso.
           </p>
         </div>
-
-        <button
-          onClick={() => startWorkout(currentRoutine.dayNumber)}
-          className="px-6 py-3.5 bg-[#C0FF00] text-black font-black text-sm rounded-xl hover:bg-[#aee600] transition-transform hover:scale-105 active:scale-95 shadow-[0_0_25px_rgba(192,255,0,0.3)] flex items-center justify-center gap-2"
-        >
-          <Play className="w-4 h-4 fill-current" />
-          <span>Iniciar Esta Rutina Ahora</span>
-        </button>
       </div>
 
-      {/* Day Selector Pills */}
-      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
-        {routines.map((r) => {
-          const isSelected = r.dayNumber === selectedDay;
-          return (
-            <button
-              key={r.dayNumber}
-              onClick={() => setSelectedDay(r.dayNumber)}
-              className={`px-4 py-3 rounded-2xl border text-left shrink-0 transition-all min-w-[170px] ${
-                isSelected
-                  ? 'bg-[#C0FF00] text-black border-[#C0FF00] shadow-[0_0_20px_rgba(192,255,0,0.25)] font-bold'
-                  : 'bg-white/5 border-white/10 text-white/70 hover:bg-white/10'
-              }`}
-            >
-              <div className="flex items-center justify-between text-xs mb-1">
-                <span
-                  className={
-                    isSelected
-                      ? 'text-black font-black uppercase text-[10px]'
-                      : 'text-white/40 uppercase text-[10px]'
-                  }
-                >
-                  Día {r.dayNumber}
-                </span>
-                {r.isRestDay && (
-                  <span
-                    className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${isSelected ? 'bg-black/20 text-black' : 'bg-white/10 text-white/50'}`}
+      {/* Estado vacío (nuevo usuario) */}
+      {!hasExercises ? (
+        <div className="metal-card rounded-[28px] p-8 sm:p-10 text-center space-y-4">
+          <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-tr from-slate-100 to-white border border-black/10 flex items-center justify-center">
+            <Dumbbell className="w-7 h-7 text-slate-400" />
+          </div>
+          <div className="space-y-1">
+            <h2 className="text-xl font-black">Tu rutina te está esperando</h2>
+            <p className="text-sm text-slate-500 max-w-sm mx-auto">
+              Añade tu primer ejercicio desde la Biblioteca y comenzaremos a armar tu plan con
+              series, descansos y consejos del Coach IA.
+            </p>
+          </div>
+          <button
+            onClick={() => navigateTo('exercises')}
+            className="relative inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#C0FF00] text-black font-black text-sm hover:bg-[#aee600] active:scale-95 transition-all"
+          >
+            <Plus className="w-4 h-4" />
+            Ir a la Biblioteca
+          </button>
+          {guidance.step === 'exercises' && (
+            <p className="text-xs font-bold text-amber-600 animate-sheet-fade">
+              ✨ Pulso dorado: añade tu primer ejercicio
+            </p>
+          )}
+        </div>
+      ) : (
+        <>
+          {/* Selector de días */}
+          {routines.length > 1 && (
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+              {routines.map((r) => {
+                const selected = r.dayNumber === selectedDay;
+                return (
+                  <button
+                    key={r.dayNumber}
+                    onClick={() => setSelectedDay(r.dayNumber)}
+                    className={`px-4 py-2.5 rounded-2xl border text-left shrink-0 transition-all min-w-[140px] ${
+                      selected
+                        ? 'bg-[#C0FF00] text-black border-[#aee600] font-bold shadow-[0_8px_20px_-8px_rgba(112,160,20,0.5)]'
+                        : 'bg-white/70 border-black/10 text-slate-600 hover:bg-white'
+                    }`}
                   >
-                    Movilidad
-                  </span>
-                )}
-              </div>
-              <p className="text-sm font-extrabold truncate">{r.focus}</p>
-              <p
-                className={`text-[11px] truncate mt-0.5 ${isSelected ? 'text-black/80 font-medium' : 'text-white/40'}`}
-              >
-                {r.exercises.length} ejercicios • {r.estimatedMinutes} min
-              </p>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Routine Overview Header Card */}
-      <div className="bg-[#0A0A0A] border border-white/10 rounded-[32px] p-6 sm:p-8 relative overflow-hidden">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xs text-[#C0FF00] font-bold uppercase tracking-wider">
-                Día {currentRoutine.dayNumber} • {currentRoutine.difficulty}
-              </span>
+                    <p className="text-[10px] font-black uppercase opacity-70">
+                      Día {r.dayNumber}
+                    </p>
+                    <p className="text-sm font-extrabold truncate">{r.focus}</p>
+                    <p className="text-[11px] opacity-70">
+                      {r.exercises.length} ejercicios • {r.estimatedMinutes} min
+                    </p>
+                  </button>
+                );
+              })}
             </div>
-            <h2 className="text-3xl font-black text-white">{currentRoutine.name}</h2>
-            <p className="text-sm text-white/60 max-w-2xl mt-1 leading-relaxed">
-              {currentRoutine.description}
-            </p>
+          )}
 
-            <div className="flex flex-wrap gap-2 mt-4">
-              {currentRoutine.targetMuscles.map((muscle) => (
-                <span
-                  key={muscle}
-                  className="px-3 py-1 rounded-xl bg-white/5 border border-white/10 text-xs text-white/80 font-medium"
+          {/* Tarjeta del día */}
+          {currentRoutine && (
+            <div className="metal-card rounded-[28px] p-6 sm:p-8">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-wider text-amber-600">
+                    Día {currentRoutine.dayNumber} • {currentRoutine.difficulty}
+                  </p>
+                  <h2 className="text-2xl sm:text-3xl font-black mt-1">{currentRoutine.name}</h2>
+                  <p className="text-sm text-slate-500 mt-1 max-w-2xl leading-relaxed">
+                    {currentRoutine.description}
+                  </p>
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {currentRoutine.targetMuscles.map((m) => (
+                      <span
+                        key={m}
+                        className="px-2.5 py-1 rounded-full bg-white/70 border border-black/5 text-[11px] font-bold text-slate-500"
+                      >
+                        {m}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => startWorkout(currentRoutine.dayNumber)}
+                  className="relative shrink-0 inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#C0FF00] text-black font-black text-sm hover:bg-[#aee600] active:scale-95 transition-all"
                 >
-                  {muscle}
-                </span>
-              ))}
+                  {guidance.step === 'routine' && (
+                    <span
+                      className="absolute -inset-1 rounded-full border-2 border-amber-400 animate-gold-ring"
+                      aria-hidden="true"
+                    />
+                  )}
+                  <Play className="w-4 h-4 fill-current" />
+                  Iniciar Entrenamiento
+                </button>
+              </div>
             </div>
+          )}
+
+          {/* Lista de ejercicios */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between px-1">
+              <h3 className="text-lg font-black flex items-center gap-2">
+                <Layers className="w-5 h-5 text-amber-500" />
+                Ejercicios ({currentRoutine?.exercises.length ?? 0})
+              </h3>
+              <button
+                onClick={() => navigateTo('exercises')}
+                className="text-xs font-bold text-[#547c08] hover:underline flex items-center gap-1"
+              >
+                Añadir <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {currentRoutine?.exercises.map((ex, idx) => (
+              <RoutineExerciseRow
+                key={ex.id}
+                exercise={ex}
+                index={idx}
+                canRemove={currentRoutine.exercises.length > 1}
+                isExpanded={expandedId === ex.id}
+                onToggleExpand={() => setExpandedId(expandedId === ex.id ? null : ex.id)}
+                onRemove={() => removeExerciseFromRoutine(currentRoutine.dayNumber, ex.id)}
+              />
+            ))}
+
+            <button
+              onClick={() => navigateTo('exercises')}
+              className="w-full py-4 px-6 border-2 border-dashed border-slate-300 rounded-[24px] bg-white/30 hover:bg-white/60 text-slate-500 hover:text-slate-700 transition-all flex items-center justify-center gap-3 cursor-pointer group"
+            >
+              <div className="w-9 h-9 rounded-xl bg-white group-hover:bg-[#C0FF00] text-slate-400 group-hover:text-black flex items-center justify-center transition-all">
+                <Plus className="w-5 h-5" />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-bold">Añadir ejercicio al Día {currentRoutine?.dayNumber}</p>
+                <p className="text-xs">Explora +1,324 ejercicios desde la Biblioteca</p>
+              </div>
+            </button>
           </div>
+        </>
+      )}
 
-          {/* Quick Metrics */}
-          <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5 shrink-0 self-start lg:self-auto">
-            <div className="text-center px-3 border-r border-white/10">
-              <p className="text-[10px] uppercase text-white/40 font-bold">Tiempo</p>
-              <p className="text-xl font-black text-white">{currentRoutine.estimatedMinutes} min</p>
-            </div>
-            <div className="text-center px-3 border-r border-white/10">
-              <p className="text-[10px] uppercase text-white/40 font-bold">Ejercicios</p>
-              <p className="text-xl font-black text-white">{currentRoutine.exercises.length}</p>
-            </div>
-            <div className="text-center px-3">
-              <p className="text-[10px] uppercase text-white/40 font-bold">Intensidad</p>
-              <p className="text-xl font-black text-[#C0FF00]">RPE 8-9</p>
-            </div>
-          </div>
+      {/* Coach IA unificado */}
+      <CoachPanel />
+    </div>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// Fila de ejercicio: correcto y minimal, con detalles expandibles.
+// ---------------------------------------------------------------------------
+interface RoutineExerciseRowProps {
+  exercise: Exercise;
+  index: number;
+  canRemove: boolean;
+  isExpanded: boolean;
+  onToggleExpand: () => void;
+  onRemove: () => void;
+}
+
+const RoutineExerciseRow: React.FC<RoutineExerciseRowProps> = ({
+  exercise: ex,
+  index,
+  canRemove,
+  isExpanded,
+  onToggleExpand,
+  onRemove,
+}) => {
+  return (
+    <div className="bg-white/70 border border-black/5 rounded-[20px] overflow-hidden">
+      <div className="p-4 flex flex-wrap items-center gap-3">
+        <div className="w-9 h-9 rounded-xl bg-slate-100 border border-black/5 flex items-center justify-center font-black text-xs text-amber-600 shrink-0">
+          {index + 1}
         </div>
-      </div>
-
-      {/* Exercises List */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xl font-bold text-white flex items-center gap-2">
-            <Layers className="w-5 h-5 text-[#C0FF00]" />
-            <span>Lista de Ejercicios ({currentRoutine.exercises.length})</span>
-          </h3>
-          <span className="text-xs text-white/50">
-            Haz clic en "Ver Detalles" para consejos técnicos y biomecánica
-          </span>
+        <div className="flex-1 min-w-0">
+          <h4 className="font-black capitalize truncate">{ex.name}</h4>
+          <p className="text-[11px] text-slate-500">
+            {ex.sets} × {ex.reps} • {ex.suggestedWeightKg} kg • descanso {ex.restSeconds}s •{' '}
+            {ex.primaryMuscle}
+          </p>
         </div>
-
-        <div className="grid grid-cols-1 gap-4">
-          {currentRoutine.exercises.map((ex, index) => (
-            <RoutineExerciseRow
-              key={ex.id}
-              exercise={ex}
-              index={index}
-              isDone={!!completedExercises[ex.id]}
-              canRemove={currentRoutine.exercises.length > 1}
-              onToggleComplete={() => toggleComplete(ex.id)}
-              onShowDetails={() => setSelectedExercise(ex)}
-              onSwap={() => setExerciseToSwap(ex)}
-              onRemove={() => removeExerciseFromRoutine(currentRoutine.dayNumber, ex.id)}
+        <div className="flex items-center gap-1.5 shrink-0">
+          <button
+            onClick={onToggleExpand}
+            className="px-3 py-2 rounded-full bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition-colors flex items-center gap-1"
+          >
+            Detalles
+            <ChevronDown
+              className={`w-3.5 h-3.5 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
             />
-          ))}
+          </button>
+          {canRemove && (
+            <button
+              onClick={onRemove}
+              className="p-2 rounded-full text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+              aria-label="Quitar de la rutina"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
         </div>
-
-        {/* Add Exercise from 1,324 Dataset Button */}
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          className="w-full py-4 px-6 border-2 border-dashed border-white/15 hover:border-[#C0FF00]/60 rounded-[24px] bg-white/[0.02] hover:bg-white/[0.06] text-white transition-all flex items-center justify-center gap-3 group cursor-pointer"
-        >
-          <div className="w-9 h-9 rounded-xl bg-white/5 group-hover:bg-[#C0FF00] text-white/70 group-hover:text-black flex items-center justify-center transition-all">
-            <Plus className="w-5 h-5" />
-          </div>
-          <div className="text-left">
-            <p className="text-sm font-bold text-white group-hover:text-[#C0FF00] transition-colors flex items-center gap-2">
-              <span>Añadir Ejercicio al Día {currentRoutine.dayNumber}</span>
-              <span className="px-2 py-0.5 rounded-full bg-[#C0FF00]/10 text-[#C0FF00] text-[10px] font-mono font-black border border-[#C0FF00]/20">
-                +1,324 Ejercicios
-              </span>
-            </p>
-            <p className="text-xs text-white/50">
-              Explora y añade variantes desde la base de datos hasaneyldrm/exercises-dataset
-            </p>
-          </div>
-        </button>
       </div>
 
-      {/* Exercise Details Modal */}
-      {selectedExercise && (
-        <RoutineExerciseDetailModal
-          exercise={selectedExercise}
-          onClose={() => setSelectedExercise(null)}
-          onAskCoach={() => handleAskCoachAboutExercise(selectedExercise)}
-          onStartWorkout={() => {
-            setSelectedExercise(null);
-            startWorkout(currentRoutine.dayNumber);
-          }}
-        />
-      )}
-
-      {/* Modal to Swap Exercise */}
-      {exerciseToSwap && (
-        <DatasetPickerModal
-          badge="Sustituir Ejercicio"
-          title={`Reemplazar "${exerciseToSwap.name}"`}
-          subtitle={`Selecciona cualquier ejercicio de la base de datos para sustituirlo en tu Día ${currentRoutine.dayNumber}.`}
-          onClose={() => setExerciseToSwap(null)}
-          onSelect={handleSelectSwap}
-        />
-      )}
-
-      {/* Modal to Add Exercise to Routine */}
-      {isAddModalOpen && (
-        <DatasetPickerModal
-          badge="Añadir a Rutina"
-          title={`Añadir Ejercicio al Día ${currentRoutine.dayNumber} (${currentRoutine.focus})`}
-          subtitle="Elige entre los 1,324 ejercicios con técnica e ilustraciones para agregar a tu rutina."
-          onClose={() => setIsAddModalOpen(false)}
-          onSelect={handleSelectAdd}
-        />
+      {isExpanded && (
+        <div className="px-4 pb-4 pt-1 space-y-3 animate-sheet-fade">
+          <p className="text-xs bg-amber-50 border border-amber-200/60 rounded-xl p-3 text-slate-700">
+            <strong>Cue del Coach:</strong> "{ex.technicalCue}"
+          </p>
+          {ex.fullInstructions.length > 0 && (
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5">
+                Cómo ejecutarlo
+              </p>
+              <ol className="space-y-1.5">
+                {ex.fullInstructions.map((ins, i) => (
+                  <li key={i} className="flex items-start gap-2 text-xs text-slate-600">
+                    <span className="w-4 h-4 rounded-full bg-slate-100 flex items-center justify-center text-[9px] font-black shrink-0 mt-px">
+                      {i + 1}
+                    </span>
+                    {ins}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+          {ex.commonMistakes.length > 0 && (
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-wider text-red-400 mb-1.5">
+                Errores a evitar
+              </p>
+              <ul className="space-y-1">
+                {ex.commonMistakes.map((m, i) => (
+                  <li key={i} className="flex items-start gap-2 text-xs text-slate-500">
+                    <span className="text-red-400 font-bold">•</span>
+                    {m}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
 };
+
+export default RoutineView;

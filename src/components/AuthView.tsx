@@ -4,15 +4,15 @@ import {
   Mail,
   Lock,
   User,
-  ArrowLeft,
   ArrowRight,
   CheckCircle2,
   ShieldCheck,
+  Loader2,
 } from 'lucide-react';
 import { useApp } from '../context/useApp';
 
 export const AuthView: React.FC = () => {
-  const { navigateTo, loginDemoUser, updateUserProfile } = useApp();
+  const { loginDemoUser, loginWithEmail, registerWithEmail } = useApp();
   const [tab, setTab] = useState<'login' | 'register' | 'forgot'>('login');
 
   // Form states
@@ -22,19 +22,22 @@ export const AuthView: React.FC = () => {
   const [rememberMe, setRememberMe] = useState(true);
   const [recoverySent, setRecoverySent] = useState(false);
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
       setError('Por favor ingresa tu correo y contraseña.');
       return;
     }
     setError('');
-    // For prototype simulation
-    loginDemoUser();
+    setIsSubmitting(true);
+    const { error: authError } = await loginWithEmail(email, password);
+    setIsSubmitting(false);
+    if (authError) setError(authError);
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !password) {
       setError('Por favor completa todos los campos para registrarte.');
@@ -45,8 +48,10 @@ export const AuthView: React.FC = () => {
       return;
     }
     setError('');
-    updateUserProfile({ name, email });
-    navigateTo('onboarding');
+    setIsSubmitting(true);
+    const { error: registerError } = await registerWithEmail(email, password, name);
+    setIsSubmitting(false);
+    if (registerError) setError(registerError);
   };
 
   const handleForgot = (e: React.FormEvent) => {
@@ -60,29 +65,20 @@ export const AuthView: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-[#F3F4F6] flex flex-col justify-center items-center p-6 relative overflow-hidden">
+    <div className="min-h-[calc(100vh-4rem)] py-8 px-6 flex flex-col justify-center items-center relative overflow-hidden">
       {/* Background glow auras */}
-      <div className="absolute top-[-15%] right-[-10%] w-[500px] h-[500px] bg-[#C0FF00]/10 blur-[130px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-600/10 blur-[130px] rounded-full pointer-events-none" />
-
-      {/* Back button */}
-      <button
-        onClick={() => navigateTo('landing')}
-        className="absolute top-6 left-6 flex items-center gap-2 text-xs font-semibold text-white/50 hover:text-white transition-colors py-2 px-3 rounded-lg hover:bg-white/5"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        <span>Volver al Inicio</span>
-      </button>
+      <div className="absolute top-[-15%] right-[-10%] w-[500px] h-[500px] bg-amber-200/40 blur-[130px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-lime-200/40 blur-[130px] rounded-full pointer-events-none" />
 
       {/* Card container */}
-      <div className="w-full max-w-md bg-[#0A0A0A] border border-white/10 rounded-[32px] p-8 shadow-2xl relative z-10">
+      <div className="w-full max-w-md metal-card rounded-[32px] p-8 shadow-2xl relative z-10">
         {/* Brand header */}
         <div className="flex flex-col items-center text-center mb-8">
-          <div className="w-12 h-12 bg-[#C0FF00] rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_25px_rgba(192,255,0,0.3)]">
+          <div className="w-12 h-12 bg-[#C0FF00] rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_25px_rgba(112,160,20,0.35)]">
             <Zap className="w-7 h-7 text-black fill-current" />
           </div>
-          <h1 className="text-2xl font-black text-white">FitAI Coach</h1>
-          <p className="text-xs text-white/50 mt-1">
+          <h1 className="text-2xl font-black text-[#1d1d1f]">FitAI Coach</h1>
+          <p className="text-xs text-slate-500 mt-1">
             Plataforma PaaS para entrenamiento inteligente
           </p>
         </div>
@@ -184,16 +180,18 @@ export const AuthView: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full py-3.5 bg-[#C0FF00] text-black font-black text-sm rounded-xl hover:bg-[#aee600] transition-transform active:scale-[0.98] shadow-[0_0_25px_rgba(192,255,0,0.3)] mt-2"
+              disabled={isSubmitting}
+              className="w-full py-3.5 bg-[#C0FF00] text-black font-black text-sm rounded-xl hover:bg-[#aee600] transition-transform active:scale-[0.98] shadow-[0_0_25px_rgba(112,160,20,0.3)] mt-2 disabled:opacity-60 disabled:pointer-events-none flex items-center justify-center gap-2"
             >
+              {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
               Iniciar Sesión
             </button>
 
             <div className="relative my-6 text-center">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-white/10"></div>
+                <div className="w-full border-t border-black/10"></div>
               </div>
-              <span className="relative px-3 bg-[#0A0A0A] text-[11px] text-white/40 uppercase font-semibold">
+              <span className="relative px-3 bg-white text-[11px] text-slate-500 uppercase font-semibold">
                 Acceso Rápido Prototipo
               </span>
             </div>
@@ -265,10 +263,12 @@ export const AuthView: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full py-3.5 bg-[#C0FF00] text-black font-black text-sm rounded-xl hover:bg-[#aee600] transition-transform active:scale-[0.98] shadow-[0_0_25px_rgba(192,255,0,0.3)] flex items-center justify-center gap-2"
+              disabled={isSubmitting}
+              className="w-full py-3.5 bg-[#C0FF00] text-black font-black text-sm rounded-xl hover:bg-[#aee600] transition-transform active:scale-[0.98] shadow-[0_0_25px_rgba(112,160,20,0.3)] flex items-center justify-center gap-2 disabled:opacity-60 disabled:pointer-events-none"
             >
+              {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
               <span>Continuar al Onboarding</span>
-              <ArrowRight className="w-4 h-4" />
+              {!isSubmitting && <ArrowRight className="w-4 h-4" />}
             </button>
           </form>
         )}

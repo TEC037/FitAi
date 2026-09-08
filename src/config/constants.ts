@@ -30,11 +30,19 @@ export const MAX_WEEKLY_VOLUME_REFERENCE = 13000;
 export const COACH_THINKING_DELAY_MS = 900; // latencia mínima de "pensando"
 
 export const STORAGE_KEYS = {
-  USER: 'fitai_user_v1',
-  AUTH: 'fitai_auth_v1',
-  HISTORY: 'fitai_history_v1',
-  SCREEN: 'fitai_screen_v1',
-  ROUTINES: 'fitai_routines_v2',
-  CHAT: 'fitai_chat_v1',
-  WORKOUT: 'fitai_workout_v1',
+  USER: 'fitai_user_v2',
+  AUTH: 'fitai_auth_v2',
+  HISTORY: 'fitai_history_v2',
+  SCREEN: 'fitai_screen_v2',
+  ROUTINES: 'fitai_routines_v3',
+  CHAT: 'fitai_chat_v2',
+  WORKOUT: 'fitai_workout_v2',
 } as const;
+
+// Supabase (Auth + base de datos)
+export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
+
+// Cuenta demo con la que entra el botón circular (se crea en el seeder SQL).
+export const DEMO_EMAIL = 'demo@fitai.app';
+export const DEMO_PASSWORD = 'fitai-demo-2026';

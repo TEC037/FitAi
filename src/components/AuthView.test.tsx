@@ -35,7 +35,6 @@ describe('AuthView', () => {
     expect(
       screen.getByRole('button', { name: /Acceder con Carlos Ramírez \(Usuario Demo\)/ })
     ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Volver al Inicio' })).toBeInTheDocument();
   });
 
   it('valida los campos requeridos en el inicio de sesión', () => {
@@ -159,16 +158,5 @@ describe('AuthView', () => {
     expect(loginTab.className).toContain('bg-[#C0FF00]');
     expect(registerTab.className).not.toContain('bg-[#C0FF00]');
     expect(screen.getByPlaceholderText('carlos.ramirez@ejemplo.com')).toBeInTheDocument();
-  });
-
-  it('vuelve a la pantalla de inicio con el botón de regreso', () => {
-    render(
-      <AppProvider>
-        <Harness />
-      </AppProvider>
-    );
-
-    fireEvent.click(screen.getByRole('button', { name: 'Volver al Inicio' }));
-    expect(screen.getByTestId('harness-screen')).toHaveTextContent('landing');
   });
 });

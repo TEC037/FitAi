@@ -168,6 +168,7 @@ describe('AppContext workout persistence', () => {
   beforeEach(() => {
     localStorage.clear();
     window.scrollTo = () => {};
+    localStorage.setItem(STORAGE_KEYS.ROUTINES, JSON.stringify([DEMO_ROUTINE]));
   });
 
   it('persiste una sesión activa al iniciar entrenamiento', async () => {
