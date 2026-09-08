@@ -40,8 +40,12 @@ export const STORAGE_KEYS = {
 } as const;
 
 // Supabase (Auth + base de datos)
-export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
+// Lectura con guarda: el módulo también se bundlea en Cloudflare Pages
+// Functions (workerd), donde `import.meta.env` no existe.
+const ENV = ((typeof import.meta !== 'undefined' && import.meta.env) ||
+  {}) as Record<string, string | undefined>;
+export const SUPABASE_URL = ENV.VITE_SUPABASE_URL as string | undefined;
+export const SUPABASE_ANON_KEY = ENV.VITE_SUPABASE_ANON_KEY as string | undefined;
 
 // Cuenta demo con la que entra el botón circular (se crea en el seeder SQL).
 export const DEMO_EMAIL = 'demo@fitai.app';
