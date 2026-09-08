@@ -7,6 +7,7 @@ import {
   Loader2,
   SlidersHorizontal,
   ChevronDown,
+  Star,
 } from 'lucide-react';
 import { FilterDrillDownSheet } from './FilterDrillDownSheet';
 import { Highlight } from './Highlight';
@@ -32,6 +33,7 @@ import {
 import { DatasetExercise } from '../types';
 import { useApp } from '../context/useApp';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
+import { useFavorites } from '../hooks/useFavorites';
 import { formatNumber } from '../utils/format';
 import { useIsMobile } from '../hooks/useIsMobile';
 
@@ -87,6 +89,7 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
   initialCategory,
 }) => {
   const { routines, addExerciseToRoutine, sendCoachMessage, navigateTo } = useApp();
+  const { favoriteIds } = useFavorites();
 
   const isMobile = useIsMobile();
 
@@ -102,6 +105,7 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
   const storedSort = useMemo(() => readStoredSort(), []);
   const [sortOrder, setSortOrder] = useState<'relevance' | 'name' | 'name-desc'>(storedSort);
   const [showFilterSheet, setShowFilterSheet] = useState(false);
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
 
   // Persiste los filtros al cambiar para rehidratarlos al volver a la vista.
   useEffect(() => {
@@ -178,6 +182,15 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
     isLoadingDB,
   ]);
 
+  // Filtro local "favoritos" (post-búsqueda): se aplica sobre el resultado visible.
+  const favoritesFiltered = useMemo(
+    () =>
+      favoritesOnly
+        ? visibleExercises.filter((exercise) => favoriteIds.has(exercise.id))
+        : visibleExercises,
+    [visibleExercises, favoritesOnly, favoriteIds]
+  );
+
   const handleSearchChange = (q: string) => {
     setSearchQuery(q);
     setDisplayCount(PAGE_SIZE);
@@ -244,10 +257,25 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
               : searchQuery ||
                   selectedCategory !== 'all' ||
                   selectedEquipment !== 'all' ||
-                  selectedTarget !== 'all'
-                ? `${formatNumber(filteredCount)} resultados`
+                  selectedTarget !== 'all' ||
+                  favoritesOnly
+                ? `${formatNumber(favoritesFiltered.length)} resultados`
                 : `${formatNumber(EXERCISE_DATABASE.length)} ejercicios`}
           </p>
+          <button
+            onClick={() => setFavoritesOnly((v) => !v)}
+            aria-pressed={favoritesOnly}
+            aria-label="Mostrar solo favoritos"
+            className={`flex items-center gap-1 p-2 rounded-full border transition-colors shrink-0 ${
+              favoritesOnly
+                ? 'bg-amber-300/15 text-amber-200 border-amber-300/40'
+                : 'text-white/60 border-white/10 hover:bg-white/5'
+            }`}
+          >
+            <Star
+              className={`w-4 h-4 ${favoritesOnly ? 'fill-amber-300 text-amber-200' : ''}`}
+            />
+          </button>
           <SortSelect sortOrder={sortOrder} onSortChange={handleSortChange} compact />
         </div>
         </div>
@@ -342,7 +370,7 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
               )}
             </div>
 
-            {visibleExercises.length === 0 ? (
+            {favoritesFiltered.length === 0 ? (
               <div className="bg-[#0A0A0A] border border-white/10 rounded-3xl p-12 text-center flex flex-col items-center justify-center gap-4">
                 <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-white/40">
                   <Search className="w-7 h-7" />
@@ -364,40 +392,40 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
             ) : (
               <>
                 <div className="flex flex-col gap-2">
-                  {visibleExercises.map((exercise) => (
-                <button
-                  key={exercise.id}
-                  onClick={() => setSelectedExercise(exercise)}
-                  className="flex items-center gap-3 bg-[#0A0A0A] border border-white/10 rounded-2xl px-3 py-2.5 text-left active:border-[#C0FF00]/50 transition-colors"
-                >
-                  <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center">
-                    <img
-                      src={getExerciseImageUrl(exercise.image)}
-                      alt={exercise.name}
-                      loading="lazy"
-                      className="w-full h-full object-contain p-0.5"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-white capitalize truncate">
-                    <Highlight text={exercise.name} query={debouncedSearchQuery} />
-                  </p>
-                    <p className="text-[11px] text-white/50">{translateTarget(exercise.target)}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
+                  {favoritesFiltered.map((exercise) => (
+                    <button
+                      key={exercise.id}
+                      onClick={() => setSelectedExercise(exercise)}
+                      className="flex items-center gap-3 bg-[#0A0A0A] border border-white/10 rounded-2xl px-3 py-2.5 text-left active:border-[#C0FF00]/50 transition-colors"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center">
+                        <img
+                          src={getExerciseImageUrl(exercise.image)}
+                          alt={exercise.name}
+                          loading="lazy"
+                          className="w-full h-full object-contain p-0.5"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-white capitalize truncate">
+                          <Highlight text={exercise.name} query={debouncedSearchQuery} />
+                        </p>
+                        <p className="text-[11px] text-white/50">{translateTarget(exercise.target)}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
 
-            {visibleExercises.length < filteredCount && (
-              <button
-                onClick={() => setDisplayCount((prev) => prev + PAGE_SIZE)}
-                className="w-full py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 text-white font-bold text-xs transition-transform active:scale-[0.98]"
-              >
-                Cargar Más (+{Math.min(PAGE_SIZE, filteredCount - visibleExercises.length)})
-              </button>
+                {favoritesFiltered.length < filteredCount && (
+                  <button
+                    onClick={() => setDisplayCount((prev) => prev + PAGE_SIZE)}
+                    className="w-full py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 text-white font-bold text-xs transition-transform active:scale-[0.98]"
+                  >
+                    Cargar Más (+{Math.min(PAGE_SIZE, filteredCount - favoritesFiltered.length)})
+                  </button>
+                )}
+              </>
             )}
-          </>
-        )}
         </>
       )}
 
@@ -486,9 +514,12 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
         categories={categories}
         equipmentList={equipmentList}
         targets={targets}
-        visibleCount={visibleExercises.length}
+        visibleCount={favoritesFiltered.length}
         filteredCount={filteredCount}
         sortOrder={sortOrder}
+        favoritesActive={favoritesOnly}
+        favoriteCount={favoriteIds.size}
+        onToggleFavorites={() => setFavoritesOnly((v) => !v)}
         onSortChange={handleSortChange}
         onSearchChange={handleSearchChange}
         onCategoryChange={handleCategoryChange}
@@ -502,7 +533,7 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
         <div className="flex justify-center items-center py-20">
           <Loader2 className="w-12 h-12 text-[#C0FF00] animate-spin" />
         </div>
-      ) : visibleExercises.length === 0 ? (
+      ) : favoritesFiltered.length === 0 ? (
         <div className="bg-[#0A0A0A] border border-white/10 rounded-[32px] p-12 text-center flex flex-col items-center justify-center gap-4">
           <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-white/40">
             <Search className="w-7 h-7" />
@@ -523,7 +554,7 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {visibleExercises.map((exercise) => (
+          {favoritesFiltered.map((exercise) => (
             <ExerciseLibraryCard
               key={exercise.id}
               exercise={exercise}
@@ -537,7 +568,7 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
       )}
 
       {/* Pagination / Load More */}
-      {visibleExercises.length < filteredCount && (
+      {favoritesFiltered.length < filteredCount && (
         <div className="flex justify-center pt-6 pb-8">
           <button
             onClick={() => setDisplayCount((prev) => prev + PAGE_SIZE)}
@@ -545,7 +576,7 @@ export const ExerciseDatabaseView: React.FC<ExerciseDatabaseViewProps> = ({
           >
             <span>Cargar Más Ejercicios</span>
             <span className="px-2 py-0.5 bg-[#C0FF00] text-black rounded-full font-mono text-xs font-black">
-              +{Math.min(PAGE_SIZE, filteredCount - visibleExercises.length)}
+              +{Math.min(PAGE_SIZE, filteredCount - favoritesFiltered.length)}
             </span>
           </button>
         </div>

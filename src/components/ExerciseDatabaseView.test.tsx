@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { ExerciseDatabaseView } from './ExerciseDatabaseView';
 import { DatasetExercise } from '../types';
+import { resetFavorites } from '../store/favoritesStore';
 
 const { useApp } = vi.hoisted(() => ({ useApp: vi.fn() }));
 
@@ -210,6 +211,8 @@ describe('ExerciseDatabaseView (DOM)', () => {
     vi.clearAllMocks();
     window.scrollTo = vi.fn();
     window.sessionStorage.clear();
+    window.localStorage.clear();
+    resetFavorites();
   });
 
   it('muestra el encabezado y el total de ejercicios', () => {
@@ -477,6 +480,52 @@ describe('ExerciseDatabaseView (DOM)', () => {
     expect(screen.getByLabelText('Ordenar resultados por')).toHaveValue('name-desc');
     expect(screen.getAllByRole('heading', { level: 4 })[0]).toHaveTextContent('Squat');
   });
+
+  it('marca un ejercicio como favorito desde la tarjeta y lo persiste', () => {
+    renderView();
+
+    const star = screen.getAllByRole('button', { name: 'Añadir a favoritos' })[0];
+    expect(star).toHaveAttribute('aria-pressed', 'false');
+
+    fireEvent.click(star);
+
+    expect(screen.getByRole('button', { name: 'Quitar de favoritos' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    expect(window.localStorage.getItem('fitai.favoriteExercises')).toBe('["0001"]');
+  });
+
+  it('filtra la biblioteca a solo favoritos y muestra el contador', () => {
+    renderView();
+
+    fireEvent.click(screen.getAllByRole('button', { name: 'Añadir a favoritos' })[0]);
+    const toggle = screen.getByRole('button', { name: /Favoritos/ });
+    expect(toggle).toHaveAttribute('aria-pressed', 'false');
+
+    fireEvent.click(toggle);
+
+    expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    expect(within(toggle).getByText('1')).toBeInTheDocument();
+    expect(screen.getByText('Bench Press')).toBeInTheDocument();
+    expect(screen.queryByText('Squat')).not.toBeInTheDocument();
+    expect(screen.queryByText('Dumbbell Curl')).not.toBeInTheDocument();
+  });
+
+  it('restaura la lista completa al desactivar el filtro de favoritos', () => {
+    renderView();
+
+    fireEvent.click(screen.getAllByRole('button', { name: 'Añadir a favoritos' })[0]);
+    const toggle = screen.getByRole('button', { name: /Favoritos/ });
+    fireEvent.click(toggle);
+    expect(screen.queryByText('Squat')).not.toBeInTheDocument();
+
+    fireEvent.click(toggle);
+
+    expect(screen.getByText('Squat')).toBeInTheDocument();
+    expect(screen.getByText('Dumbbell Curl')).toBeInTheDocument();
+    expect(toggle).toHaveAttribute('aria-pressed', 'false');
+  });
 });
 
 describe('ExerciseDatabaseView (variante móvil)', () => {
@@ -486,6 +535,8 @@ describe('ExerciseDatabaseView (variante móvil)', () => {
     vi.clearAllMocks();
     window.scrollTo = vi.fn();
     window.sessionStorage.clear();
+    window.localStorage.clear();
+    resetFavorites();
     mockMobileViewport();
   });
 

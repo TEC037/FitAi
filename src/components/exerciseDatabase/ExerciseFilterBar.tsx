@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, X, RotateCcw, ArrowUpDown } from 'lucide-react';
+import { Search, X, RotateCcw, ArrowUpDown, Star } from 'lucide-react';
 import { IllustratedFilterRow } from '../IllustratedFilter';
 import { ExerciseMeta, ResultSortOrder } from './types';
 
@@ -34,6 +34,9 @@ interface ExerciseFilterBarProps {
   visibleCount: number;
   filteredCount: number;
   sortOrder: ResultSortOrder;
+  favoritesActive: boolean;
+  favoriteCount: number;
+  onToggleFavorites: () => void;
   onSortChange: (sort: ResultSortOrder) => void;
   onSearchChange: (q: string) => void;
   onCategoryChange: (category: string) => void;
@@ -53,6 +56,9 @@ export const ExerciseFilterBar: React.FC<ExerciseFilterBarProps> = ({
   visibleCount,
   filteredCount,
   sortOrder,
+  favoritesActive,
+  favoriteCount,
+  onToggleFavorites,
   onSortChange,
   onSearchChange,
   onCategoryChange,
@@ -148,6 +154,25 @@ export const ExerciseFilterBar: React.FC<ExerciseFilterBarProps> = ({
               Restablecer Filtros
             </button>
           )}
+          <button
+            onClick={onToggleFavorites}
+            aria-pressed={favoritesActive}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-colors ${
+              favoritesActive
+                ? 'bg-amber-300/15 text-amber-200 border-amber-300/40'
+                : 'text-white/70 border-white/10 hover:bg-white/5'
+            }`}
+          >
+            <Star
+              className={`w-3.5 h-3.5 ${favoritesActive ? 'fill-amber-300 text-amber-200' : ''}`}
+            />
+            Favoritos
+            {favoriteCount > 0 && (
+              <span className="px-1.5 rounded-full bg-amber-300/20 text-amber-200 text-[10px] font-black">
+                {favoriteCount}
+              </span>
+            )}
+          </button>
           <SortSelect sortOrder={sortOrder} onSortChange={onSortChange} />
           <span className="text-[11px] text-white/40 hidden lg:inline">
             Pasa el cursor sobre una tarjeta para ver la animación en GIF

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Play, Info, Plus, Check } from 'lucide-react';
+import { Play, Info, Plus, Check, Star } from 'lucide-react';
 import { DatasetExercise, DailyRoutine } from '../../types';
+import { useFavorites } from '../../hooks/useFavorites';
 import {
   getExerciseGifUrl,
   getExerciseImageUrl,
@@ -28,6 +29,9 @@ export const ExerciseLibraryCard: React.FC<ExerciseLibraryCardProps> = ({
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [isAdding, setIsAdding] = useState<boolean>(false);
   const [wasJustAdded, setWasJustAdded] = useState<boolean>(false);
+  const { isFavorite, toggleFavorite } = useFavorites();
+
+  const fav = isFavorite(exercise.id);
 
   const imageUrl = getExerciseImageUrl(exercise.image);
   const gifUrl = getExerciseGifUrl(exercise.gif_url);
@@ -71,6 +75,17 @@ export const ExerciseLibraryCard: React.FC<ExerciseLibraryCardProps> = ({
             </span>
           )}
         </div>
+
+        {/* Favorito */}
+        <button
+          onClick={() => toggleFavorite(exercise.id)}
+          aria-pressed={fav}
+          aria-label={fav ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+          title={fav ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+          className="absolute top-2 right-2 z-10 p-2 rounded-full bg-black/50 backdrop-blur-md border border-white/10 hover:bg-black/70 transition-colors"
+        >
+          <Star className={`w-4 h-4 ${fav ? 'fill-amber-300 text-amber-300' : 'text-white/70'}`} />
+        </button>
 
         {/* Quick inspect button */}
         <button
