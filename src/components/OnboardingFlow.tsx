@@ -1,392 +1,304 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowRight,
+  ArrowLeft,
   CheckCircle2,
-  ShieldAlert,
   BrainCircuit,
-  ChevronDown,
-  SlidersHorizontal,
   Zap,
 } from 'lucide-react';
 import { useApp } from '../context/useApp';
 import { ExperienceLevel, FitnessGoal } from '../types';
+import { DailyRoutine } from '../types';
+import { SURVEY_QUESTIONS, SurveyQuestion } from '../data/surveyQuestions';
+import { EXERCISE_DATABASE } from '../services/exerciseDatabaseService';
+import {
+  SurveyAnswers,
+  RoutineSummary,
+  generateRoutineFromSurvey,
+} from '../utils/routineGenerator';
 
-const EXPERIENCE_OPTIONS = [
-  { id: 'principiante', label: 'Principiante', desc: '< 1 año' },
-  { id: 'intermedio', label: 'Intermedio', desc: '1 a 3 años' },
-  { id: 'avanzado', label: 'Avanzado', desc: '3+ años' },
-] as const;
+const EQUIPMENT_LABELS: Record<string, string> = {
+  gimnasio: 'Gimnasio completo',
+  barras: 'Barras y discos',
+  mancuernas: 'Mancuernas',
+  maquinas: 'Máquinas guiadas',
+  poleas: 'Poleas y cables',
+  calistenia: 'Calistenia / peso corporal',
+};
 
-const GOAL_OPTIONS: { id: FitnessGoal; title: string; desc: string }[] = [
-  { id: 'hipertrofia', title: 'Ganar Masa', desc: '8-12 reps' },
-  { id: 'perdida_grasa', title: 'Perder Grasa', desc: 'déficit y densidad' },
-  { id: 'fuerza', title: 'Fuerza Máxima', desc: '3-6 reps' },
-  { id: 'resistencia', title: 'Resistencia', desc: '15+ reps' },
-  { id: 'condicion_general', title: 'Condición General', desc: 'salud y tono' },
-];
+const LIMITATION_LABELS: Record<string, string> = {
+  ninguna: '',
+  rodillas: 'Rodillas',
+  espalda: 'Zona lumbar',
+  hombros: 'Hombros',
+  cervical: 'Cervical',
+};
 
-const MUSCLES = ['Pecho', 'Espalda', 'Hombros', 'Brazos', 'Piernas', 'Glúteos', 'Abdomen y Core'];
+type AnswerMap = Record<string, string[]>;
 
-const EQUIPMENT_OPTIONS = [
-  'Gimnasio completo',
-  'Barras y discos olímpicos',
-  'Mancuernas',
-  'Poleas y cables',
-  'Máquinas guiadas',
-  'Calistenia / Peso corporal',
-];
+// --- Paso 1: Nombre (obligatorio) ---
 
-interface ProfileStepProps {
+const NameStep: React.FC<{
   name: string;
-  age: number;
-  gender: string;
-  height: number;
-  weight: number;
-  experience: ExperienceLevel;
-  daysPerWeek: number;
-  avgDuration: number;
-  primaryGoal: FitnessGoal;
-  targetMuscles: string[];
-  equipment: string[];
-  injuries: string;
-  showAdvanced: boolean;
   onName: (v: string) => void;
-  onAge: (v: number) => void;
-  onGender: (v: string) => void;
-  onHeight: (v: number) => void;
-  onWeight: (v: number) => void;
-  onExperience: (v: ExperienceLevel) => void;
-  onDaysPerWeek: (v: number) => void;
-  onAvgDuration: (v: number) => void;
-  onPrimaryGoal: (v: FitnessGoal) => void;
-  onToggleMuscle: (m: string) => void;
-  onToggleEquipment: (item: string) => void;
-  onInjuries: (v: string) => void;
-  onToggleAdvanced: () => void;
-}
+  onContinue: () => void;
+}> = ({ name, onName, onContinue }) => (
+  <div className="space-y-6 animate-fadeIn">
+    <div>
+      <p className="text-[10px] uppercase tracking-[0.2em] text-[#C0FF00] font-bold mb-1">
+        Paso 1 • Tu Nombre
+      </p>
+      <h2 className="text-2xl sm:text-3xl font-black">¿Cómo te llamas?</h2>
+      <p className="text-xs text-white/50 mt-1 leading-relaxed">
+        Enseguida te haremos una encuesta breve para entender tu punto de partida y tus
+        necesidades. Tu plan se generará a partir de tus respuestas.
+      </p>
+    </div>
 
-const ProfileStep: React.FC<ProfileStepProps> = ({
-  name,
-  age,
-  gender,
-  height,
-  weight,
-  experience,
-  daysPerWeek,
-  avgDuration,
-  primaryGoal,
-  targetMuscles,
-  equipment,
-  injuries,
-  showAdvanced,
-  onName,
-  onAge,
-  onGender,
-  onHeight,
-  onWeight,
-  onExperience,
-  onDaysPerWeek,
-  onAvgDuration,
-  onPrimaryGoal,
-  onToggleMuscle,
-  onToggleEquipment,
-  onInjuries,
-  onToggleAdvanced,
-}) => {
+    <div>
+      <label
+        htmlFor="onboarding-name"
+        className="block text-xs font-semibold text-white/70 mb-1.5"
+      >
+        Nombre <span className="text-[#C0FF00]">*</span>
+      </label>
+      <input
+        id="onboarding-name"
+        type="text"
+        value={name}
+        onChange={(e) => onName(e.target.value)}
+        autoFocus
+        placeholder="Escribe tu nombre aquí..."
+        className={`w-full bg-white/5 border rounded-xl px-4 py-4 text-base text-white focus:outline-none focus:border-[#C0FF00] ${
+          name.trim() ? 'border-white/10' : 'border-[#C0FF00]/50'
+        }`}
+      />
+      {!name.trim() && (
+        <p className="text-[11px] text-amber-400 mt-1.5">Ingresa tu nombre para continuar.</p>
+      )}
+    </div>
+
+    <div className="flex justify-end">
+      <button
+        type="button"
+        onClick={onContinue}
+        disabled={!name.trim()}
+        className="flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-black bg-[#C0FF00] text-black hover:bg-[#aee600] transition-transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(192,255,0,0.3)] disabled:opacity-40 disabled:pointer-events-none"
+      >
+        <span>Comenzar</span>
+        <ArrowRight className="w-4 h-4" />
+      </button>
+    </div>
+  </div>
+);
+
+// --- Paso: una pregunta de la encuesta ---
+
+const SurveyStep: React.FC<{
+  question: SurveyQuestion;
+  value: string[];
+  onSelect: (value: string[]) => void;
+  canGoBack: boolean;
+  onBack: () => void;
+  onNext: () => void;
+}> = ({ question, value, onSelect, canGoBack, onBack, onNext }) => {
+  const Icon = question.icon;
+  const isSingle = question.type === 'single';
+
+  const handleSelect = (optionValue: string) => {
+    if (question.id === 'limitations') {
+      if (optionValue === 'ninguna') {
+        onSelect(['ninguna']);
+        return;
+      }
+      const filtered = value.filter((v) => v !== 'ninguna');
+      onSelect(
+        filtered.includes(optionValue)
+          ? filtered.filter((v) => v !== optionValue)
+          : [...filtered, optionValue]
+      );
+      return;
+    }
+    if (isSingle) {
+      onSelect(value[0] === optionValue ? [''] : [optionValue]);
+      return;
+    }
+    onSelect(
+      value.includes(optionValue)
+        ? value.filter((v) => v !== optionValue)
+        : [...value, optionValue]
+    );
+  };
+
+  const isValid = isSingle ? Boolean(value[0]) : value.length >= 1;
+
   return (
-    <div className="space-y-6 animate-fadeIn">
-      <div>
-        <p className="text-[10px] uppercase tracking-[0.2em] text-[#C0FF00] font-bold mb-1">
-          Paso 1 • Tu Nombre
-        </p>
-        <h2 className="text-2xl sm:text-3xl font-black">¿Cómo te llamas?</h2>
-        <p className="text-xs text-white/50 mt-1">
-          Solo necesitamos tu nombre para personalizar tu plan. El resto de datos es opcional y
-          puedes ajustarlos después desde tu perfil.
-        </p>
+    <div className="space-y-5 animate-fadeIn">
+      <div className="flex items-center gap-2">
+        <div className="w-9 h-9 rounded-xl bg-[#C0FF00]/10 border border-[#C0FF00]/30 flex items-center justify-center">
+          <Icon className="w-4 h-4 text-[#C0FF00]" />
+        </div>
+        <h2 className="text-xl sm:text-2xl font-black">{question.title}</h2>
+      </div>
+      {question.hint && <p className="text-xs text-white/50">{question.hint}</p>}
+
+      <div className={`grid gap-2 ${question.options.length > 4 ? 'sm:grid-cols-2' : 'sm:grid-cols-2'} grid-cols-1`}>
+        {question.options.map((option) => {
+          const selected = question.id === 'limitations'
+            ? option.value === 'ninguna'
+              ? value.includes('ninguna')
+              : value.includes(option.value) && !value.includes('ninguna')
+            : value.includes(option.value);
+          return (
+            <button
+              key={option.value}
+              type="button"
+              aria-pressed={selected}
+              onClick={() => handleSelect(option.value)}
+              className={`p-3 rounded-2xl border text-left transition-all ${
+                selected
+                  ? 'bg-[#C0FF00]/10 border-[#C0FF00] text-white'
+                  : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+              }`}
+            >
+              <p className={`text-sm font-bold ${selected ? 'text-[#C0FF00]' : ''}`}>
+                {option.label}
+              </p>
+              {option.desc && <p className="text-[10px] text-white/40 mt-0.5">{option.desc}</p>}
+            </button>
+          );
+        })}
       </div>
 
-      <div>
-        <label
-          htmlFor="onboarding-name"
-          className="block text-xs font-semibold text-white/70 mb-1.5"
-        >
-          Nombre <span className="text-[#C0FF00]">*</span>
-        </label>
-        <input
-          id="onboarding-name"
-          type="text"
-          value={name}
-          onChange={(e) => onName(e.target.value)}
-          autoFocus
-          placeholder="Escribe tu nombre aquí..."
-          className={`w-full bg-white/5 border rounded-xl px-4 py-4 text-base text-white focus:outline-none focus:border-[#C0FF00] ${
-            name.trim() ? 'border-white/10' : 'border-[#C0FF00]/50'
-          }`}
-        />
-        {!name.trim() && (
-          <p className="text-[11px] text-amber-400 mt-1.5">Ingresa tu nombre para continuar.</p>
-        )}
-      </div>
-
-      {/* Configuración opcional (plegada por defecto) */}
-      <div className="pt-2 border-t border-white/10">
+      <div className="pt-4 border-t border-white/10 flex justify-between items-center">
         <button
           type="button"
-          onClick={onToggleAdvanced}
-          aria-expanded={showAdvanced}
-          className="w-full flex items-center justify-between gap-3 py-2.5 text-left"
+          onClick={onBack}
+          disabled={!canGoBack}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black bg-white/5 text-white/70 hover:bg-white/10 transition-colors disabled:opacity-30 disabled:pointer-events-none"
         >
-          <span className="flex items-center gap-2 text-xs font-bold text-[#C0FF00]">
-            <SlidersHorizontal className="w-4 h-4" />
-            Personalizar mi plan (opcional)
-          </span>
-          <ChevronDown
-            className={`w-4 h-4 text-white/50 transition-transform ${showAdvanced ? 'rotate-180' : ''}`}
-          />
+          <ArrowLeft className="w-4 h-4" />
+          Atrás
         </button>
-
-        {showAdvanced && (
-          <div className="space-y-5 pt-4 pb-2 animate-fadeIn">
-            <div>
-              <label className="block text-xs font-semibold text-white/70 mb-2">
-                Objetivo principal
-              </label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {GOAL_OPTIONS.map((goal) => (
-                  <button
-                    key={goal.id}
-                    type="button"
-                    onClick={() => onPrimaryGoal(goal.id)}
-                    className={`p-2.5 rounded-xl border text-left transition-all ${
-                      primaryGoal === goal.id
-                        ? 'bg-[#C0FF00]/10 border-[#C0FF00] text-white'
-                        : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
-                    }`}
-                  >
-                    <p
-                      className={`text-xs font-bold ${primaryGoal === goal.id ? 'text-[#C0FF00]' : ''}`}
-                    >
-                      {goal.title}
-                    </p>
-                    <p className="text-[10px] text-white/40 mt-0.5">{goal.desc}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-white/70 mb-2">
-                Nivel de experiencia
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                {EXPERIENCE_OPTIONS.map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => onExperience(item.id)}
-                    className={`p-2.5 rounded-xl border text-left transition-all ${
-                      experience === item.id
-                        ? 'bg-[#C0FF00]/10 border-[#C0FF00] text-white'
-                        : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
-                    }`}
-                  >
-                    <p className={`text-xs font-bold ${experience === item.id ? 'text-[#C0FF00]' : ''}`}>
-                      {item.label}
-                    </p>
-                    <p className="text-[10px] text-white/40 mt-0.5">{item.desc}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="text-xs font-semibold text-white/70">Días por semana</label>
-                <span className="text-xs font-black text-[#C0FF00]">{daysPerWeek} días</span>
-              </div>
-              <div className="flex gap-2">
-                {[2, 3, 4, 5, 6].map((d) => (
-                  <button
-                    key={d}
-                    type="button"
-                    onClick={() => onDaysPerWeek(d)}
-                    className={`flex-1 py-2.5 rounded-xl font-bold text-xs border transition-all ${
-                      daysPerWeek === d
-                        ? 'bg-[#C0FF00] text-black border-[#C0FF00]'
-                        : 'bg-white/5 text-white/60 border-white/10 hover:bg-white/10'
-                    }`}
-                  >
-                    {d}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="text-xs font-semibold text-white/70">Duración por sesión</label>
-                <span className="text-xs font-black text-[#C0FF00]">{avgDuration} min</span>
-              </div>
-              <div className="grid grid-cols-4 gap-2">
-                {[45, 60, 75, 90].map((dur) => (
-                  <button
-                    key={dur}
-                    type="button"
-                    onClick={() => onAvgDuration(dur)}
-                    className={`py-2.5 rounded-xl font-bold text-xs border transition-all ${
-                      avgDuration === dur
-                        ? 'bg-[#C0FF00] text-black border-[#C0FF00]'
-                        : 'bg-white/5 text-white/60 border-white/10 hover:bg-white/10'
-                    }`}
-                  >
-                    {dur} min
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-white/70 mb-2">
-                Zonas a priorizar
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {MUSCLES.map((muscle) => {
-                  const isSelected = targetMuscles.includes(muscle);
-                  return (
-                    <button
-                      key={muscle}
-                      type="button"
-                      onClick={() => onToggleMuscle(muscle)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                        isSelected
-                          ? 'bg-[#C0FF00] text-black shadow-md'
-                          : 'bg-white/5 text-white/70 border border-white/10 hover:bg-white/10'
-                      }`}
-                    >
-                      {muscle}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-white/70 mb-2">
-                Equipamiento disponible
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {EQUIPMENT_OPTIONS.map((item) => {
-                  const isSelected = equipment.includes(item);
-                  return (
-                    <button
-                      key={item}
-                      type="button"
-                      onClick={() => onToggleEquipment(item)}
-                      className={`p-2.5 rounded-xl border text-left text-xs font-semibold transition-all flex items-center justify-between ${
-                        isSelected
-                          ? 'bg-[#C0FF00]/10 border-[#C0FF00] text-white'
-                          : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
-                      }`}
-                    >
-                      <span>{item}</span>
-                      {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-[#C0FF00]" />}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div>
-              <div className="flex items-center gap-2 mb-1.5">
-                <ShieldAlert className="w-4 h-4 text-amber-400" />
-                <label htmlFor="onboarding-injuries" className="text-xs font-semibold text-white/80">
-                  Lesiones o limitaciones físicas
-                </label>
-              </div>
-              <textarea
-                id="onboarding-injuries"
-                value={injuries}
-                onChange={(e) => onInjuries(e.target.value)}
-                rows={2}
-                placeholder="Ej. Molestia en rodilla derecha... (deja vacío si no tienes)"
-                className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-[#C0FF00] placeholder:text-white/30 resize-none"
-              />
-            </div>
-
-            <div className="grid grid-cols-3 gap-3">
-              <div>
-                <label htmlFor="onboarding-age" className="block text-xs font-semibold text-white/70 mb-1.5">
-                  Edad
-                </label>
-                <input
-                  id="onboarding-age"
-                  type="number"
-                  value={age}
-                  onChange={(e) => onAge(Number(e.target.value))}
-                  min={14}
-                  max={90}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#C0FF00]"
-                />
-              </div>
-              <div>
-                <label htmlFor="onboarding-height" className="block text-xs font-semibold text-white/70 mb-1.5">
-                  Estatura (cm)
-                </label>
-                <input
-                  id="onboarding-height"
-                  type="number"
-                  value={height}
-                  onChange={(e) => onHeight(Number(e.target.value))}
-                  min={120}
-                  max={230}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#C0FF00]"
-                />
-              </div>
-              <div>
-                <label htmlFor="onboarding-weight" className="block text-xs font-semibold text-white/70 mb-1.5">
-                  Peso (kg)
-                </label>
-                <input
-                  id="onboarding-weight"
-                  type="number"
-                  step="0.1"
-                  value={weight}
-                  onChange={(e) => onWeight(Number(e.target.value))}
-                  min={35}
-                  max={200}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#C0FF00]"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="onboarding-gender" className="block text-xs font-semibold text-white/70 mb-1.5">
-                Género
-              </label>
-              <select
-                id="onboarding-gender"
-                value={gender}
-                onChange={(e) => onGender(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#C0FF00]"
-              >
-                <option value="Masculino" className="bg-[#111]">
-                  Masculino
-                </option>
-                <option value="Femenino" className="bg-[#111]">
-                  Femenino
-                </option>
-                <option value="Otro" className="bg-[#111]">
-                  Prefiero no decir
-                </option>
-              </select>
-            </div>
-          </div>
-        )}
+        <button
+          type="button"
+          onClick={onNext}
+          disabled={!isValid}
+          className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-black bg-[#C0FF00] text-black hover:bg-[#aee600] transition-colors disabled:opacity-40 disabled:pointer-events-none"
+        >
+          Siguiente
+          <ArrowRight className="w-4 h-4" />
+        </button>
       </div>
     </div>
   );
 };
+
+// --- Paso: datos biométricos ---
+
+const BiosStep: React.FC<{
+  age: number;
+  height: number;
+  weight: number;
+  gender: string;
+  onAge: (v: number) => void;
+  onHeight: (v: number) => void;
+  onWeight: (v: number) => void;
+  onGender: (v: string) => void;
+  onBack: () => void;
+  onGenerate: () => void;
+}> = ({ age, height, weight, gender, onAge, onHeight, onWeight, onGender, onBack, onGenerate }) => (
+  <div className="space-y-5 animate-fadeIn">
+    <div>
+      <p className="text-[10px] uppercase tracking-[0.2em] text-[#C0FF00] font-bold mb-1">Tu perfil</p>
+      <h2 className="text-2xl sm:text-3xl font-black">Un par de datos biométricos</h2>
+      <p className="text-xs text-white/50 mt-1">Para calibrar cargas iniciales razonables.</p>
+    </div>
+
+    <div className="grid grid-cols-3 gap-3">
+      <div>
+        <label htmlFor="onboarding-age" className="block text-xs font-semibold text-white/70 mb-1.5">
+          Edad
+        </label>
+        <input
+          id="onboarding-age"
+          type="number"
+          value={age}
+          onChange={(e) => onAge(Number(e.target.value))}
+          min={14}
+          max={90}
+          className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#C0FF00]"
+        />
+      </div>
+      <div>
+        <label htmlFor="onboarding-height" className="block text-xs font-semibold text-white/70 mb-1.5">
+          Estatura (cm)
+        </label>
+        <input
+          id="onboarding-height"
+          type="number"
+          value={height}
+          onChange={(e) => onHeight(Number(e.target.value))}
+          min={120}
+          max={230}
+          className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#C0FF00]"
+        />
+      </div>
+      <div>
+        <label htmlFor="onboarding-weight" className="block text-xs font-semibold text-white/70 mb-1.5">
+          Peso (kg)
+        </label>
+        <input
+          id="onboarding-weight"
+          type="number"
+          step="0.1"
+          value={weight}
+          onChange={(e) => onWeight(Number(e.target.value))}
+          min={35}
+          max={200}
+          className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#C0FF00]"
+        />
+      </div>
+    </div>
+
+    <div>
+      <label htmlFor="onboarding-gender" className="block text-xs font-semibold text-white/70 mb-1.5">
+        Género
+      </label>
+      <select
+        id="onboarding-gender"
+        value={gender}
+        onChange={(e) => onGender(e.target.value)}
+        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#C0FF00]"
+      >
+        <option value="Masculino" className="bg-[#111]">Masculino</option>
+        <option value="Femenino" className="bg-[#111]">Femenino</option>
+        <option value="Otro" className="bg-[#111]">Prefiero no decir</option>
+      </select>
+    </div>
+
+    <div className="pt-4 border-t border-white/10 flex justify-between items-center">
+      <button
+        type="button"
+        onClick={onBack}
+        className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black bg-white/5 text-white/70 hover:bg-white/10 transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Atrás
+      </button>
+      <button
+        type="button"
+        onClick={onGenerate}
+        className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-black bg-[#C0FF00] text-black hover:bg-[#aee600] transition-colors"
+      >
+        Generar mi plan
+        <ArrowRight className="w-4 h-4" />
+      </button>
+    </div>
+  </div>
+);
+
+// --- Paso final: generación + resumen + bienvenida ---
 
 interface GenerationStepProps {
   isGenerating: boolean;
@@ -394,9 +306,11 @@ interface GenerationStepProps {
   daysPerWeek: number;
   primaryGoal: FitnessGoal;
   name: string;
-  experience: ExperienceLevel;
   avgDuration: number;
+  summary: RoutineSummary | null;
+  routines: DailyRoutine[];
   onFinish: () => void;
+  onBack: () => void;
 }
 
 const GenerationStep: React.FC<GenerationStepProps> = ({
@@ -405,9 +319,11 @@ const GenerationStep: React.FC<GenerationStepProps> = ({
   daysPerWeek,
   primaryGoal,
   name,
-  experience,
   avgDuration,
+  summary,
+  routines,
   onFinish,
+  onBack,
 }) => {
   return (
     <div className="py-8 text-center space-y-6 animate-fadeIn">
@@ -424,8 +340,8 @@ const GenerationStep: React.FC<GenerationStepProps> = ({
               Estamos preparando una rutina personalizada para ti...
             </h2>
             <p className="text-xs text-white/60 max-w-md mx-auto mt-2 leading-relaxed">
-              Sincronizando {daysPerWeek} días de entrenamiento con enfoque en {primaryGoal.toUpperCase()}{' '}
-              y adaptando cargas para {name}.
+              Sincronizando {daysPerWeek} días de entrenamiento con enfoque en{' '}
+              {primaryGoal.toUpperCase()} y adaptando cargas para {name}.
             </p>
           </div>
 
@@ -437,9 +353,9 @@ const GenerationStep: React.FC<GenerationStepProps> = ({
               />
             </div>
             <p className="text-[10px] text-white/40 font-mono">
-              {generationProgress < 40 && 'Analizando volumen por grupo muscular...'}
+              {generationProgress < 40 && 'Analizando tu encuesta y volumen por grupo muscular...'}
               {generationProgress >= 40 && generationProgress < 80 &&
-                'Filtrando ejercicios contra lesiones señaladas...'}
+                'Filtrando ejercicios contra tu equipamiento y lesiones...'}
               {generationProgress >= 80 && 'Calculando cargas iniciales y descansos óptimos...'}
             </p>
           </div>
@@ -456,8 +372,8 @@ const GenerationStep: React.FC<GenerationStepProps> = ({
             </span>
             <h2 className="text-3xl font-black mt-3">¡Bienvenido a FitAI Coach, {name}!</h2>
             <p className="text-sm text-white/70 max-w-lg mx-auto mt-2 leading-relaxed">
-              Tu plan personalizado de <strong>{daysPerWeek} días</strong> para <strong>{primaryGoal}</strong>{' '}
-              ha sido configurado. Tu primera sesión programada es <strong>Empuje Dinámico (Pecho y Tríceps)</strong>.
+              Tu plan personalizado de <strong>{daysPerWeek} días</strong> para{' '}
+              <strong>{primaryGoal}</strong> ha sido generado a partir de tus respuestas.
             </p>
           </div>
 
@@ -467,86 +383,125 @@ const GenerationStep: React.FC<GenerationStepProps> = ({
               <strong className="text-white">{name}</strong>
             </div>
             <div className="flex justify-between text-white/60">
-              <span>Nivel inicial:</span>
-              <strong className="text-[#C0FF00] uppercase font-bold">{experience}</strong>
+              <span>Enfoque:</span>
+              <strong className="text-[#C0FF00] uppercase font-bold">{summary?.goalLabel ?? primaryGoal}</strong>
             </div>
             <div className="flex justify-between text-white/60">
-              <span>División de entreno:</span>
+              <span>Estilo:</span>
+              <strong className="text-white">{summary?.styleLabel}</strong>
+            </div>
+            <div className="flex justify-between text-white/60">
+              <span>División:</span>
               <strong className="text-white">{daysPerWeek} días / {avgDuration} min sesión</strong>
             </div>
-            <div className="flex justify-between text-white/60">
-              <span>Protección articular:</span>
-              <strong className="text-amber-400">Filtro de seguridad activo</strong>
-            </div>
+            {summary?.safetyNote && (
+              <div className="flex justify-between text-amber-400">
+                <span>Protección articular:</span>
+                <strong className="max-w-[60%] text-right">{summary.safetyNote}</strong>
+              </div>
+            )}
           </div>
 
-          <button
-            onClick={onFinish}
-            className="w-full max-w-lg mx-auto py-4 bg-[#C0FF00] text-black font-black text-base rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-transform shadow-[0_0_35px_rgba(192,255,0,0.4)] flex items-center justify-center gap-3"
-          >
-            <span>Entrar a Mi Dashboard</span>
-            <ArrowRight className="w-5 h-5" />
-          </button>
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-5 text-left max-w-lg mx-auto">
+            <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-3">
+              Tu semana de entrenamiento
+            </p>
+            <ul className="space-y-1.5">
+              {routines.map((r) => (
+                <li key={r.dayNumber} className="flex items-center justify-between text-xs">
+                  <span className="text-white/80 font-bold">Día {r.dayNumber} • {r.name}</span>
+                  <span className="text-white/40">
+                    {r.isRestDay ? 'recuperación' : `${r.exercises.length} ejercicios`}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="max-w-lg mx-auto flex items-center gap-3">
+            <button
+              onClick={onBack}
+              className="flex items-center gap-2 px-5 py-4 rounded-2xl text-xs font-black bg-white/5 text-white/70 hover:bg-white/10 border border-white/10 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Atrás
+            </button>
+            <button
+              onClick={onFinish}
+              className="flex-1 py-4 bg-[#C0FF00] text-black font-black text-base rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-transform shadow-[0_0_35px_rgba(192,255,0,0.4)] flex items-center justify-center gap-3"
+            >
+              <span>Entrar a Mi Dashboard</span>
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       )}
     </div>
   );
 };
 
+// --- Flujo completo ---
+
 export const OnboardingFlow: React.FC = () => {
   const { user, completeOnboarding } = useApp();
+  const totalSteps = SURVEY_QUESTIONS.length + 3;
   const [step, setStep] = useState<number>(1);
-  const totalSteps = 2;
-  const [showAdvanced, setShowAdvanced] = useState(false);
 
-  // Onboarding local form states (solo el nombre es obligatorio)
   const [name, setName] = useState('');
   const [age, setAge] = useState(user.age || 28);
   const [gender, setGender] = useState(user.gender || 'Masculino');
   const [height, setHeight] = useState(user.height || 178);
   const [weight, setWeight] = useState(user.weight || 78.2);
 
-  const [experience, setExperience] = useState<ExperienceLevel>(user.experience || 'intermedio');
-  const [daysPerWeek, setDaysPerWeek] = useState(user.daysPerWeek || 4);
-  const [avgDuration, setAvgDuration] = useState(user.avgDuration || 60);
-
-  const [primaryGoal, setPrimaryGoal] = useState<FitnessGoal>(user.primaryGoal || 'hipertrofia');
-  const [targetMuscles, setTargetMuscles] = useState<string[]>(
-    user.targetMuscles || ['Pecho', 'Espalda', 'Hombros']
+  const [answers, setAnswers] = useState<AnswerMap>(() =>
+    Object.fromEntries(SURVEY_QUESTIONS.map((q) => [q.id, []]))
   );
 
-  const [equipment, setEquipment] = useState<string[]>(
-    user.equipment || ['Gimnasio completo', 'Barras y discos', 'Mancuernas']
-  );
-  const [injuries, setInjuries] = useState(user.injuries || '');
+  const surveyIndex = step >= 2 && step <= SURVEY_QUESTIONS.length + 1 ? step - 2 : -1;
+  const biosStep = step === SURVEY_QUESTIONS.length + 2;
+  const genStep = step === SURVEY_QUESTIONS.length + 3;
 
-  // Generation step animation
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
+  const [generated, setGenerated] = useState<{ routines: DailyRoutine[]; summary: RoutineSummary } | null>(null);
+  const generationTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const handleToggleMuscle = (muscle: string) => {
-    setTargetMuscles((prev) =>
-      prev.includes(muscle) ? prev.filter((m) => m !== muscle) : [...prev, muscle]
-    );
+  useEffect(() => {
+    return () => {
+      if (generationTimer.current) clearInterval(generationTimer.current);
+    };
+  }, []);
+
+  const surveyAnswers: SurveyAnswers = useMemo(() => {
+    const pick = (id: string) => answers[id]?.[0];
+    return {
+      goal: (pick('goal') as FitnessGoal) || 'hipertrofia',
+      experience: (pick('experience') as ExperienceLevel) || 'intermedio',
+      daysPerWeek: Number(pick('days')) || 4,
+      minutesPerSession: Number(pick('minutes')) || 60,
+      equipment: answers.equipment ?? [],
+      priorityMuscles: answers.muscles ?? [],
+      limitations: answers.limitations ?? [],
+      style: (pick('style') as SurveyAnswers['style']) || 'balanced',
+    };
+  }, [answers]);
+
+  const goTo = (next: number) => {
+    setStep(next);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleToggleEquipment = (item: string) => {
-    setEquipment((prev) =>
-      prev.includes(item) ? prev.filter((e) => e !== item) : [...prev, item]
-    );
-  };
-
-  const handleStart = () => {
-    if (!name.trim()) return;
-    // Trigger Step 2 (AI Generation Simulation)
-    setStep(2);
+  const handleStartGeneration = () => {
+    const result = generateRoutineFromSurvey(surveyAnswers, EXERCISE_DATABASE);
+    setGenerated(result);
+    goTo(totalSteps);
     setIsGenerating(true);
     setGenerationProgress(15);
 
-    const interval = setInterval(() => {
+    generationTimer.current = setInterval(() => {
       setGenerationProgress((p) => {
         if (p >= 100) {
-          clearInterval(interval);
+          if (generationTimer.current) clearInterval(generationTimer.current);
           setIsGenerating(false);
           return 100;
         }
@@ -556,20 +511,27 @@ export const OnboardingFlow: React.FC = () => {
   };
 
   const handleFinishOnboarding = () => {
-    completeOnboarding({
-      name,
-      age: Number(age),
-      gender,
-      height: Number(height),
-      weight: Number(weight),
-      experience,
-      daysPerWeek: Number(daysPerWeek),
-      avgDuration: Number(avgDuration),
-      primaryGoal,
-      targetMuscles,
-      equipment,
-      injuries,
-    });
+    if (!generated) return;
+    const limitations = (answers.limitations ?? []).filter((l) => l !== 'ninguna');
+    completeOnboarding(
+      {
+        name,
+        age: Number(age),
+        gender,
+        height: Number(height),
+        weight: Number(weight),
+        experience: surveyAnswers.experience,
+        daysPerWeek: Number(surveyAnswers.daysPerWeek),
+        avgDuration: Number(surveyAnswers.minutesPerSession),
+        primaryGoal: surveyAnswers.goal,
+        targetMuscles: surveyAnswers.priorityMuscles.length
+          ? surveyAnswers.priorityMuscles
+          : ['Pecho', 'Espalda', 'Hombros'],
+        equipment: surveyAnswers.equipment.map((id) => EQUIPMENT_LABELS[id]).filter(Boolean),
+        injuries: limitations.map((l) => LIMITATION_LABELS[l]).filter(Boolean).join(', '),
+      },
+      generated.routines
+    );
   };
 
   return (
@@ -602,65 +564,49 @@ export const OnboardingFlow: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="max-w-2xl w-full mx-auto bg-[#0A0A0A] border border-white/10 rounded-[32px] p-6 sm:p-10 shadow-2xl relative z-10 my-auto">
-        {/* STEP 1: Nombre (obligatorio) + configuración opcional */}
-        {step === 1 && (
-          <ProfileStep
-            name={name}
-            age={age}
-            gender={gender}
-            height={height}
-            weight={weight}
-            experience={experience}
-            daysPerWeek={daysPerWeek}
-            avgDuration={avgDuration}
-            primaryGoal={primaryGoal}
-            targetMuscles={targetMuscles}
-            equipment={equipment}
-            injuries={injuries}
-            showAdvanced={showAdvanced}
-            onName={setName}
-            onAge={setAge}
-            onGender={setGender}
-            onHeight={setHeight}
-            onWeight={setWeight}
-            onExperience={setExperience}
-            onDaysPerWeek={setDaysPerWeek}
-            onAvgDuration={setAvgDuration}
-            onPrimaryGoal={setPrimaryGoal}
-            onToggleMuscle={handleToggleMuscle}
-            onToggleEquipment={handleToggleEquipment}
-            onInjuries={setInjuries}
-            onToggleAdvanced={() => setShowAdvanced((prev) => !prev)}
+        {step === 1 && <NameStep name={name} onName={setName} onContinue={() => goTo(2)} />}
+
+        {surveyIndex >= 0 && (
+          <SurveyStep
+            question={SURVEY_QUESTIONS[surveyIndex]}
+            value={answers[SURVEY_QUESTIONS[surveyIndex].id] ?? []}
+            onSelect={(value) =>
+              setAnswers((prev) => ({ ...prev, [SURVEY_QUESTIONS[surveyIndex].id]: value }))
+            }
+            canGoBack={surveyIndex > 0}
+            onBack={() => goTo(step - 1)}
+            onNext={() => goTo(step + 1)}
           />
         )}
 
-        {/* STEP 2: AI Generating Custom Routine */}
-        {step === 2 && (
+        {biosStep && (
+          <BiosStep
+            age={age}
+            height={height}
+            weight={weight}
+            gender={gender}
+            onAge={setAge}
+            onHeight={setHeight}
+            onWeight={setWeight}
+            onGender={setGender}
+            onBack={() => goTo(step - 1)}
+            onGenerate={handleStartGeneration}
+          />
+        )}
+
+        {genStep && (
           <GenerationStep
             isGenerating={isGenerating}
             generationProgress={generationProgress}
-            daysPerWeek={daysPerWeek}
-            primaryGoal={primaryGoal}
+            daysPerWeek={Number(surveyAnswers.daysPerWeek)}
+            primaryGoal={surveyAnswers.goal}
             name={name}
-            experience={experience}
-            avgDuration={avgDuration}
+            avgDuration={Number(surveyAnswers.minutesPerSession)}
+            summary={generated?.summary ?? null}
+            routines={generated?.routines ?? []}
             onFinish={handleFinishOnboarding}
+            onBack={() => goTo(totalSteps - 1)}
           />
-        )}
-
-        {/* Step 1 Actions */}
-        {step === 1 && (
-          <div className="mt-8 pt-6 border-t border-white/10 flex justify-end">
-            <button
-              type="button"
-              onClick={handleStart}
-              disabled={!name.trim()}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-black bg-[#C0FF00] text-black hover:bg-[#aee600] transition-transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(192,255,0,0.3)] disabled:opacity-40 disabled:pointer-events-none"
-            >
-              <span>Comenzar</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
         )}
       </main>
 
@@ -671,3 +617,5 @@ export const OnboardingFlow: React.FC = () => {
     </div>
   );
 };
+
+export default OnboardingFlow;

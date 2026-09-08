@@ -96,7 +96,10 @@ export interface AppContextType {
   logout: () => Promise<void>;
   resetToDemoData: () => void;
   updateUserProfile: (updates: Partial<UserProfile>) => void;
-  completeOnboarding: (newProfileData: Partial<UserProfile>) => void;
+  completeOnboarding: (
+    newProfileData: Partial<UserProfile>,
+    generatedRoutines?: DailyRoutine[]
+  ) => void;
 
   // Workout Actions
   startWorkout: (routineDay?: number) => void;
@@ -570,13 +573,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const completeOnboarding = (newProfileData: Partial<UserProfile>) => {
+  const completeOnboarding = (
+    newProfileData: Partial<UserProfile>,
+    generatedRoutines?: DailyRoutine[]
+  ) => {
     const mergedUser: UserProfile = {
       ...user,
       ...newProfileData,
       weeklyCompliance: FRESH_START_COMPLIANCE,
     };
     setUser(mergedUser);
+    if (generatedRoutines && generatedRoutines.length > 0) {
+      setRoutines(
+        [...generatedRoutines].sort((a, b) => a.dayNumber - b.dayNumber)
+      );
+      setSelectedDay(generatedRoutines[0].dayNumber ?? 1);
+    }
     setIsAuthenticated(true);
     navigateTo('routine');
   };
