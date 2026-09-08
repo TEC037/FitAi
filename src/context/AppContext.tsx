@@ -327,7 +327,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     });
 
-    const unsubscribe = onAuthStateChange((userId) => {
+    let unsubscribe: (() => void) | null = null;
+    void onAuthStateChange((userId) => {
       if (!active) return;
       if (userId) {
         void applyHydration(userId);
@@ -338,6 +339,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setIsHydrating(false);
         setCurrentScreen('landing');
       }
+    }).then((u) => {
+      if (active) unsubscribe = u;
     });
 
     return () => {

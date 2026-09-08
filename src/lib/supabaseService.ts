@@ -1,4 +1,4 @@
-import { supabase } from './supabaseClient';
+import { getSupabaseClient } from './supabaseClient';
 import {
   ChatMessage,
   DailyRoutine,
@@ -206,14 +206,16 @@ function weightToRow(userId: string, w: { date: string; weight: number }) {
 // ---------- Auth ----------
 
 export async function signInWithEmail(email: string, password: string) {
-  if (!supabase) return { error: 'Supabase no configurado' };
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const client = await getSupabaseClient();
+  if (!client) return { error: 'Supabase no configurado' };
+  const { data, error } = await client.auth.signInWithPassword({ email, password });
   return { userId: data.user?.id ?? null, error: error?.message ?? null };
 }
 
 export async function signUpWithEmail(email: string, password: string, name: string) {
-  if (!supabase) return { error: 'Supabase no configurado' };
-  const { data, error } = await supabase.auth.signUp({
+  const client = await getSupabaseClient();
+  if (!client) return { error: 'Supabase no configurado' };
+  const { data, error } = await client.auth.signUp({
     email,
     password,
     options: { data: { name }, emailRedirectTo: window.location.origin },
@@ -226,9 +228,10 @@ export async function signUpWithEmail(email: string, password: string, name: str
 }
 
 export async function signInDemo() {
-  if (!supabase) return { error: 'Supabase no configurado' };
+  const client = await getSupabaseClient();
+  if (!client) return { error: 'Supabase no configurado' };
 
-  const { data, error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await client.auth.signInWithPassword({
     email: DEMO_EMAIL,
     password: DEMO_PASSWORD,
   });
@@ -238,13 +241,13 @@ export async function signInDemo() {
 
   // La cuenta demo aún no existe: créala y reintenta.
   if (error?.message?.toLowerCase().includes('invalid login credentials')) {
-    const { error: signUpError } = await supabase.auth.signUp({
+    const { error: signUpError } = await client.auth.signUp({
       email: DEMO_EMAIL,
       password: DEMO_PASSWORD,
       options: { data: { name: 'Carlos Ramírez' } },
     });
     if (!signUpError) {
-      const retry = await supabase.auth.signInWithPassword({
+      const retry = await client.auth.signInWithPassword({
         email: DEMO_EMAIL,
         password: DEMO_PASSWORD,
       });
@@ -257,19 +260,24 @@ export async function signInDemo() {
 }
 
 export async function signOutSession() {
-  if (!supabase) return;
-  await supabase.auth.signOut();
+  const client = await getSupabaseClient();
+  if (!client) return;
+  await client.auth.signOut();
 }
 
 export async function getSessionUserId(): Promise<string | null> {
-  if (!supabase) return null;
-  const { data } = await supabase.auth.getSession();
+  const client = await getSupabaseClient();
+  if (!client) return null;
+  const { data } = await client.auth.getSession();
   return data.session?.user?.id ?? null;
 }
 
-export function onAuthStateChange(cb: (userId: string | null) => void): (() => void) | null {
-  if (!supabase) return null;
-  const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+export async function onAuthStateChange(
+  cb: (userId: string | null) => void
+): Promise<(() => void) | null> {
+  const client = await getSupabaseClient();
+  if (!client) return null;
+  const { data } = client.auth.onAuthStateChange((_event, session) => {
     cb(session?.user?.id ?? null);
   });
   return () => data.subscription.unsubscribe();
@@ -286,15 +294,16 @@ export async function hydrateAll(userId: string): Promise<HydratedData> {
     weightHistory: [],
     chatMessages: [],
   };
-  if (!supabase) return empty;
+  const client = await getSupabaseClient();
+  if (!client) return empty;
 
   const [profileRes, routinesRes, sessionsRes, prsRes, weightRes, chatRes] = await Promise.all([
-    supabase.from('profiles').select('*').eq('id', userId).maybeSingle(),
-    supabase.from('routines').select('*').eq('user_id', userId).order('day_number'),
-    supabase.from('workout_sessions').select('*').eq('user_id', userId).order('created_at'),
-    supabase.from('personal_records').select('*').eq('user_id', userId),
-    supabase.from('weight_history').select('*').eq('user_id', userId).order('date'),
-    supabase.from('chat_messages').select('*').eq('user_id', userId).order('timestamp'),
+    client.from('profiles').select('*').eq('id', userId).maybeSingle(),
+    client.from('routines').select('*').eq('user_id', userId).order('day_number'),
+    client.from('workout_sessions').select('*').eq('user_id', userId).order('created_at'),
+    client.from('personal_records').select('*').eq('user_id', userId),
+    client.from('weight_history').select('*').eq('user_id', userId).order('date'),
+    client.from('chat_messages').select('*').eq('user_id', userId).order('timestamp'),
   ]);
 
   return {
@@ -310,53 +319,60 @@ export async function hydrateAll(userId: string): Promise<HydratedData> {
 }
 
 export async function persistProfile(user: UserProfile) {
-  if (!supabase) return;
-  await supabase.from('profiles').upsert(userToProfileRow(user), { onConflict: 'id' });
+  const client = await getSupabaseClient();
+  if (!client) return;
+  await client.from('profiles').upsert(userToProfileRow(user), { onConflict: 'id' });
 }
 
 export async function persistRoutines(userId: string, routines: DailyRoutine[]) {
-  if (!supabase) return;
-  await supabase.from('routines').delete().eq('user_id', userId);
+  const client = await getSupabaseClient();
+  if (!client) return;
+  await client.from('routines').delete().eq('user_id', userId);
   if (routines.length === 0) return;
   const rows = routines.map((r, i) => routineToRow(userId, r, i));
-  await supabase.from('routines').insert(rows);
+  await client.from('routines').insert(rows);
 }
 
 export async function persistHistory(userId: string, history: WorkoutSessionLog[]) {
-  if (!supabase) return;
-  await supabase.from('workout_sessions').delete().eq('user_id', userId);
+  const client = await getSupabaseClient();
+  if (!client) return;
+  await client.from('workout_sessions').delete().eq('user_id', userId);
   if (history.length === 0) return;
-  await supabase.from('workout_sessions').insert(history.map((s) => sessionToRow(userId, s)));
+  await client.from('workout_sessions').insert(history.map((s) => sessionToRow(userId, s)));
 }
 
 export async function persistRecords(userId: string, prs: PersonalRecord[]) {
-  if (!supabase) return;
-  await supabase.from('personal_records').delete().eq('user_id', userId);
+  const client = await getSupabaseClient();
+  if (!client) return;
+  await client.from('personal_records').delete().eq('user_id', userId);
   if (prs.length === 0) return;
-  await supabase.from('personal_records').insert(prs.map((pr) => prToRow(userId, pr)));
+  await client.from('personal_records').insert(prs.map((pr) => prToRow(userId, pr)));
 }
 
 export async function persistWeightHistory(
   userId: string,
   weightHistory: { date: string; weight: number }[]
 ) {
-  if (!supabase) return;
-  await supabase.from('weight_history').delete().eq('user_id', userId);
+  const client = await getSupabaseClient();
+  if (!client) return;
+  await client.from('weight_history').delete().eq('user_id', userId);
   if (weightHistory.length === 0) return;
-  await supabase.from('weight_history').insert(weightHistory.map((w) => weightToRow(userId, w)));
+  await client.from('weight_history').insert(weightHistory.map((w) => weightToRow(userId, w)));
 }
 
 export async function persistChat(userId: string, messages: ChatMessage[]) {
-  if (!supabase) return;
-  await supabase.from('chat_messages').delete().eq('user_id', userId);
+  const client = await getSupabaseClient();
+  if (!client) return;
+  await client.from('chat_messages').delete().eq('user_id', userId);
   if (messages.length === 0) return;
-  await supabase.from('chat_messages').insert(messages.map((m) => chatToRow(userId, m)));
+  await client.from('chat_messages').insert(messages.map((m) => chatToRow(userId, m)));
 }
 
 /** Si el usuario (típicamente la demo) no tiene rutinas, sembra los datos demo. */
 export async function ensureDemoData(userId: string) {
-  if (!supabase) return;
-  const { data } = await supabase.from('routines').select('day_number').eq('user_id', userId);
+  const client = await getSupabaseClient();
+  if (!client) return;
+  const { data } = await client.from('routines').select('day_number').eq('user_id', userId);
   if (data && data.length > 0) return;
   await persistRoutines(userId, MOCK_ROUTINES);
   await persistHistory(userId, MOCK_HISTORY);
