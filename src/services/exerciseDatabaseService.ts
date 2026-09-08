@@ -276,6 +276,28 @@ export function getDatasetExerciseById(id: string): DatasetExercise | undefined 
   return EXERCISE_DATABASE.find((e) => e.id === id);
 }
 
+function normalizeName(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[()]/g, '')
+    .trim();
+}
+
+/**
+ * Busca un ejercicio del dataset por nombre, ignorando mayúsculas, acentos y
+ * paréntesis. Devuelve `undefined` si la base aún no se ha cargado o no existe.
+ */
+export function getExerciseByName(name: string): DatasetExercise | undefined {
+  const needle = normalizeName(name);
+  if (!needle) return undefined;
+  return (
+    EXERCISE_DATABASE.find((e) => normalizeName(e.name).includes(needle)) ||
+    EXERCISE_DATABASE.find((e) => normalizeName(e.name) === needle)
+  );
+}
+
 /**
  * Map an exercise from hasaneyldrm/exercises-dataset into the app's Routine Exercise format.
  */

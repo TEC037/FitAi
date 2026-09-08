@@ -391,3 +391,42 @@ describe('AppContext workout persistence', () => {
     });
   });
 });
+
+function ImportHarness() {
+  const { routines, selectedDay, importRoutines } = useApp();
+  return (
+    <div>
+      <span data-testid="import-names">{routines.map((r) => r.name).join('|')}</span>
+      <span data-testid="import-selected">{selectedDay}</span>
+      <button
+        onClick={() =>
+          importRoutines([{ ...DEMO_ROUTINE, name: 'Rutina Importada' }])
+        }
+      >
+        import
+      </button>
+    </div>
+  );
+}
+
+describe('AppContext importRoutines', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    window.scrollTo = () => {};
+    localStorage.setItem(STORAGE_KEYS.ROUTINES, JSON.stringify([DEMO_ROUTINE]));
+  });
+
+  it('reemplaza la rutina actual y selecciona el primer día importado', () => {
+    render(
+      <AppProvider>
+        <ImportHarness />
+      </AppProvider>
+    );
+
+    expect(screen.getByTestId('import-names').textContent).toBe('Empuje Dinámico');
+    fireEvent.click(screen.getByRole('button', { name: 'import' }));
+
+    expect(screen.getByTestId('import-names').textContent).toBe('Rutina Importada');
+    expect(screen.getByTestId('import-selected').textContent).toBe('1');
+  });
+});

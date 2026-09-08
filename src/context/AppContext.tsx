@@ -120,6 +120,8 @@ export interface AppContextType {
   removeExerciseFromRoutine: (dayNumber: number, exerciseId: string) => void;
   resetRoutines: () => void;
   duplicateRoutineDay: (dayNumber: number) => number | undefined;
+  /** Reemplaza la rutina completa por una importada (p. ej. desde texto compartido). */
+  importRoutines: (routines: DailyRoutine[]) => void;
 
   // Coach AI Actions
   sendCoachMessage: (text: string) => void;
@@ -550,6 +552,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return nextDay;
   };
 
+  const importRoutines = (imported: DailyRoutine[]) => {
+    setRoutines(imported);
+    setSelectedDay(imported[0]?.dayNumber ?? 1);
+  };
+
   const updateUserProfile = (updates: Partial<UserProfile>) => {
     setUser((prev) => ({ ...prev, ...updates }));
     if (updates.weight) {
@@ -852,6 +859,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         removeExerciseFromRoutine,
         resetRoutines,
         duplicateRoutineDay,
+        importRoutines,
 
         sendCoachMessage,
       }}

@@ -6,6 +6,7 @@ import {
   setExerciseDatabase,
   datasetToRoutineExercise,
   getAvailableCategories,
+  getExerciseByName,
   getExerciseGifUrl,
   getExerciseImageUrl,
   getDatasetExerciseById,
@@ -30,6 +31,15 @@ describe('dataset', () => {
   it('obtiene un ejercicio por su id', () => {
     const item = getDatasetExerciseById('0001');
     expect(item?.name).toBe('3/4 sit-up');
+  });
+
+  it('busca ejercicios por nombre sin diferenciar mayúsculas ni acentos', () => {
+    const first = EXERCISE_DATABASE[0];
+    const found = getExerciseByName(first.name.toUpperCase());
+    expect(found).toBeDefined();
+    expect(found?.id).toBe(first.id);
+    expect(getExerciseByName('No existe este ejercicio XYZ')).toBeUndefined();
+    expect(getExerciseByName('   ')).toBeUndefined();
   });
 });
 

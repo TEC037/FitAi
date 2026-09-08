@@ -71,6 +71,7 @@ function mockView(overrides: Record<string, unknown> = {}) {
     navigateTo: vi.fn(),
     removeExerciseFromRoutine: vi.fn(),
     duplicateRoutineDay: vi.fn(),
+    importRoutines: vi.fn(),
     isWorkoutActive: false,
     user,
     chatMessages: [],
@@ -163,6 +164,51 @@ describe('RoutineView (vista unificada)', () => {
       expect(writeText).toHaveBeenCalled();
       expect(screen.getByText('¡Rutina copiada!')).toBeInTheDocument();
     });
+  });
+
+  it('importa una rutina pegada desde texto', () => {
+    const importRoutines = vi.fn();
+    mockView({ importRoutines });
+    render(<RoutineView />);
+
+    fireEvent.click(screen.getByRole('button', { name: /Cargar rutina/ }));
+    fireEvent.change(screen.getByLabelText('Texto de la rutina compartida'), {
+      target: {
+        value:
+          'Mi Rutina FitAI\n' +
+          '==============\n' +
+          '\n' +
+          'Día 1 - Empuje Dinámico (Día 1)\n' +
+          '  Enfoque: Pecho y Tríceps\n' +
+          '  Dificultad: intermedio • ~45 min\n' +
+          '  1. Press de Banca con Barra\n' +
+          '     - 4 x 8-10 @ 80 kg\n' +
+          '     - Descanso: 2 min',
+      },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Importar' }));
+
+    expect(importRoutines).toHaveBeenCalledTimes(1);
+    expect(importRoutines).toHaveBeenCalledWith(
+      expect.arrayContaining([expect.objectContaining({ name: 'Empuje Dinámico' })])
+    );
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('rechaza texto sin una rutina válida y no importa nada', () => {
+    const importRoutines = vi.fn();
+    mockView({ importRoutines });
+    render(<RoutineView />);
+
+    fireEvent.click(screen.getByRole('button', { name: /Cargar rutina/ }));
+    fireEvent.change(screen.getByLabelText('Texto de la rutina compartida'), {
+      target: { value: 'esto no es una rutina válida' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Importar' }));
+
+    expect(screen.getByRole('alert')).toHaveTextContent(/No se reconoció una rutina válida/);
+    expect(importRoutines).not.toHaveBeenCalled();
   });
 
   it('abre el Coach IA y envía una pregunta', () => {

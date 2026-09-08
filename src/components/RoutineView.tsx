@@ -8,10 +8,13 @@ import {
   ArrowRight,
   Copy,
   Share2,
+  ClipboardPaste,
+  ShieldCheck,
 } from 'lucide-react';
 import { useApp } from '../context/useApp';
 import { useGuidanceStep } from '../hooks/useGuidanceStep';
 import { formatRoutineForSharing } from '../utils/routineShare';
+import { parseRoutineText, createDatabaseResolver } from '../utils/routineImport';
 import { ActiveWorkoutCard } from './routineView/ActiveWorkoutCard';
 import { CoachPanel } from './routineView/CoachPanel';
 import { RoutineExerciseRow } from './routineView/RoutineExerciseRow';
@@ -26,11 +29,30 @@ export const RoutineView: React.FC = () => {
     navigateTo,
     removeExerciseFromRoutine,
     duplicateRoutineDay,
+    importRoutines,
     isWorkoutActive,
   } = useApp();
   const guidance = useGuidanceStep();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [imported, setImported] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const [importText, setImportText] = useState('');
+  const [importError, setImportError] = useState<string | null>(null);
+
+  const handleImportRoutine = () => {
+    const result = parseRoutineText(importText, createDatabaseResolver());
+    if (result.error || result.routines.length === 0) {
+      setImportError(result.error ?? 'No se reconoció una rutina válida en el texto.');
+      return;
+    }
+    importRoutines(result.routines);
+    setImportOpen(false);
+    setImportText('');
+    setImportError(null);
+    setImported(true);
+    window.setTimeout(() => setImported(false), 2500);
+  };
 
   const handleShareRoutine = async () => {
     const text = formatRoutineForSharing(routines);
@@ -78,21 +100,80 @@ export const RoutineView: React.FC = () => {
             Entrena, descansa y acumula consejos de IA en un solo paso.
           </p>
         </div>
-        {hasExercises && (
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => void handleShareRoutine()}
+            onClick={() => {
+              setImportOpen((prev) => !prev);
+              setImportError(null);
+            }}
+            aria-expanded={importOpen}
             aria-live="polite"
             className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold transition-all border ${
-              copied
+              imported
                 ? 'bg-lime-100 text-[#547c08] border-lime-200'
                 : 'bg-white/70 text-slate-600 border-black/10 hover:bg-white'
             }`}
           >
-            <Share2 className="w-4 h-4" />
-            {copied ? '¡Rutina copiada!' : 'Compartir'}
+            <ClipboardPaste className="w-4 h-4" />
+            {imported ? '¡Rutina importada!' : importOpen ? 'Cancelar' : 'Cargar rutina'}
           </button>
-        )}
+          {hasExercises && (
+            <button
+              onClick={() => void handleShareRoutine()}
+              aria-live="polite"
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold transition-all border ${
+                copied
+                  ? 'bg-lime-100 text-[#547c08] border-lime-200'
+                  : 'bg-white/70 text-slate-600 border-black/10 hover:bg-white'
+              }`}
+            >
+              <Share2 className="w-4 h-4" />
+              {copied ? '¡Rutina copiada!' : 'Compartir'}
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Panel de importación desde texto compartido */}
+      {importOpen && (
+        <div className="metal-card rounded-[24px] p-5 space-y-3 animate-fadeIn">
+          <div className="flex items-center gap-2">
+            <ClipboardPaste className="w-4 h-4 text-[#547c08]" />
+            <p className="text-sm font-black">Cargar rutina desde texto</p>
+          </div>
+          <p className="text-xs text-slate-500 flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-lime-600" />
+            Pega el texto del botón «Compartir». Se sanea antes de aplicarse: se tratan
+            los datos como no confiables y se aplican límites de seguridad.
+          </p>
+          <textarea
+            aria-label="Texto de la rutina compartida"
+            rows={6}
+            value={importText}
+            onChange={(e) => {
+              setImportText(e.target.value);
+              setImportError(null);
+            }}
+            placeholder={'Mi Rutina FitAI\n================\n\nDía 1 - Empuje Dinámico (Día 1)\n  Enfoque: Pecho y Tríceps\n  Dificultad: intermedio • ~45 min\n  1. Press de Banca con Barra\n     - 4 x 8-10 @ 80 kg'}
+            className="w-full bg-white/70 border border-black/10 rounded-2xl p-3 text-xs font-mono text-slate-700 focus:outline-none focus:border-[#C0FF00] resize-y"
+          />
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={handleImportRoutine}
+              disabled={!importText.trim()}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#C0FF00] text-black font-black text-xs hover:bg-[#aee600] active:scale-95 transition-all disabled:opacity-40 disabled:pointer-events-none"
+            >
+              <ClipboardPaste className="w-4 h-4" />
+              Importar
+            </button>
+            {importError && (
+              <p role="alert" className="text-xs font-bold text-red-500">
+                {importError}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Estado vacío (nuevo usuario) */}
       {!hasExercises ? (
