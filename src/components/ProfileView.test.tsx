@@ -103,6 +103,20 @@ describe('ProfileView', () => {
     });
   });
 
+  it('muestra la racha de constancia derivada del historial tras iniciar sesión', async () => {
+    render(
+      <AppProvider>
+        <LoginDemo>
+          <AuthHarness />
+        </LoginDemo>
+      </AppProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Récord: 2 semanas/)).toBeInTheDocument();
+    });
+  });
+
   it('guarda un cambio de nombre en localStorage y muestra el mensaje de éxito', async () => {
     render(
       <AppProvider>

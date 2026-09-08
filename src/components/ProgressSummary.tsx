@@ -2,6 +2,7 @@ import React from 'react';
 import { Activity, Trophy, TrendingUp, Clock, Flame, Scale, Dumbbell, History } from 'lucide-react';
 import { useApp } from '../context/useApp';
 import { computeDashboardStats } from '../utils/dashboardStats';
+import { computeTrainingStreak } from '../utils/trainingStreak';
 import { formatIsoDate } from '../utils/format';
 
 /** Métricas de progreso integradas en el Perfil. */
@@ -14,6 +15,16 @@ export const ProgressSummary: React.FC = () => {
   const stats = computeDashboardStats(history, weightHistory, personalRecords);
   const hasWeekVolume = stats.weeklyBuckets.some((b) => b.volumeKg > 0);
   const maxWeekVolume = Math.max(...stats.weeklyBuckets.map((b) => b.volumeKg), 1);
+
+  const streak = computeTrainingStreak(history.map((h) => h.date));
+  const currentStreakLabel =
+    streak.currentWeeks > 0
+      ? `Racha actual: ${streak.currentWeeks} ${streak.currentWeeks === 1 ? 'semana' : 'semanas'}`
+      : '';
+  const recordStreakLabel =
+    streak.longestWeeks > 0
+      ? `Récord: ${streak.longestWeeks} ${streak.longestWeeks === 1 ? 'semana' : 'semanas'}`
+      : '';
 
   const kpis = [
     { label: 'Constancia', value: `${user.weeklyCompliance}%`, icon: Activity, tone: 'text-lime-600 bg-lime-100' },
@@ -152,6 +163,11 @@ export const ProgressSummary: React.FC = () => {
             ? `Última semana: ${Math.round(stats.latestWeekVolumeKg)} kg • ${stats.workoutsThisWeek} sesiones esta semana`
             : 'Registra tus sesiones para ver tu volumen semanal.'}
         </p>
+        {(currentStreakLabel || recordStreakLabel) && (
+          <p className="text-[11px] text-slate-500 mt-1 font-semibold">
+            {[currentStreakLabel, recordStreakLabel].filter(Boolean).join(' • ')}
+          </p>
+        )}
       </div>
 
       {/* Historial reciente */}
