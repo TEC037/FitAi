@@ -159,6 +159,19 @@ function DuplicateHarness() {
   );
 }
 
+function RecordsHarness() {
+  const { personalRecords, startWorkout, logActiveSet, finishWorkout } = useApp();
+  return (
+    <div>
+      <span data-testid="pr-count">{personalRecords.length}</span>
+      <span data-testid="pr-value">{personalRecords[0]?.recordValue ?? 'none'}</span>
+      <button onClick={() => startWorkout(1)}>start-records</button>
+      <button onClick={() => logActiveSet(80, 8, 8, 'ok')}>log-records</button>
+      <button onClick={() => finishWorkout('ok', 8)}>finish-records</button>
+    </div>
+  );
+}
+
 function readHistory(): WorkoutSessionLog[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.HISTORY);
@@ -321,6 +334,25 @@ describe('AppContext workout persistence', () => {
       expect(snapshot?.activeWorkoutSets).toHaveLength(1);
       expect(snapshot?.activeWorkoutSets[0].completedAt).toMatch(/^\d{2}:\d{2}$/);
     });
+  });
+
+  it('deriva un récord personal desde la sesión terminada', async () => {
+    render(
+      <AppProvider>
+        <RecordsHarness />
+      </AppProvider>
+    );
+
+    fireEvent.click(screen.getByText('start-records'));
+    await waitFor(() => expect(readWorkoutSnapshot()?.isWorkoutActive).toBe(true));
+
+    fireEvent.click(screen.getByText('log-records'));
+    fireEvent.click(screen.getByText('finish-records'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('pr-count').textContent).toBe('1');
+    });
+    expect(screen.getByTestId('pr-value').textContent).toBe('80 kg (x8 reps)');
   });
 
   it('duplica un día de rutina reasignando dayNumber e ids de ejercicios', async () => {

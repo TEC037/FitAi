@@ -36,6 +36,7 @@ import {
 import { generateCoachReply, CoachContext } from '../ai/coachEngine';
 import { buildServerlessPayload, fetchServerlessCoachReply } from '../lib/serverlessCoach';
 import { withMinDelay } from '../utils/withMinDelay';
+import { derivePersonalRecords } from '../utils/personalRecords';
 import { formatClock, getLocalDateStamp } from '../utils/format';
 import { usePersistedState } from '../hooks/usePersistedState';
 import { isSupabaseEnabled } from '../lib/supabaseClient';
@@ -739,6 +740,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
 
     setHistory((prev) => [newSession, ...prev]);
+    setPersonalRecords(derivePersonalRecords([newSession, ...history], personalRecords));
     setIsWorkoutActive(false);
     setActiveRoutine(null);
     setWorkoutElapsedTime(0);
