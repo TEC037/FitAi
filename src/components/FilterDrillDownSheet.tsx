@@ -7,6 +7,7 @@ import {
 } from '../services/exerciseDatabaseService';
 import { formatNumber } from '../utils/format';
 import { Highlight } from './Highlight';
+import { Chip } from './Chip';
 
 export interface FilterLevelOption {
   id: string;
@@ -407,15 +408,12 @@ export const FilterDrillDownSheet: React.FC<FilterDrillDownSheetProps> = ({
           {hasActive && (
             <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none -mx-1 px-1">
               {activeSelections.map((sel) => (
-                <button
+                <Chip
                   key={sel.kind}
-                  onClick={() => levels[sel.kind].onSelect('all')}
-                  aria-label={`Quitar filtro ${sel.label}`}
-                  className="shrink-0 flex items-center gap-1 text-[11px] font-bold px-2.5 py-1.5 rounded-full bg-[#C0FF00]/15 text-[#C0FF00] border border-[#C0FF00]/30 capitalize hover:bg-[#C0FF00]/25 transition-colors"
-                >
-                  {sel.label}
-                  <X className="w-3 h-3" />
-                </button>
+                  label={sel.label}
+                  size="md"
+                  onRemove={() => levels[sel.kind].onSelect('all')}
+                />
               ))}
             </div>
           )}
