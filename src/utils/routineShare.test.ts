@@ -50,7 +50,7 @@ describe('formatRoutineForSharing', () => {
     expect(text.indexOf('Día 1')).toBeLessThan(text.indexOf('Día 2'));
     expect(text).toContain('1. Press de Banca con Barra');
     expect(text).toContain('4 x 8-10 @ 80 kg');
-    expect(text).toContain('Descanso: 2 min');
+    expect(text).toContain('Descanso: 90 seg');
     expect(text).toContain('Músculos: Pectoral, Tríceps');
   });
 

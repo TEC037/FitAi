@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { usePersistedState } from './usePersistedState';
 
 const KEY = 'fitai_test_key';
@@ -14,12 +14,14 @@ describe('usePersistedState', () => {
     expect(result.current[0]).toBe(42);
   });
 
-  it('escribe en localStorage cuando el valor cambia', () => {
+  it('escribe en localStorage cuando el valor cambia', async () => {
     const { result } = renderHook(() => usePersistedState<number>(KEY, 0));
     act(() => {
       result.current[1](10);
     });
-    expect(JSON.parse(localStorage.getItem(KEY) as string)).toBe(10);
+    await waitFor(() => {
+      expect(JSON.parse(localStorage.getItem(KEY) as string)).toBe(10);
+    });
   });
 
   it('restaura el valor guardado al montar', () => {
@@ -45,7 +47,7 @@ describe('usePersistedState', () => {
     expect(result.current[0]).toBe(500);
   });
 
-  it('soporta serialización y parsing personalizados (texto plano)', () => {
+  it('soporta serialización y parsing personalizados (texto plano)', async () => {
     const { result } = renderHook(() =>
       usePersistedState<string>(KEY, 'dashboard', {
         serialize: (v) => v,
@@ -56,12 +58,16 @@ describe('usePersistedState', () => {
     act(() => {
       result.current[1]('routine');
     });
-    expect(localStorage.getItem(KEY)).toBe('routine');
+    await waitFor(() => {
+      expect(localStorage.getItem(KEY)).toBe('routine');
+    });
 
     act(() => {
       result.current[1]('dashboard');
     });
-    expect(localStorage.getItem(KEY)).toBe('dashboard');
+    await waitFor(() => {
+      expect(localStorage.getItem(KEY)).toBe('dashboard');
+    });
   });
 
   it('restaura texto plano guardado con parse personalizado', () => {

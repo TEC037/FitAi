@@ -1,294 +1,65 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @theme {
-  --animate-radar-sweep: radar-sweep 6s linear infinite;
-  --animate-radar-fade: radar-fade 0.25s ease-out both;
-  --animate-radar-deploy: radar-deploy 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
-  --animate-sheet-up: sheet-up 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
-  --animate-sheet-fade: sheet-fade 0.25s ease-out both;
-  --animate-gold-pulse: gold-pulse 1.8s ease-in-out infinite;
-  --animate-gold-ring: gold-ring 1.8s ease-in-out infinite;
-}
+  --color-surface: #101319;
+  --color-surface-dim: #101319;
+  --color-surface-bright: #363940;
+  --color-surface-container-lowest: #0b0e14;
+  --color-surface-container-low: #191c22;
+  --color-surface-container: #1d2026;
+  --color-surface-container-high: #272a31;
+  --color-surface-container-highest: #32353c;
+  --color-surface-variant: #32353c;
+  --color-on-surface: #e1e2eb;
+  --color-on-surface-variant: #c4c9ac;
+  --color-primary: #ffffff;
+  --color-on-primary: #283500;
+  --color-primary-fixed: #c3f400;
+  --color-primary-fixed-dim: #abd600;
+  --color-on-primary-fixed: #161e00;
+  --color-on-primary-fixed-variant: #3c4d00;
+  --color-primary-container: #c3f400;
+  --color-on-primary-container: #556d00;
+  --color-secondary: #4ae176;
+  --color-secondary-fixed: #6bff8f;
+  --color-secondary-fixed-dim: #4ae176;
+  --color-secondary-container: #00b954;
+  --color-on-secondary: #003915;
+  --color-on-secondary-container: #004119;
+  --color-tertiary-fixed: #c4e7ff;
+  --color-tertiary-fixed-dim: #7bd0ff;
+  --color-tertiary-container: #c4e7ff;
+  --color-error: #ffb4ab;
+  --color-outline: #8e9379;
+  --color-outline-variant: #444933;
 
-@keyframes radar-sweep {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes radar-fade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes radar-deploy {
-  from {
-    opacity: 0;
-    transform: translate(var(--fx), var(--fy)) translate(-50%, -50%) rotate(var(--a))
-      translateY(calc(-1 * var(--r))) rotate(calc(-1 * var(--a))) scale(0.3);
-  }
-  to {
-    opacity: 1;
-    transform: translate(0, 0) translate(-50%, -50%) rotate(var(--a))
-      translateY(calc(-1 * var(--r))) rotate(calc(-1 * var(--a))) scale(1);
-  }
-}
-
-@keyframes sheet-up {
-  from {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes sheet-fade {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Pulso dorado de guía (burbuja expansiva) */
-@keyframes gold-pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(229, 170, 45, 0.55);
-  }
-  70% {
-    box-shadow: 0 0 0 14px rgba(229, 170, 45, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(229, 170, 45, 0);
-  }
-}
-
-/* Anillo dorado rotando entorno al ítem sugerido */
-@keyframes gold-ring {
-  0%,
-  100% {
-    opacity: 0.55;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.08);
-  }
+  --font-headline: "Space Grotesk", sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-label: "Space Grotesk", sans-serif;
+  --font-body: "Lexend", sans-serif;
 }
 
 @layer base {
-  body {
-    font-family:
-      'Plus Jakarta Sans',
-      -apple-system,
-      BlinkMacSystemFont,
-      'Segoe UI',
-      Roboto,
-      sans-serif;
-    background-color: #f2f4f7;
-    color: #1d1d1f;
+  html, body {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #101319;
+    color: #e1e2eb;
+    font-family: "Lexend", sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6, .font-space {
+    font-family: "Space Grotesk", sans-serif;
   }
 }
 
-/* Fondo "metalizado sutil" tipo Apple: degradado perla → plata */
-.metal-surface {
-  background:
-    radial-gradient(1200px 600px at 20% -10%, #ffffff 0%, rgba(255, 255, 255, 0) 60%),
-    radial-gradient(1000px 500px at 80% 110%, rgba(226, 232, 240, 0.9) 0%, rgba(255, 255, 255, 0) 55%),
-    linear-gradient(180deg, #f6f7f9 0%, #eef1f5 55%, #e7ebf0 100%);
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
-
-.metal-card {
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.85), rgba(246, 248, 251, 0.65)),
-    radial-gradient(600px 300px at 15% 0%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 55%);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  box-shadow:
-    0 1px 2px rgba(15, 23, 42, 0.04),
-    0 8px 24px -12px rgba(15, 23, 42, 0.12);
-}
-
-/* Custom modern scrollbar (claro) */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #eef1f5;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #c6ccd6;
-  border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #aeb6c2;
-}
-
-/* ---------------------------------------------------------------------------
-   Capa de migración claro-metalizado.
-   Remapea los colores oscuros hardcodeados de la UI legada hacia superficies
-   claras tipo Apple. Ubicada DESPUÉS de Tailwind para ganar en cascada.
-   --------------------------------------------------------------------------- */
-
-/* Superficies de app (oscuras → claras) */
-.bg-\[\#050505\],
-.bg-\[\#0A0A0A\],
-.bg-\[\#040404\],
-.bg-\[\#111\],
-.bg-\[\#121212\],
-.bg-\[\#141414\],
-.bg-\[\#0a0a0a\] {
-  background-color: rgba(255, 255, 255, 0.72) !important;
-  background-image: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.92),
-    rgba(246, 248, 251, 0.6)
-  );
-}
-
-/* Texto principal oscuro */
-.text-\[\#F3F4F6\] {
-  color: #1d1d1f !important;
-}
-
-.text-white,
-.text-white\/90 {
-  color: #1d1d1f !important;
-}
-.text-white\/80 {
-  color: rgba(29, 29, 31, 0.82) !important;
-}
-.text-white\/70 {
-  color: rgba(29, 29, 31, 0.7) !important;
-}
-.text-white\/60 {
-  color: rgba(29, 29, 31, 0.6) !important;
-}
-.text-white\/50 {
-  color: rgba(29, 29, 31, 0.52) !important;
-}
-.text-white\/40 {
-  color: rgba(29, 29, 31, 0.42) !important;
-}
-.text-white\/30 {
-  color: rgba(29, 29, 31, 0.34) !important;
-}
-.text-white\/20,
-.text-white\/10 {
-  color: rgba(29, 29, 31, 0.28) !important;
-}
-
-/* Acento lima → verde oliva legible sobre fondo claro */
-.text-\[\#C0FF00\] {
-  color: #547c08 !important;
-}
-.text-\[\#C0FF00\]\/90,
-.text-\[\#C0FF00\]\/80,
-.text-\[\#C0FF00\]\/60,
-.text-\[\#C0FF00\]\/50,
-.text-\[\#C0FF00\]\/40,
-.text-\[\#C0FF00\]\/20,
-.text-\[\#C0FF00\]\/10 {
-  color: #547c08 !important;
-}
-
-/* Bordes blanquecinos → bordes negros sutiles */
-.border-white,
-.border-white\/90,
-.border-white\/80,
-.border-white\/50,
-.border-white\/40,
-.border-white\/30,
-.border-white\/20,
-.border-white\/15 {
-  border-color: rgba(15, 23, 42, 0.12) !important;
-}
-.border-white\/10 {
-  border-color: rgba(15, 23, 42, 0.08) !important;
-}
-.border-white\/5 {
-  border-color: rgba(15, 23, 42, 0.05) !important;
-}
-
-/* Superficies translúcidas blancas (chips/inputs) → gris sutil */
-.bg-white\/5 {
-  background-color: rgba(15, 23, 42, 0.05) !important;
-}
-.bg-white\/10 {
-  background-color: rgba(15, 23, 42, 0.07) !important;
-}
-.bg-white\/15 {
-  background-color: rgba(15, 23, 42, 0.09) !important;
-}
-.bg-white\/20 {
-  background-color: rgba(15, 23, 42, 0.11) !important;
-}
-.bg-white\/\[0\.02\],
-.bg-white\/\[0\.04\],
-.bg-white\/\[0\.06\] {
-  background-color: rgba(15, 23, 42, 0.04) !important;
-}
-
-/* Chips de acento lima → tinte oliva claro */
-.bg-\[\#C0FF00\]\/10 {
-  background-color: rgba(112, 160, 20, 0.12) !important;
-}
-.bg-\[\#C0FF00\]\/20 {
-  background-color: rgba(112, 160, 20, 0.18) !important;
-}
-.bg-\[\#C0FF00\]\/15,
-.bg-\[\#C0FF00\]\/5 {
-  background-color: rgba(112, 160, 20, 0.1) !important;
-}
-.border-\[\#C0FF00\]\/20,
-.border-\[\#C0FF00\]\/30,
-.border-\[\#C0FF00\]\/60,
-.border-\[\#C0FF00\] {
-  border-color: rgba(112, 160, 20, 0.45) !important;
-}
-
-/* Gradientes de tarjetas legadas */
-.from-white\/10 {
-  --tw-gradient-from: rgba(15, 23, 42, 0.06) var(--tw-gradient-from-position) !important;
-}
-.via-\[\#0A0A0A\],
-.via-\[\#0a0a0a\] {
-  --tw-gradient-stops: var(--tw-gradient-from),
-    rgba(255, 255, 255, 0.5) var(--tw-gradient-via-position),
-    var(--tw-gradient-to) !important;
-}
-
-/* Sombras lima → sombras neutras claras */
-.shadow-\[0_0_40px_rgba\(192\,255\,0\,0\.35\)\],
-.shadow-\[0_0_30px_rgba\(192\,255\,0\,0\.3\)\],
-.shadow-\[0_0_25px_rgba\(192\,255\,0\,0\.3\)\],
-.shadow-\[0_0_20px_rgba\(192\,255\,0\,0\.3\)\],
-.shadow-\[0_0_20px_rgba\(192\,255\,0\,0\.25\)\],
-.shadow-\[0_0_30px_rgba\(192\,255\,0\,0\.5\)\],
-.shadow-\[0_0_40px_rgba\(192\,255\,0\,0\.35\)\] {
-  box-shadow:
-    0 1px 2px rgba(15, 23, 42, 0.05),
-    0 12px 28px -12px rgba(15, 23, 42, 0.18) !important;
-}
-
-/* Options de selects (estaban en negro para dropdown) */
-option {
-  background-color: #ffffff;
-  color: #1d1d1f;
+.no-scrollbar,
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

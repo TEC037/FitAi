@@ -65,7 +65,7 @@ describe('parseRoutineText', () => {
       sets: 4,
       reps: '8-10',
       suggestedWeightKg: 80,
-      restSeconds: 120,
+      restSeconds: 90,
     });
     expect(imported.exercises[0].id).toMatch(/^import_/);
 

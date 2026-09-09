@@ -26,6 +26,7 @@ export const STORAGE_KEYS = {
   ROUTINES: 'fitai_routines_v3',
   CHAT: 'fitai_chat_v2',
   WORKOUT: 'fitai_workout_v2',
+  DEMO: 'fitai_demo_v2',
 } as const;
 
 // Supabase (Auth + base de datos)

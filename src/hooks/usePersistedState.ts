@@ -1,4 +1,4 @@
-import { useState, useEffect, Dispatch, SetStateAction } from 'react';
+import { useState, useEffect, useRef, Dispatch, SetStateAction } from 'react';
 
 interface UsePersistedStateOptions<T> {
   /** Custom serialization (default: JSON.stringify). */
@@ -17,11 +17,8 @@ function defaultParse<T>(raw: string): T {
 
 /**
  * useState con persistencia en localStorage: hidrata desde la clave al montar y
- * escribe en cada cambio. Fallback silencioso al valor por defecto ante cualquier
- * error (storage ausente, JSON corrupto o cuota superada).
- *
- * Nota: serialize/parse deben ser estables (módulo/useCallback) para no re-ejecutar
- * el efecto de persistencia en cada render.
+ * escribe en cada cambio (con debounce). Se sincroniza entre pestañas.
+ * Fallback silencioso al valor por defecto ante cualquier error.
  */
 export function usePersistedState<T>(
   key: string,
@@ -30,23 +27,80 @@ export function usePersistedState<T>(
 ): [T, Dispatch<SetStateAction<T>>] {
   const { serialize = JSON.stringify, parse = defaultParse } = options;
 
+  const serializeRef = useRef(serialize);
+  const parseRef = useRef(parse);
+
+  useEffect(() => {
+    serializeRef.current = serialize;
+    parseRef.current = parse;
+  }, [serialize, parse]);
+
   const [value, setValue] = useState<T>(() => {
     try {
       const saved = localStorage.getItem(key);
       if (saved === null) return resolveDefault(defaultValue);
-      return parse(saved);
+      return parseRef.current(saved);
     } catch {
       return resolveDefault(defaultValue);
     }
   });
 
+  // Si cambia la key dinámica, reiniciamos el estado
   useEffect(() => {
     try {
-      localStorage.setItem(key, serialize(value));
+      const saved = localStorage.getItem(key);
+      if (saved !== null) {
+        setValue(parseRef.current(saved));
+      } else {
+        setValue(resolveDefault(defaultValue));
+      }
     } catch {
-      // Persistencia opcional: si falla, la app sigue funcionando en memoria.
+      setValue(resolveDefault(defaultValue));
     }
-  }, [key, value, serialize, parse]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]); 
+
+  // Escribir en localStorage con debounce
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (timeoutRef.current !== null) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      try {
+        localStorage.setItem(key, serializeRef.current(value));
+      } catch {
+        // Fallback silencioso
+      }
+    }, 300);
+
+    return () => {
+      if (timeoutRef.current !== null) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [key, value]);
+
+  // Sincronizar entre pestañas
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === key && e.newValue !== null) {
+        try {
+          setValue(parseRef.current(e.newValue));
+        } catch {
+          // Fallback silencioso
+        }
+      } else if (e.key === key && e.newValue === null) {
+        setValue(resolveDefault(defaultValue));
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
 
   return [value, setValue];
 }

@@ -235,6 +235,12 @@ export function parseRoutineText(
       continue;
     }
 
+    const restMatchSeg = line.match(/^-\s*Descanso:\s*(\d{1,4})\s*seg/i);
+    if (restMatchSeg) {
+      pendingRest = clampInt(Number(restMatchSeg[1]), 0, 900, 60);
+      continue;
+    }
+
     const restMatch = line.match(/^-\s*Descanso:\s*(\d{1,3})\s*min/i);
     if (restMatch) {
       pendingRest = clampInt(Number(restMatch[1]) * 60, 0, 900, 60);

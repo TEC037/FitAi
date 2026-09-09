@@ -1,112 +1,54 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import App from './App';
 
-// Test de integración: monta la app completa con lazy imports (toda la UI)
-// y ejercicios cargados de forma asíncrona. Bajo carga de la suite completa
-// el presupuesto por defecto (5s) resulta corto.
-vi.setConfig({ testTimeout: 15000 });
-
-async function mountLanding() {
-  render(<App />);
-  expect(
-    await screen.findByText('¿Cómo funciona FitAI Coach?', {}, { timeout: 5000 })
-  ).toBeInTheDocument();
-}
-
-/** Abre el menú circular y entra a una pantalla autenticada. */
-async function openNavTo(label: string) {
-  fireEvent.click(screen.getByRole('button', { name: 'Abrir menú de navegación' }));
-  fireEvent.click(screen.getByRole('button', { name: label }));
-}
-
-describe('App', () => {
+describe('App (Punto Fuerte)', () => {
   beforeEach(() => {
     localStorage.clear();
-    Element.prototype.scrollIntoView = vi.fn();
+    window.print = vi.fn();
   });
 
-  it('muestra la landing no autenticada por defecto', async () => {
-    await mountLanding();
-    expect(
-      screen.getByRole('heading', { level: 1, name: /Tu entrenador inteligente/ })
-    ).toBeInTheDocument();
+  it('muestra la marca Punto Fuerte en el header', () => {
+    render(<App />);
+    expect(screen.getByText('Punto Fuerte')).toBeInTheDocument();
   });
 
-  it('entra en la demo desde el botón circular de la barra superior y aterriza en Rutina', async () => {
-    await mountLanding();
-
-    fireEvent.click(screen.getByRole('button', { name: 'Probar la demo' }));
-    expect(
-      await screen.findByRole('heading', { name: 'Mi Rutina' }, { timeout: 5000 })
-    ).toBeInTheDocument();
-    expect(screen.getAllByText(/Carlos Ramírez/).length).toBeGreaterThan(0);
+  it('abre por defecto en la pestaña Hoy', () => {
+    render(<App />);
+    expect(screen.getByRole('heading', { name: /¡A por ello, Carlos!/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Hoy/i })).toHaveAttribute('aria-current', 'page');
   });
 
-  it('navega a Perfil y Progreso desde el menú circular', async () => {
-    await mountLanding();
-    fireEvent.click(screen.getByRole('button', { name: 'Probar la demo' }));
-    await screen.findByRole('heading', { name: 'Mi Rutina' }, { timeout: 5000 });
+  it('navega por las pestañas inferiores', () => {
+    render(<App />);
 
-    await openNavTo('Perfil');
+    fireEvent.click(screen.getByRole('button', { name: /Entrenar/i }));
+    expect(screen.getByText(/En Vivo/i)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /Rutinas/i }));
     expect(
-      await screen.findByRole('heading', { name: 'Perfil y Preferencias' }, { timeout: 5000 })
+      screen.getByPlaceholderText(/Buscar por ejercicio, músculo o rutina/)
     ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /Progreso/i }));
+    expect(screen.getByRole('heading', { name: /Progreso/i })).toBeInTheDocument();
   });
 
-  it('navega a la Biblioteca de Ejercicios', async () => {
-    await mountLanding();
-    fireEvent.click(screen.getByRole('button', { name: 'Probar la demo' }));
-    await screen.findByRole('heading', { name: 'Mi Rutina' }, { timeout: 5000 });
-
-    await openNavTo('Biblioteca');
-    expect(
-      await screen.findByText('Biblioteca de Ejercicios', {}, { timeout: 5000 })
-    ).toBeInTheDocument();
+  it('abre el modal de notificaciones desde el header', () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Notificaciones' }));
+    expect(screen.getByRole('heading', { name: /Notificaciones/i })).toBeInTheDocument();
   });
 
-  it('abre el modal de seguridad desde el Perfil', async () => {
-    await mountLanding();
-    fireEvent.click(screen.getByRole('button', { name: 'Probar la demo' }));
-    await screen.findByRole('heading', { name: 'Mi Rutina' }, { timeout: 5000 });
-
-    await openNavTo('Perfil');
-    await screen.findByRole('heading', { name: 'Perfil y Preferencias' }, { timeout: 5000 });
-
-    fireEvent.click(screen.getByRole('button', { name: 'Ver Normas Médicas' }));
-    expect(
-      await screen.findByRole('heading', { name: 'Consideraciones de Seguridad y Salud' })
-    ).toBeInTheDocument();
+  it('abre el perfil desde el header', () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Perfil de usuario' }));
+    expect(screen.getByText('Perfil de Atleta')).toBeInTheDocument();
   });
 
-  it('inicia sesión desde la pantalla de autenticación', async () => {
-    await mountLanding();
-
-    fireEvent.click(screen.getByRole('button', { name: 'Iniciar Sesión' }));
-    expect(
-      await screen.findByRole('heading', { name: 'FitAI Coach' }, { timeout: 5000 })
-    ).toBeInTheDocument();
-
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Acceder con Carlos Ramírez (Usuario Demo)' })
-    );
-    expect(
-      await screen.findByRole('heading', { name: 'Mi Rutina' }, { timeout: 5000 })
-    ).toBeInTheDocument();
-  });
-
-  it('cierra sesión y vuelve a la landing', async () => {
-    await mountLanding();
-    fireEvent.click(screen.getByRole('button', { name: 'Probar la demo' }));
-    await screen.findByRole('heading', { name: 'Mi Rutina' }, { timeout: 5000 });
-
-    fireEvent.click(screen.getByRole('button', { name: 'Abrir menú de navegación' }));
-    fireEvent.click(screen.getByRole('button', { name: /Cerrar Sesión/ }));
-    fireEvent.click(screen.getByRole('button', { name: /Sí, cerrar sesión/ }));
-
-    await waitFor(
-      () => expect(screen.getByText('¿Cómo funciona FitAI Coach?')).toBeInTheDocument(),
-      { timeout: 5000 }
-    );
+  it('abre el modal de peso desde la acción rápida de Hoy', () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: /Registrar peso/i }));
+    expect(screen.getByRole('heading', { name: /Registrar Peso/i })).toBeInTheDocument();
   });
 });

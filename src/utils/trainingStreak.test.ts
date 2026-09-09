@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { computeTrainingStreak } from './trainingStreak';
 
-const REFERENCE = new Date(2026, 8, 8);
+const REFERENCE = new Date(2026, 8, 8); // Sep 8, 2026 is a Tuesday
 
 describe('computeTrainingStreak', () => {
   it('Devuelve cero sin sesiones', () => {
@@ -43,6 +43,21 @@ describe('computeTrainingStreak', () => {
 
   it('Ignora sesiones futuras respecto a la referencia', () => {
     expect(computeTrainingStreak(['2026-10-02', '2026-09-08'], REFERENCE)).toEqual({
+      currentWeeks: 1,
+      longestWeeks: 1,
+    });
+  });
+
+  it('maintains streak on Monday when last session was Sunday', () => {
+    const refMonday = new Date(2026, 8, 7);
+    expect(computeTrainingStreak(['2026-09-06'], refMonday)).toEqual({
+      currentWeeks: 1,
+      longestWeeks: 1,
+    });
+  });
+
+  it('grace period — current week without sessions keeps streak from last week', () => {
+    expect(computeTrainingStreak(['2026-09-02'], REFERENCE)).toEqual({
       currentWeeks: 1,
       longestWeeks: 1,
     });

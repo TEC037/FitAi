@@ -14,15 +14,24 @@ let clientPromise: Promise<SupabaseClient | null> | undefined;
 export function getSupabaseClient(): Promise<SupabaseClient | null> {
   if (!isSupabaseEnabled) return Promise.resolve(null);
   if (!clientPromise) {
-    clientPromise = import('@supabase/supabase-js').then(({ createClient }) =>
-      createClient(SUPABASE_URL as string, SUPABASE_ANON_KEY as string, {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-          detectSessionInUrl: true,
-        },
-      })
-    );
+    clientPromise = import('@supabase/supabase-js')
+      .then(({ createClient }) =>
+        createClient(SUPABASE_URL as string, SUPABASE_ANON_KEY as string, {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true,
+          },
+        })
+      )
+      .catch((err) => {
+        clientPromise = undefined;
+        throw err;
+      });
   }
   return clientPromise;
+}
+
+export function _resetSupabaseClientForTesting(): void {
+  clientPromise = undefined;
 }

@@ -139,3 +139,8 @@ export type AppScreen =
   | 'routine'
   | 'exercises'
   | 'profile';
+
+/** Resultado genérico para operaciones que pueden fallar. */
+export type Result<T = void> =
+  | { ok: true; data: T }
+  | { ok: false; error: string };

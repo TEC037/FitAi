@@ -1,110 +1,242 @@
-import React, { Suspense, lazy, useState } from 'react';
+import React, { useState } from 'react';
 import { AppProvider } from './context/AppContext';
-import { useApp } from './context/useApp';
-import { TopBar } from './components/TopBar';
-import { RoundNav } from './components/RoundNav';
-import { SafetyModal } from './components/SafetyModal';
-import { PageLoader } from './components/PageLoader';
-import { ErrorBoundary } from './components/ErrorBoundary';
+import { TabType, Routine, Exercise } from './ui/types';
+import { UiDataProvider, useUiData } from './ui/data/store';
+import { Header } from './ui/components/Header';
+import { BottomNav } from './ui/components/BottomNav';
+import { HoyScreen } from './ui/components/HoyScreen';
+import { EntrenarScreen } from './ui/components/EntrenarScreen';
+import { RutinasScreen } from './ui/components/RutinasScreen';
+import { ProgresoScreen } from './ui/components/ProgresoScreen';
+import { AuthScreen } from './ui/components/AuthScreen';
 
-const LandingPage = lazy(() =>
-  import('./components/LandingPage').then((m) => ({ default: m.LandingPage }))
-);
-const AuthView = lazy(() => import('./components/AuthView').then((m) => ({ default: m.AuthView })));
-const OnboardingFlow = lazy(() =>
-  import('./components/OnboardingFlow').then((m) => ({ default: m.OnboardingFlow }))
-);
-const RoutineView = lazy(() =>
-  import('./components/RoutineView').then((m) => ({ default: m.RoutineView }))
-);
-const ProfileView = lazy(() =>
-  import('./components/ProfileView').then((m) => ({ default: m.ProfileView }))
-);
-const ExerciseDatabaseView = lazy(() =>
-  import('./components/ExerciseDatabaseView').then((m) => ({ default: m.ExerciseDatabaseView }))
-);
+// Modals
+import { WeightModal } from './ui/components/modals/WeightModal';
+import { QuickMealModal } from './ui/components/modals/QuickMealModal';
+import { CoachNotesModal } from './ui/components/modals/CoachNotesModal';
+import { HistoryModal } from './ui/components/modals/HistoryModal';
+import { CreateRoutineModal } from './ui/components/modals/CreateRoutineModal';
+import { FinishWorkoutModal } from './ui/components/modals/FinishWorkoutModal';
+import { ExportPdfModal } from './ui/components/modals/ExportPdfModal';
+import { VideoModal } from './ui/components/modals/VideoModal';
+import { NotificationsModal } from './ui/components/modals/NotificationsModal';
+import { ProfileModal } from './ui/components/modals/ProfileModal';
 
-const AppContent: React.FC = () => {
-  const { currentScreen, isAuthenticated, isHydrating } = useApp();
-  const [isNavOpen, setIsNavOpen] = useState(false);
-  const [isSafetyModalOpen, setIsSafetyModalOpen] = useState(false);
+function AppShell() {
+  const ui = useUiData();
+  const [currentTab, setCurrentTab] = useState<TabType>('hoy');
 
-  if (isHydrating) {
-    return (
-      <div className="min-h-screen metal-surface flex items-center justify-center">
-        <PageLoader />
-      </div>
-    );
-  }
+  // Shared App State
+  const [weight, setWeight] = useState<number>(ui.profile.weight);
+  const [hasUnreadNotifications, setHasUnreadNotifications] = useState<boolean>(true);
 
-  if (!isAuthenticated) {
-    if (currentScreen === 'auth') {
+  // Modal Visibility States
+  const [isWeightModalOpen, setIsWeightModalOpen] = useState(false);
+  const [isMealModalOpen, setIsMealModalOpen] = useState(false);
+  const [isCoachNotesOpen, setIsCoachNotesOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isCreateRoutineOpen, setIsCreateRoutineOpen] = useState(false);
+  const [isFinishWorkoutOpen, setIsFinishWorkoutOpen] = useState(false);
+  const [isExportPdfOpen, setIsExportPdfOpen] = useState(false);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [videoExercise, setVideoExercise] = useState<Exercise | null>(null);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  // Finish workout summary
+  const [finishSummary, setFinishSummary] = useState({
+    durationSeconds: 34 * 60 + 12,
+    volumeKg: 4250,
+    setsCompleted: 7,
+  });
+
+  // Start a workout from anywhere
+  const handleStartWorkout = () => {
+    ui.startWorkoutRoutine(ui.nextSession?.routineDay);
+    setCurrentTab('entrenar');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleStartRoutine = (routine: Routine) => {
+    ui.startWorkoutRoutine(routine.dayNumber);
+    setCurrentTab('entrenar');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleFinishWorkout = (summary: {
+    durationSeconds: number;
+    volumeKg: number;
+    setsCompleted: number;
+  }) => {
+    setFinishSummary(summary);
+    setIsFinishWorkoutOpen(true);
+  };
+
+  const handleConfirmFinishWorkout = () => {
+    setIsFinishWorkoutOpen(false);
+    // Add burned calories to today's total
+    const extraCalories = Math.round((finishSummary.durationSeconds / 60) * 8.5);
+    ui.addExtraCalories(extraCalories);
+    // Switch to progress screen to see results
+    setCurrentTab('progreso');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleOpenVideo = (exercise: Exercise) => {
+    setVideoExercise(exercise);
+    setIsVideoModalOpen(true);
+  };
+
+  const handleSaveRoutine = (newRoutine: Routine) => {
+    ui.addCustomRoutine(newRoutine);
+  };
+
+  const handleSaveWeight = (newWeight: number) => {
+    setWeight(newWeight);
+    ui.saveWeight(newWeight);
+  };
+
+  const handleTabChange = (tab: TabType) => {
+    setCurrentTab(tab);
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+
+  // Auth gate: si hay Supabase configurado, exigimos sesión antes de la app.
+  if (ui.canUseEmailAuth && !ui.isAuthenticated) {
+    if (ui.isHydrating) {
       return (
-        <ErrorBoundary>
-          <TopBar onOpenNav={() => setIsNavOpen(true)} />
-          <Suspense fallback={<PageLoader />}>
-            <AuthView />
-          </Suspense>
-          <RoundNav isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
-          <SafetyModal isOpen={isSafetyModalOpen} onClose={() => setIsSafetyModalOpen(false)} />
-        </ErrorBoundary>
+        <div className="min-h-screen bg-[#101319] text-[#e1e2eb] flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <span className="w-2 h-2 rounded-full bg-[#c3f400] animate-pulse shadow-[0_0_8px_#c3f400]"></span>
+            <span className="font-headline text-sm text-[#c4c9ac] font-semibold">
+              Preparando tu espacio…
+            </span>
+          </div>
+        </div>
       );
     }
-    // Default unauthenticated is Landing Page
-    return (
-      <ErrorBoundary>
-        <TopBar onOpenNav={() => setIsNavOpen(true)} />
-        <Suspense fallback={<PageLoader />}>
-          <LandingPage />
-        </Suspense>
-        <RoundNav isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
-        <SafetyModal isOpen={isSafetyModalOpen} onClose={() => setIsSafetyModalOpen(false)} />
-      </ErrorBoundary>
-    );
+    return <AuthScreen />;
   }
 
-  if (currentScreen === 'onboarding') {
-    return (
-      <ErrorBoundary>
-        <Suspense fallback={<PageLoader />}>
-          <OnboardingFlow />
-        </Suspense>
-        <RoundNav isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
-        <SafetyModal isOpen={isSafetyModalOpen} onClose={() => setIsSafetyModalOpen(false)} />
-      </ErrorBoundary>
-    );
-  }
-
-  // Authenticated Main Layout (light, metallic)
   return (
-    <div className="min-h-screen metal-surface text-[#1d1d1f] font-sans selection:bg-[#C0FF00] selection:text-black relative overflow-hidden">
-      <div className="relative">
-        <TopBar onOpenNav={() => setIsNavOpen(true)} />
+    <div className="min-h-screen bg-[#101319] text-[#e1e2eb] flex flex-col antialiased">
+      {/* Fixed Global Header */}
+      <Header
+        onOpenNotifications={() => setIsNotificationsOpen(true)}
+        onOpenProfile={() => setIsProfileOpen(true)}
+        hasUnreadNotifications={hasUnreadNotifications}
+      />
 
-        {/* Main Scrollable View Area */}
-        <main className="max-w-5xl mx-auto px-4 sm:px-6 py-6 pb-16">
-          <ErrorBoundary>
-            <Suspense fallback={<PageLoader />}>
-              {currentScreen === 'routine' && <RoutineView />}
-              {currentScreen === 'exercises' && <ExerciseDatabaseView />}
-              {currentScreen === 'profile' && (
-                <ProfileView onOpenSafetyModal={() => setIsSafetyModalOpen(true)} />
-              )}
-            </Suspense>
-          </ErrorBoundary>
-        </main>
-      </div>
+      {/* Main Screen Content */}
+      <main className="flex-1 w-full pt-16 pb-20 overflow-x-hidden">
+        {currentTab === 'hoy' && (
+          <HoyScreen
+            onStartWorkout={handleStartWorkout}
+            onOpenWeightModal={() => setIsWeightModalOpen(true)}
+            onOpenMealModal={() => setIsMealModalOpen(true)}
+            onOpenCoachNotes={() => setIsCoachNotesOpen(true)}
+            onOpenHistory={() => setIsHistoryOpen(true)}
+            todayCalories={ui.todayCalories}
+          />
+        )}
 
-      <RoundNav isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
-      <SafetyModal isOpen={isSafetyModalOpen} onClose={() => setIsSafetyModalOpen(false)} />
+        {currentTab === 'entrenar' && (
+          <EntrenarScreen
+            onFinishWorkout={handleFinishWorkout}
+            onOpenVideoModal={handleOpenVideo}
+          />
+        )}
+
+        {currentTab === 'rutinas' && (
+          <RutinasScreen
+            onStartRoutine={handleStartRoutine}
+            onCreateRoutineOpen={() => setIsCreateRoutineOpen(true)}
+          />
+        )}
+
+        {currentTab === 'progreso' && (
+          <ProgresoScreen
+            onExportPdf={() => setIsExportPdfOpen(true)}
+            onOpenNewPrModal={() => setIsCreateRoutineOpen(true)}
+          />
+        )}
+      </main>
+
+      {/* Fixed Sticky Bottom Navigation */}
+      <BottomNav
+        currentTab={currentTab}
+        onTabChange={handleTabChange}
+        isTrainingActive={true}
+      />
+
+      {/* Modals & Dialogs */}
+      <WeightModal
+        isOpen={isWeightModalOpen}
+        onClose={() => setIsWeightModalOpen(false)}
+        currentWeight={weight}
+        onSaveWeight={handleSaveWeight}
+      />
+
+      <QuickMealModal
+        isOpen={isMealModalOpen}
+        onClose={() => setIsMealModalOpen(false)}
+        onAddCalories={ui.addExtraCalories}
+      />
+
+      <CoachNotesModal
+        isOpen={isCoachNotesOpen}
+        onClose={() => setIsCoachNotesOpen(false)}
+      />
+
+      <HistoryModal
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+      />
+
+      <CreateRoutineModal
+        isOpen={isCreateRoutineOpen}
+        onClose={() => setIsCreateRoutineOpen(false)}
+        onSaveRoutine={handleSaveRoutine}
+      />
+
+      <FinishWorkoutModal
+        isOpen={isFinishWorkoutOpen}
+        onClose={() => setIsFinishWorkoutOpen(false)}
+        summary={finishSummary}
+        onConfirmFinish={handleConfirmFinishWorkout}
+      />
+
+      <ExportPdfModal
+        isOpen={isExportPdfOpen}
+        onClose={() => setIsExportPdfOpen(false)}
+      />
+
+      <VideoModal
+        isOpen={isVideoModalOpen}
+        onClose={() => setIsVideoModalOpen(false)}
+        exercise={videoExercise}
+      />
+
+      <NotificationsModal
+        isOpen={isNotificationsOpen}
+        onClose={() => setIsNotificationsOpen(false)}
+        onClear={() => setHasUnreadNotifications(false)}
+      />
+
+      <ProfileModal
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
+      />
     </div>
   );
-};
+}
 
 export default function App() {
   return (
     <AppProvider>
-      <AppContent />
+      <UiDataProvider>
+        <AppShell />
+      </UiDataProvider>
     </AppProvider>
   );
 }

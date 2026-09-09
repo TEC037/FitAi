@@ -7,7 +7,7 @@ function renderExerciseLine(
   return [
     `  ${index + 1}. ${ex.name}`,
     `     - ${ex.sets} x ${ex.reps} @ ${ex.suggestedWeightKg} kg`,
-    `     - Descanso: ${Math.round(ex.restSeconds / 60)} min`,
+    `     - Descanso: ${ex.restSeconds} seg`,
   ].join('\n');
 }
 

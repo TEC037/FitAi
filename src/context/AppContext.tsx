@@ -58,10 +58,12 @@ import {
 } from '../lib/supabaseService';
 
 import { translateAuthError } from '../utils/authErrors';
+import { DEMO_EMAIL } from '../config/constants';
 
 export interface AppContextType {
   user: UserProfile;
   isAuthenticated: boolean;
+  isDemoUser: boolean;
   isHydrating: boolean;
   currentScreen: AppScreen;
   routines: DailyRoutine[];
@@ -180,6 +182,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     false
   );
   const [isHydrating, setIsHydrating] = useState<boolean>(isSupabaseEnabled);
+  const [isDemoUser, setIsDemoUser] = usePersistedState<boolean>(
+    STORAGE_KEYS.DEMO,
+    false
+  );
   const [currentScreen, setCurrentScreen] = usePersistedState<AppScreen>(
     STORAGE_KEYS.SCREEN,
     'landing',
@@ -315,10 +321,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setChatMessages(data.chatMessages);
     setActiveUserId(userId);
     hydratedRef.current = true;
+    setIsDemoUser(data.profile?.email === DEMO_EMAIL);
     setIsAuthenticated(true);
     setCurrentScreen((prev) => (prev === 'landing' || prev === 'auth' ? 'routine' : prev));
     setIsHydrating(false);
-  }, [setUser, setRoutines, setHistory, setChatMessages, setCurrentScreen, setIsAuthenticated]);
+  }, [setUser, setRoutines, setHistory, setChatMessages, setCurrentScreen, setIsAuthenticated, setIsDemoUser]);
 
   useEffect(() => {
     if (!isSupabaseEnabled) {
@@ -408,6 +415,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         // Fallback: demo local si Supabase falla
         setUser(INITIAL_USER);
         setRoutines(MOCK_ROUTINES);
+        setIsDemoUser(true);
         setIsAuthenticated(true);
         navigateTo('routine');
       }
@@ -420,6 +428,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setPersonalRecords(MOCK_PRS);
     setWeightHistory(MOCK_WEIGHT_HISTORY);
     setChatMessages(INITIAL_CHAT_MESSAGES);
+    setIsDemoUser(true);
     setIsAuthenticated(true);
     navigateTo('routine');
   };
@@ -427,6 +436,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const loginWithEmail = async (email: string, password: string) => {
     if (!isSupabaseEnabled) {
       setUser(INITIAL_USER);
+      setIsDemoUser(false);
       setIsAuthenticated(true);
       navigateTo('routine');
       return { error: null };
@@ -434,6 +444,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const { userId, error } = await signInWithEmail(email, password);
     if (error || !userId) return { error: translateAuthError(error ?? 'No se pudo iniciar sesión.') };
     await applyHydration(userId);
+    setIsDemoUser(false);
     navigateTo('routine');
     return { error: null };
   };
@@ -442,6 +453,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (!isSupabaseEnabled) {
       setUser({ ...INITIAL_USER, name, email });
       setRoutines([]);
+      setIsDemoUser(false);
       setIsAuthenticated(true);
       navigateTo('onboarding');
       return { error: null };
@@ -450,6 +462,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (error) return { error: translateAuthError(error) };
     if (userId) {
       await applyHydration(userId);
+      setIsDemoUser(false);
       navigateTo('onboarding');
     }
     return { error: null };
@@ -459,6 +472,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (isSupabaseEnabled) await signOutSession();
     setActiveUserId(null);
     hydratedRef.current = false;
+    setIsDemoUser(false);
     setIsAuthenticated(false);
     setCurrentScreen('landing');
   };
@@ -470,6 +484,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setPersonalRecords(MOCK_PRS);
     setChatMessages(INITIAL_CHAT_MESSAGES);
     setRoutines(MOCK_ROUTINES);
+    setIsDemoUser(true);
     localStorage.removeItem(STORAGE_KEYS.ROUTINES);
     localStorage.removeItem(STORAGE_KEYS.CHAT);
     localStorage.removeItem(STORAGE_KEYS.WORKOUT);
@@ -822,62 +837,113 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     [user, allometricProfile, setChatMessages]
   );
 
+  const contextValue = useMemo(
+    () => ({
+      user,
+      isAuthenticated,
+      isDemoUser,
+      isHydrating,
+      currentScreen,
+      routines,
+      selectedDay,
+      history,
+      personalRecords,
+      weightHistory,
+      chatMessages,
+      isCoachTyping,
+
+      allometricProfile,
+
+      isWorkoutActive,
+      activeRoutine,
+      activeExerciseIndex,
+      activeSetIndex,
+      activeWorkoutSets,
+      workoutElapsedTime,
+      restTimerSeconds,
+      isRestTimerActive,
+
+      navigateTo,
+      setSelectedDay,
+      loginDemoUser,
+      loginWithEmail,
+      registerWithEmail,
+      logout,
+      resetToDemoData,
+      updateUserProfile,
+      completeOnboarding,
+
+      startWorkout,
+      cancelWorkout,
+      logActiveSet,
+      goToNextExercise,
+      goToPreviousExercise,
+      startRestTimer,
+      pauseRestTimer,
+      adjustRestTimer,
+      finishWorkout,
+
+      addExerciseToRoutine,
+      replaceRoutineExercise,
+      removeExerciseFromRoutine,
+      resetRoutines,
+      duplicateRoutineDay,
+      importRoutines,
+
+      sendCoachMessage,
+    }),
+    [
+      user,
+      isAuthenticated,
+      isDemoUser,
+      isHydrating,
+      currentScreen,
+      routines,
+      selectedDay,
+      history,
+      personalRecords,
+      weightHistory,
+      chatMessages,
+      isCoachTyping,
+      allometricProfile,
+      isWorkoutActive,
+      activeRoutine,
+      activeExerciseIndex,
+      activeSetIndex,
+      activeWorkoutSets,
+      workoutElapsedTime,
+      restTimerSeconds,
+      isRestTimerActive,
+      navigateTo,
+      setSelectedDay,
+      loginDemoUser,
+      loginWithEmail,
+      registerWithEmail,
+      logout,
+      resetToDemoData,
+      updateUserProfile,
+      completeOnboarding,
+      startWorkout,
+      cancelWorkout,
+      logActiveSet,
+      goToNextExercise,
+      goToPreviousExercise,
+      startRestTimer,
+      pauseRestTimer,
+      adjustRestTimer,
+      finishWorkout,
+      addExerciseToRoutine,
+      replaceRoutineExercise,
+      removeExerciseFromRoutine,
+      resetRoutines,
+      duplicateRoutineDay,
+      importRoutines,
+      sendCoachMessage,
+    ]
+  );
+
   return (
-    <AppContext.Provider
-      value={{
-        user,
-        isAuthenticated,
-        isHydrating,
-        currentScreen,
-        routines,
-        selectedDay,
-        history,
-        personalRecords,
-        weightHistory,
-        chatMessages,
-        isCoachTyping,
-
-        allometricProfile,
-
-        isWorkoutActive,
-        activeRoutine,
-        activeExerciseIndex,
-        activeSetIndex,
-        activeWorkoutSets,
-        workoutElapsedTime,
-        restTimerSeconds,
-        isRestTimerActive,
-
-        navigateTo,
-        setSelectedDay,
-        loginDemoUser,
-        loginWithEmail,
-        registerWithEmail,
-        logout,
-        resetToDemoData,
-        updateUserProfile,
-        completeOnboarding,
-
-        startWorkout,
-        cancelWorkout,
-        logActiveSet,
-        goToNextExercise,
-        goToPreviousExercise,
-        startRestTimer,
-        pauseRestTimer,
-        adjustRestTimer,
-        finishWorkout,
-
-        addExerciseToRoutine,
-        replaceRoutineExercise,
-        removeExerciseFromRoutine,
-        resetRoutines,
-        duplicateRoutineDay,
-        importRoutines,
-
-        sendCoachMessage,
-      }}
-    >
+    <AppContext.Provider value={contextValue}>
       {children}
     </AppContext.Provider>
   );

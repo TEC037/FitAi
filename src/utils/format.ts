@@ -26,10 +26,11 @@ export function formatTime(seconds: number): string {
  * Formatea un número con separador de miles en 'es-ES' (punto) de forma
  * determinista (sin depender del ICU del navegador). P.ej. 1324 -> '1.324'.
  */
-export function formatNumber(value: number): string {
-  const [intPart, decPart] = String(Math.round(value)).split('.');
+export function formatNumber(value: number, decimals: number = 0): string {
+  const fixed = value.toFixed(decimals);
+  const [intPart, decPart] = fixed.split('.');
   const grouped = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  return decPart ? `${grouped}.${decPart}` : grouped;
+  return decPart ? `${grouped},${decPart}` : grouped;
 }
 
 /** Volumen en kg con separador de miles, p.ej. "12.450". */

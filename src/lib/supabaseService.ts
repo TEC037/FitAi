@@ -5,6 +5,7 @@ import {
   PersonalRecord,
   UserProfile,
   WorkoutSessionLog,
+  Result,
 } from '../types';
 import { DEMO_EMAIL, DEMO_PASSWORD } from '../config/constants';
 import { INITIAL_USER } from '../data/mockUser';
@@ -19,6 +20,7 @@ interface HydratedData {
   personalRecords: PersonalRecord[];
   weightHistory: { date: string; weight: number }[];
   chatMessages: ChatMessage[];
+  errors: string[];
 }
 
 // ---------- Mappers ----------
@@ -215,10 +217,11 @@ export async function signInWithEmail(email: string, password: string) {
 export async function signUpWithEmail(email: string, password: string, name: string) {
   const client = await getSupabaseClient();
   if (!client) return { error: 'Supabase no configurado' };
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
   const { data, error } = await client.auth.signUp({
     email,
     password,
-    options: { data: { name }, emailRedirectTo: window.location.origin },
+    options: { data: { name }, emailRedirectTo: origin },
   });
   return {
     userId: data.user?.id ?? null,
@@ -259,17 +262,20 @@ export async function signInDemo() {
   return { userId: null, error: error?.message ?? null };
 }
 
-export async function signOutSession() {
+export async function signOutSession(): Promise<Result<void>> {
   const client = await getSupabaseClient();
-  if (!client) return;
-  await client.auth.signOut();
+  if (!client) return { ok: true, data: undefined };
+  const { error } = await client.auth.signOut();
+  if (error) return { ok: false, error: error.message };
+  return { ok: true, data: undefined };
 }
 
 export async function resetPassword(email: string) {
   const client = await getSupabaseClient();
   if (!client) return { error: 'Supabase no configurado' };
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
   const { error } = await client.auth.resetPasswordForEmail(email, {
-    redirectTo: `${window.location.origin}/?type=recovery`,
+    redirectTo: `${origin}/?type=recovery`,
   });
   return { error: error?.message ?? null };
 }
@@ -302,6 +308,7 @@ export async function hydrateAll(userId: string): Promise<HydratedData> {
     personalRecords: [],
     weightHistory: [],
     chatMessages: [],
+    errors: [],
   };
   const client = await getSupabaseClient();
   if (!client) return empty;
@@ -315,6 +322,14 @@ export async function hydrateAll(userId: string): Promise<HydratedData> {
     client.from('chat_messages').select('*').eq('user_id', userId).order('timestamp'),
   ]);
 
+  const errors: string[] = [];
+  if (profileRes.error) errors.push(`profiles: ${profileRes.error.message}`);
+  if (routinesRes.error) errors.push(`routines: ${routinesRes.error.message}`);
+  if (sessionsRes.error) errors.push(`workout_sessions: ${sessionsRes.error.message}`);
+  if (prsRes.error) errors.push(`personal_records: ${prsRes.error.message}`);
+  if (weightRes.error) errors.push(`weight_history: ${weightRes.error.message}`);
+  if (chatRes.error) errors.push(`chat_messages: ${chatRes.error.message}`);
+
   return {
     profile: profileRes.data ? profileRowToUser(profileRes.data) : null,
     routines: (routinesRes.data as Record<string, unknown>[])?.map(routineRowToRoutine).sort(
@@ -324,70 +339,150 @@ export async function hydrateAll(userId: string): Promise<HydratedData> {
     personalRecords: (prsRes.data as Record<string, unknown>[])?.map(rowToPr) ?? [],
     weightHistory: (weightRes.data as { date: string; weight: number }[]) ?? [],
     chatMessages: (chatRes.data as Record<string, unknown>[])?.map(rowToChat) ?? [],
+    errors,
   };
 }
 
-export async function persistProfile(user: UserProfile) {
+export async function persistProfile(user: UserProfile): Promise<Result<void>> {
   const client = await getSupabaseClient();
-  if (!client) return;
-  await client.from('profiles').upsert(userToProfileRow(user), { onConflict: 'id' });
+  if (!client) return { ok: true, data: undefined };
+  const { error } = await client.from('profiles').upsert(userToProfileRow(user), { onConflict: 'id' });
+  if (error) return { ok: false, error: error.message };
+  return { ok: true, data: undefined };
 }
 
-export async function persistRoutines(userId: string, routines: DailyRoutine[]) {
+export async function persistRoutines(
+  userId: string,
+  routines: DailyRoutine[],
+  options?: { allowClear?: boolean }
+): Promise<Result<void>> {
   const client = await getSupabaseClient();
-  if (!client) return;
+  if (!client) return { ok: true, data: undefined };
   if (routines.length === 0) {
-    await client.from('routines').delete().eq('user_id', userId);
-    return;
+    // Solo se borra el plan cuando el caller lo pide explícitamente
+    // (p.ej. reset de plan). Un array vacío transitorio NO debe vaciar la DB.
+    if (!options?.allowClear) return { ok: true, data: undefined };
+    const { error } = await client.from('routines').delete().eq('user_id', userId);
+    if (error) return { ok: false, error: error.message };
+    return { ok: true, data: undefined };
   }
   const rows = routines.map((r, i) => routineToRow(userId, r, i));
-  await client.from('routines').upsert(rows, { onConflict: 'user_id,day_number' });
+  const { error: upsertError } = await client.from('routines').upsert(rows, { onConflict: 'user_id,day_number' });
+  if (upsertError) return { ok: false, error: upsertError.message };
+  
   // Remove stale days that no longer exist in the plan
   const activeDays = routines.map((r) => r.dayNumber);
-  await client.from('routines').delete().eq('user_id', userId).not('day_number', 'in', `(${activeDays.join(',')})`);
+  if (activeDays.length > 0) {
+    const { error: deleteError } = await client.from('routines').delete().eq('user_id', userId).not('day_number', 'in', `(${activeDays.join(',')})`);
+    if (deleteError) return { ok: false, error: deleteError.message };
+  }
+  return { ok: true, data: undefined };
 }
 
-export async function persistHistory(userId: string, history: WorkoutSessionLog[]) {
+export async function hydrateCustomRoutines(
+  userId: string
+): Promise<{ ok: boolean; data: Record<string, unknown>[]; error?: string }> {
   const client = await getSupabaseClient();
-  if (!client) return;
-  if (history.length === 0) return;
-  await client.from('workout_sessions').upsert(
+  if (!client) return { ok: true, data: [] };
+  const { data, error } = await client
+    .from('custom_routines')
+    .select('payload')
+    .eq('user_id', userId)
+    .order('position', { ascending: true });
+  if (error) return { ok: false, error: error.message, data: [] };
+  return { ok: true, data: ((data ?? []) as { payload: Record<string, unknown> }[]).map((r) => r.payload) };
+}
+
+export async function persistCustomRoutines(
+  userId: string,
+  routines: Record<string, unknown>[],
+  options?: { allowClear?: boolean }
+): Promise<Result<void>> {
+  const client = await getSupabaseClient();
+  if (!client) return { ok: true, data: undefined };
+  if (routines.length === 0) {
+    // Mismo resguardo que persistRoutines: un vacío transitorio no borra la DB.
+    if (!options?.allowClear) return { ok: true, data: undefined };
+    const { error } = await client.from('custom_routines').delete().eq('user_id', userId);
+    if (error) return { ok: false, error: error.message };
+    return { ok: true, data: undefined };
+  }
+  const rows = routines.map((r, i) => ({
+    user_id: userId,
+    client_id: String(r.id ?? `${r.name ?? 'custom'}-${i}`),
+    name: String(r.name ?? 'Rutina personalizada'),
+    category: String(r.category ?? 'todos'),
+    difficulty: String(r.difficulty ?? 'Moderada'),
+    duration_minutes: Number(r.durationMinutes ?? 0),
+    payload: r,
+    position: i,
+  }));
+  const { error: upsertError } = await client
+    .from('custom_routines')
+    .upsert(rows, { onConflict: 'user_id,client_id' });
+  if (upsertError) return { ok: false, error: upsertError.message };
+
+  const activeIds = routines.map((r) => String(r.id ?? `${r.name ?? 'custom'}-${0}`));
+  if (activeIds.length > 0) {
+    const { error: deleteError } = await client
+      .from('custom_routines')
+      .delete()
+      .eq('user_id', userId)
+      .not('client_id', 'in', `(${activeIds.map((v) => `"${v.replace(/"/g, '""')}"`).join(',')})`);
+    if (deleteError) return { ok: false, error: deleteError.message };
+  }
+  return { ok: true, data: undefined };
+}
+
+export async function persistHistory(userId: string, history: WorkoutSessionLog[]): Promise<Result<void>> {
+  const client = await getSupabaseClient();
+  if (!client) return { ok: true, data: undefined };
+  if (history.length === 0) return { ok: true, data: undefined };
+  const { error } = await client.from('workout_sessions').upsert(
     history.map((s) => sessionToRow(userId, s)),
     { onConflict: 'id' }
   );
+  if (error) return { ok: false, error: error.message };
+  return { ok: true, data: undefined };
 }
 
-export async function persistRecords(userId: string, prs: PersonalRecord[]) {
+export async function persistRecords(userId: string, prs: PersonalRecord[]): Promise<Result<void>> {
   const client = await getSupabaseClient();
-  if (!client) return;
-  if (prs.length === 0) return;
-  await client.from('personal_records').upsert(
+  if (!client) return { ok: true, data: undefined };
+  if (prs.length === 0) return { ok: true, data: undefined };
+  const { error } = await client.from('personal_records').upsert(
     prs.map((pr) => prToRow(userId, pr)),
     { onConflict: 'id' }
   );
+  if (error) return { ok: false, error: error.message };
+  return { ok: true, data: undefined };
 }
 
 export async function persistWeightHistory(
   userId: string,
   weightHistory: { date: string; weight: number }[]
-) {
+): Promise<Result<void>> {
   const client = await getSupabaseClient();
-  if (!client) return;
-  if (weightHistory.length === 0) return;
-  await client.from('weight_history').upsert(
+  if (!client) return { ok: true, data: undefined };
+  if (weightHistory.length === 0) return { ok: true, data: undefined };
+  const { error } = await client.from('weight_history').upsert(
     weightHistory.map((w) => weightToRow(userId, w)),
     { onConflict: 'user_id,date' }
   );
+  if (error) return { ok: false, error: error.message };
+  return { ok: true, data: undefined };
 }
 
-export async function persistChat(userId: string, messages: ChatMessage[]) {
+export async function persistChat(userId: string, messages: ChatMessage[]): Promise<Result<void>> {
   const client = await getSupabaseClient();
-  if (!client) return;
-  if (messages.length === 0) return;
-  await client.from('chat_messages').upsert(
+  if (!client) return { ok: true, data: undefined };
+  if (messages.length === 0) return { ok: true, data: undefined };
+  const { error } = await client.from('chat_messages').upsert(
     messages.map((m) => chatToRow(userId, m)),
     { onConflict: 'id' }
   );
+  if (error) return { ok: false, error: error.message };
+  return { ok: true, data: undefined };
 }
 
 /** Si el usuario (típicamente la demo) no tiene rutinas, sembra los datos demo. */

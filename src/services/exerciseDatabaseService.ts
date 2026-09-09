@@ -406,8 +406,9 @@ export function getExerciseByName(name: string): DatasetExercise | undefined {
   const needle = normalizeName(name);
   if (!needle) return undefined;
   return (
-    EXERCISE_DATABASE.find((e) => normalizeName(e.name).includes(needle)) ||
-    EXERCISE_DATABASE.find((e) => normalizeName(e.name) === needle)
+    EXERCISE_DATABASE.find((e) => normalizeName(e.name) === needle) ||
+    EXERCISE_DATABASE.find((e) => normalizeName(e.name).startsWith(needle)) ||
+    EXERCISE_DATABASE.find((e) => normalizeName(e.name).includes(needle))
   );
 }
 
