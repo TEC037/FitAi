@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Icon } from './Icon';
 
 interface ExerciseImageProps {
   /** GIF animado del dataset (Gym Visual). URL absoluta. */
@@ -57,9 +58,7 @@ export const ExerciseImage: React.FC<ExerciseImageProps> = ({
           className="w-full h-full object-contain"
         />
       ) : (
-        <span className="material-symbols-outlined text-[26px] text-[#444933] select-none">
-          fitness_center
-        </span>
+        <Icon name="fitness_center" size={26} className="text-[#444933] select-none" />
       )}
       {showAttribution && attribution && (
         <span className="absolute bottom-0.5 right-1.5 font-headline text-[8px] text-white/45 select-none pointer-events-none px-1 py-0.5 rounded bg-black/25">

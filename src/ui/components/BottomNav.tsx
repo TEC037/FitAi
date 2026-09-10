@@ -1,5 +1,6 @@
 import React from 'react';
 import { TabType } from '../types';
+import { Icon } from './Icon';
 
 interface BottomNavProps {
   currentTab: TabType;
@@ -13,10 +14,10 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   isTrainingActive = true,
 }) => {
   const tabs: { id: TabType; label: string; icon: string; liveDot?: boolean }[] = [
-    { id: 'hoy', label: 'Hoy', icon: 'space_dashboard' },
-    { id: 'entrenar', label: 'Entrenar', icon: 'fitness_center', liveDot: isTrainingActive },
-    { id: 'rutinas', label: 'Rutinas', icon: 'format_list_bulleted' },
-    { id: 'progreso', label: 'Progreso', icon: 'insights' },
+    { id: 'ejercicios', label: 'Ejercicios', icon: 'fitness_center' },
+    { id: 'rutina', label: 'Rutina', icon: 'format_list_bulleted' },
+    { id: 'entrenamiento', label: 'Entrenamiento', icon: 'play_circle_filled', liveDot: isTrainingActive },
+    { id: 'ajustes', label: 'Ajustes', icon: 'settings' },
   ];
 
   return (
@@ -40,9 +41,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               }`}
             >
               <div className="relative flex items-center justify-center">
-                <span className="material-symbols-outlined text-[22px]">
-                  {tab.icon}
-                </span>
+                <Icon name={tab.icon} size={22} />
                 {tab.liveDot && !isActive && (
                   <span className="absolute -top-1 -right-1.5 w-2 h-2 rounded-full bg-[#4ae176] animate-pulse" />
                 )}

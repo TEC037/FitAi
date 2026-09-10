@@ -405,7 +405,7 @@ function historyToEntries(history: WorkoutSessionLog[]): HistoryEntry[] {
     }
     const tag =
       s.averageRpe >= 8.5
-        ? `RPE ${s.averageRpe}`
+        ? `Esfuerzo ${s.averageRpe}`
         : s.totalVolumeKg > 10000
           ? 'Sobrecarga +5%'
           : 'Completado';

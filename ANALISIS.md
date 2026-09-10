@@ -1,4 +1,4 @@
-# FitAI — Análisis de Arquitectura
+# Punto Fuerte — Análisis de Arquitectura
 
 ## Grafo de dependencias (capas)
 

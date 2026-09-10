@@ -1,4 +1,4 @@
-# Auditoría de Deuda Técnica — FitAI
+# Auditoría de Deuda Técnica — Punto Fuerte
 
 > Septiembre 2026 · Fase: **Prototipo Hi-Fi → MVP**
 

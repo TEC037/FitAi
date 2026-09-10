@@ -1,4 +1,4 @@
-export type TabType = 'hoy' | 'entrenar' | 'rutinas' | 'progreso';
+export type TabType = 'ejercicios' | 'rutina' | 'entrenamiento' | 'ajustes';
 
 export interface ExerciseSet {
   id: number;

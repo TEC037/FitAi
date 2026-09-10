@@ -1,5 +1,6 @@
 import React from 'react';
 import { useUiData } from '../../data/store';
+import { Icon } from '../Icon';
 
 interface HistoryModalProps {
   isOpen: boolean;
@@ -15,9 +16,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose }) =
       <div className="w-full max-w-md rounded-2xl bg-[#1d2026] p-5 border border-white/[0.1] shadow-2xl flex flex-col gap-4 max-h-[85vh] overflow-y-auto">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#c3f400] text-[22px]">
-              history
-            </span>
+            <Icon name="history" size={22} className="text-[#c3f400]" />
             <h3 className="font-headline text-lg text-white font-bold">
               Historial de Entrenamientos
             </h3>
@@ -26,16 +25,14 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose }) =
             onClick={onClose}
             className="w-8 h-8 rounded-full flex items-center justify-center text-[#c4c9ac] hover:text-white hover:bg-[#272a31]"
           >
-            <span className="material-symbols-outlined text-[18px]">close</span>
+            <Icon name="close" size={18} />
           </button>
         </div>
 
         <div className="flex flex-col gap-2.5">
           {history.length === 0 ? (
             <div className="flex flex-col items-center gap-2 py-10 text-center">
-              <span className="material-symbols-outlined text-[32px] text-[#444933]">
-                history
-              </span>
+              <Icon name="history" size={32} className="text-[#444933]" />
               <p className="font-body text-sm text-[#c4c9ac]">
                 Aún no hay entrenamientos registrados.
               </p>
@@ -51,9 +48,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose }) =
                   className="w-10 h-10 rounded-lg flex items-center justify-center"
                   style={{ backgroundColor: `${w.color}20`, color: w.color }}
                 >
-                  <span className="material-symbols-outlined text-[20px]">
-                    {w.icon}
-                  </span>
+                  <Icon name={w.icon} size={20} />
                 </div>
                 <div className="flex flex-col">
                   <span className="font-headline text-sm text-white font-semibold">

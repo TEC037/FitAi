@@ -1,0 +1,229 @@
+- generic [ref=e26]:
+  - banner [ref=e27]:
+    - generic [ref=e28]:
+      - generic [ref=e29]:
+        - generic [ref=e33]: Punto Fuerte
+        - generic [ref=e34]: Ejemplo
+      - generic [ref=e35]:
+        - button "Notificaciones" [ref=e36]:
+          - generic [ref=e37]: notifications
+        - button "Perfil de usuario" [ref=e39]:
+          - generic [ref=e40]: A
+  - main [ref=e41]:
+    - generic [ref=e360]:
+      - generic [ref=e361]:
+        - generic [ref=e362]:
+          - generic [ref=e363]: Rendimiento Atlético
+          - generic [ref=e366]: Actualizado hoy
+        - generic [ref=e367]:
+          - heading "Progreso" [level=1] [ref=e368]
+          - generic [ref=e369]:
+            - generic [ref=e370]: local_fire_department
+            - text: "Racha: 5 días"
+        - generic [ref=e371]:
+          - button "Semana" [ref=e372] [cursor=pointer]
+          - button "Mes" [ref=e373] [cursor=pointer]
+          - button "3 Meses" [ref=e374] [cursor=pointer]
+          - button "Año" [ref=e375] [cursor=pointer]
+      - generic [ref=e377]:
+        - generic [ref=e378]:
+          - generic [ref=e379]:
+            - generic [ref=e380]: bolt
+            - generic [ref=e381]: Estado Óptimo
+          - paragraph [ref=e382]: Carga semanal superada
+          - paragraph [ref=e383]: Estás en el top 5% de regularidad en tu categoría.
+        - img "Atleta enfocado ajustando zapatillas en gimnasio" [ref=e385]
+      - generic [ref=e386]:
+        - generic [ref=e387]:
+          - generic [ref=e388]:
+            - generic [ref=e389]:
+              - generic [ref=e390]: fitness_center
+              - generic [ref=e392]: Volumen Levantado
+            - generic [ref=e393]:
+              - generic [ref=e394]: trending_up
+              - generic [ref=e395]: 7 sesiones
+          - generic [ref=e396]:
+            - generic [ref=e397]:
+              - generic [ref=e398]: "51.316"
+              - generic [ref=e399]: kg
+            - generic [ref=e400]: este septiembre
+        - generic [ref=e403]:
+          - generic [ref=e404]:
+            - generic [ref=e405]: Sesiones
+            - generic [ref=e406]: check
+          - generic [ref=e408]:
+            - generic [ref=e409]: "7"
+            - generic [ref=e410]: 75% del objetivo
+          - generic [ref=e411]: Cumplimiento semanal
+        - generic [ref=e412]:
+          - generic [ref=e413]:
+            - generic [ref=e414]: Tiempo Total
+            - generic [ref=e415]: schedule
+          - generic [ref=e417]:
+            - generic [ref=e418]: 6h 8m
+            - generic [ref=e419]: "Media: 53 min / entreno"
+          - generic [ref=e420]: Durante septiembre
+      - generic [ref=e421]:
+        - generic [ref=e422]:
+          - generic [ref=e423]:
+            - generic [ref=e424]: Distribución Semanal
+            - heading "Tonelaje por Semana" [level=2] [ref=e425]
+          - generic [ref=e426]: Carga real
+        - generic [ref=e430]:
+          - generic [ref=e431] [cursor=pointer]: S1
+          - generic [ref=e435] [cursor=pointer]: S2
+          - generic [ref=e439] [cursor=pointer]: S3
+          - generic [ref=e443] [cursor=pointer]: S4
+        - generic [ref=e447]:
+          - generic [ref=e448]:
+            - generic [ref=e449]: insights
+            - generic [ref=e450]: Semana 2
+          - generic [ref=e451]: 28.713 kg
+      - generic [ref=e452]:
+        - generic [ref=e453]:
+          - generic [ref=e454]:
+            - generic [ref=e455]: calendar_month
+            - generic [ref=e457]:
+              - heading "Constancia Mensual" [level=2] [ref=e458]
+              - generic [ref=e459]: "Septiembre: 7 días activos"
+          - generic [ref=e460]: 75% Éxito
+        - generic [ref=e461]:
+          - generic [ref=e462]: L
+          - generic [ref=e463]: M
+          - generic [ref=e464]: X
+          - generic [ref=e465]: J
+          - generic [ref=e466]: V
+          - generic [ref=e467]: S
+          - generic [ref=e468]: D
+        - generic [ref=e469]:
+          - generic [ref=e470]: "31"
+          - button "1" [ref=e471] [cursor=pointer]
+          - button "2" [ref=e473] [cursor=pointer]
+          - button "3" [ref=e474] [cursor=pointer]
+          - button "4" [ref=e476] [cursor=pointer]
+          - button "5" [ref=e477] [cursor=pointer]
+          - button "6" [ref=e479] [cursor=pointer]
+          - button "7" [ref=e481] [cursor=pointer]
+          - button "8" [ref=e483] [cursor=pointer]
+          - button "9" [ref=e485] [cursor=pointer]
+          - button "10" [ref=e486] [cursor=pointer]
+          - button "11" [ref=e487] [cursor=pointer]
+          - button "12" [ref=e488] [cursor=pointer]
+          - button "13" [ref=e489] [cursor=pointer]
+          - button "14" [ref=e490] [cursor=pointer]
+          - button "15" [ref=e491] [cursor=pointer]
+          - button "16" [ref=e492] [cursor=pointer]
+          - button "17" [ref=e493] [cursor=pointer]
+          - button "18" [ref=e494] [cursor=pointer]
+          - button "19" [ref=e495] [cursor=pointer]
+          - button "20" [ref=e496] [cursor=pointer]
+          - button "21" [ref=e497] [cursor=pointer]
+          - button "22" [ref=e498] [cursor=pointer]
+          - button "23" [ref=e499] [cursor=pointer]
+          - button "24" [ref=e500] [cursor=pointer]
+          - button "25" [ref=e501] [cursor=pointer]
+          - button "26" [ref=e502] [cursor=pointer]
+          - button "27" [ref=e503] [cursor=pointer]
+          - button "28" [ref=e504] [cursor=pointer]
+          - button "29" [ref=e505] [cursor=pointer]
+          - button "30" [ref=e506] [cursor=pointer]
+          - generic [ref=e507]: "1"
+          - generic [ref=e508]: "2"
+          - generic [ref=e509]: "3"
+          - generic [ref=e510]: "4"
+      - generic [ref=e511]:
+        - generic [ref=e512]:
+          - generic [ref=e513]: trophy
+          - heading "Récords Personales (1 repetición máxima)" [level=2] [ref=e514]
+        - generic [ref=e515]:
+          - generic [ref=e516]:
+            - generic [ref=e518]:
+              - generic [ref=e519]: fitness_center
+              - generic [ref=e521]:
+                - generic [ref=e522]:
+                  - generic [ref=e523]: Press de Banca
+                  - generic [ref=e524]:
+                    - generic [ref=e525]: emoji_events
+                    - text: Récord nuevo
+                - generic [ref=e526]: Récord superado hace 4 días (+2.5 kg)
+            - generic [ref=e527]:
+              - generic [ref=e528]:
+                - generic [ref=e529]: "105"
+                - generic [ref=e530]: kg
+              - generic [ref=e531]: 1 rep máx
+          - generic [ref=e532]:
+            - generic [ref=e533]:
+              - generic [ref=e534]: downhill_skiing
+              - generic [ref=e536]:
+                - generic [ref=e537]: Sentadilla Profunda
+                - generic [ref=e538]: "Último test: hace 2 semanas"
+            - generic [ref=e539]:
+              - generic [ref=e540]:
+                - generic [ref=e541]: "140"
+                - generic [ref=e542]: kg
+              - generic [ref=e543]: 1 rep máx
+          - generic [ref=e544]:
+            - generic [ref=e545]:
+              - generic [ref=e546]: vertical_align_top
+              - generic [ref=e548]:
+                - generic [ref=e549]: Peso Muerto Convencional
+                - generic [ref=e550]: "Último test: hace 1 mes"
+            - generic [ref=e551]:
+              - generic [ref=e552]:
+                - generic [ref=e553]: "175"
+                - generic [ref=e554]: kg
+              - generic [ref=e555]: 1 rep máx
+          - generic [ref=e556]:
+            - generic [ref=e557]:
+              - generic [ref=e558]: upload
+              - generic [ref=e560]:
+                - generic [ref=e561]: Press Militar
+                - generic [ref=e562]: "Último test: hace 3 semanas"
+            - generic [ref=e563]:
+              - generic [ref=e564]:
+                - generic [ref=e565]: "65"
+                - generic [ref=e566]: kg
+              - generic [ref=e567]: 1 rep máx
+      - generic [ref=e568]:
+        - generic [ref=e569]:
+          - generic [ref=e570]:
+            - generic [ref=e571]: monitor_weight
+            - generic [ref=e573]:
+              - heading "Peso Corporal" [level=2] [ref=e574]
+              - text: Definición controlada
+          - generic [ref=e575]:
+            - generic [ref=e576]: arrow_downward
+            - generic [ref=e577]: "-0.4 kg"
+        - generic [ref=e579]:
+          - generic [ref=e580]:
+            - generic [ref=e581]: "78.2"
+            - generic [ref=e582]: kg
+          - generic [ref=e583]: Últimos 30 días
+        - generic [ref=e591]:
+          - generic [ref=e592]:
+            - generic [ref=e593]: water_drop
+            - generic [ref=e594]:
+              - generic [ref=e595]: Grasa Estimada
+              - generic [ref=e596]: —
+          - generic [ref=e597]:
+            - generic [ref=e598]: accessibility_new
+            - generic [ref=e599]:
+              - generic [ref=e600]: Masa Magra
+              - generic [ref=e601]: —
+      - button "share Exportar Informe de Rendimiento (.PDF)" [ref=e603] [cursor=pointer]:
+        - generic [ref=e604]: share
+        - text: Exportar Informe de Rendimiento (.PDF)
+  - navigation [ref=e176]:
+    - generic [ref=e177]:
+      - button "space_dashboard Hoy" [ref=e178]:
+        - generic [ref=e179]: space_dashboard
+        - generic [ref=e181]: Hoy
+      - button "fitness_center Entrenar" [ref=e182]:
+        - generic [ref=e183]: fitness_center
+        - generic [ref=e186]: Entrenar
+      - button "format_list_bulleted Rutinas" [ref=e187]:
+        - generic [ref=e188]: format_list_bulleted
+        - generic [ref=e190]: Rutinas
+      - button "insights Progreso" [active] [ref=e191]:
+        - generic [ref=e192]: insights
+        - generic [ref=e194]: Progreso

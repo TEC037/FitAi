@@ -1,0 +1,32 @@
+[     253ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5174/node_modules/.vite/deps/react-dom_client.js?v=313fce33:14335
+[     381ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5174/favicon.ico:0
+[     709ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://localhost:5174/:0
+[   10005ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://qwdfqyattichetaiwlbk.supabase.co/auth/v1/token?grant_type=password:0
+[  487622ms] [ERROR] Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem. @ http://localhost:5174/node_modules/.vite/deps/react.js?v=264840fd:296
+[  487638ms] [ERROR] Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem. @ http://localhost:5174/node_modules/.vite/deps/react.js?v=264840fd:296
+[  487649ms] TypeError: Cannot read properties of null (reading 'useContext')
+    at exports.useContext (http://localhost:5174/node_modules/.vite/deps/react.js?v=264840fd:706:22)
+    at useLucideContext (http://localhost:5174/node_modules/.vite/deps/lucide-react.js?v=f4d5fdc2:100:58)
+    at http://localhost:5174/node_modules/.vite/deps/lucide-react.js?v=f4d5fdc2:110:199
+    at Object.react_stack_bottom_frame (http://localhost:5174/node_modules/.vite/deps/react-dom_client.js?v=313fce33:12866:12)
+    at renderWithHooks (http://localhost:5174/node_modules/.vite/deps/react-dom_client.js?v=313fce33:4213:19)
+    at updateForwardRef (http://localhost:5174/node_modules/.vite/deps/react-dom_client.js?v=313fce33:5396:16)
+    at beginWork (http://localhost:5174/node_modules/.vite/deps/react-dom_client.js?v=313fce33:6204:21)
+    at runWithFiberInDEV (http://localhost:5174/node_modules/.vite/deps/react-dom_client.js?v=313fce33:851:66)
+    at performUnitOfWork (http://localhost:5174/node_modules/.vite/deps/react-dom_client.js?v=313fce33:8429:92)
+    at workLoopSync (http://localhost:5174/node_modules/.vite/deps/react-dom_client.js?v=313fce33:8325:37)
+[  487645ms] [WARNING] %s
+
+%s
+ An error occurred in the <ForwardRef> component. Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries. @ http://localhost:5174/node_modules/.vite/deps/react-dom_client.js?v=313fce33:5257
+[  488550ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5174/node_modules/.vite/deps/react-dom_client.js?v=264840fd:14335
+[  489021ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://localhost:5174/:0

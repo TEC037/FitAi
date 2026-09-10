@@ -13,25 +13,28 @@ describe('App (Punto Fuerte)', () => {
     expect(screen.getByText('Punto Fuerte')).toBeInTheDocument();
   });
 
-  it('abre por defecto en la pestaña Hoy', () => {
+  it('abre por defecto en la pestaña Ejercicios', () => {
     render(<App />);
-    expect(screen.getByRole('heading', { name: /¡A por ello, Carlos!/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Hoy/i })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('heading', { name: /Ejercicios/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Ejercicios/i })).toHaveAttribute('aria-current', 'page');
   });
 
-  it('navega por las pestañas inferiores', () => {
+  it('navega por las 4 pestañas inferiores (Ejercicios, Rutina, Entrenamiento, Ajustes)', () => {
     render(<App />);
 
-    fireEvent.click(screen.getByRole('button', { name: /Entrenar/i }));
-    expect(screen.getByText(/En Vivo/i)).toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole('button', { name: /Rutinas/i }));
+    fireEvent.click(screen.getByRole('button', { name: /^Rutina$/i }));
     expect(
       screen.getByPlaceholderText(/Buscar por ejercicio, músculo o rutina/)
     ).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: /Progreso/i }));
-    expect(screen.getByRole('heading', { name: /Progreso/i })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /^Entrenamiento$/i }));
+    expect(screen.getByText(/En Vivo/i)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /^Ajustes$/i }));
+    expect(screen.getByRole('heading', { name: /Ajustes/i })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /^Ejercicios$/i }));
+    expect(screen.getByRole('heading', { name: /Ejercicios/i })).toBeInTheDocument();
   });
 
   it('abre el modal de notificaciones desde el header', () => {
@@ -46,9 +49,10 @@ describe('App (Punto Fuerte)', () => {
     expect(screen.getByText('Perfil de Atleta')).toBeInTheDocument();
   });
 
-  it('abre el modal de peso desde la acción rápida de Hoy', () => {
+  it('abre el modal de peso desde la acción rápida de Ajustes', () => {
     render(<App />);
-    fireEvent.click(screen.getByRole('button', { name: /Registrar peso/i }));
+    fireEvent.click(screen.getByRole('button', { name: /^Ajustes$/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Peso:/i }));
     expect(screen.getByRole('heading', { name: /Registrar Peso/i })).toBeInTheDocument();
   });
 });

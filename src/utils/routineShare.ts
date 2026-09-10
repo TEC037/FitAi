@@ -29,9 +29,9 @@ function renderDay(day: DailyRoutine): string {
 
 export function formatRoutineForSharing(routines: DailyRoutine[]): string {
   if (routines.length === 0) {
-    return 'Mi rutina en FitAI: todavía no tengo ejercicios añadidos.';
+    return 'Mi rutina en Punto Fuerte: todavía no tengo ejercicios añadidos.';
   }
-  const header = 'Mi Rutina FitAI';
+  const header = 'Mi Rutina Punto Fuerte';
   const divider = '='.repeat(header.length);
   const days = [...routines]
     .sort((a, b) => a.dayNumber - b.dayNumber)

@@ -151,7 +151,7 @@ interface PickItem {
 const FALLBACK_POOL: PickItem[] = MOCK_ROUTINES.flatMap((day) =>
   day.exercises.map((ex) => ({
     exercise: { ...ex },
-    tokens: inferEquipmentTokens(ex.equipment),
+    tokens: inferEquipmentTokens(typeof ex.equipment === 'string' ? ex.equipment : ex.equipment.join(' ')),
     kind: 'mock' as const,
     names: [...(ex.targetMuscles ?? []), ex.primaryMuscle],
   }))

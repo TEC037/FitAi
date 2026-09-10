@@ -1,0 +1,182 @@
+- generic [ref=f2e23]:
+  - banner [ref=f2e24]:
+    - generic [ref=f2e25]:
+      - generic [ref=f2e26]:
+        - generic [ref=f2e30]: Punto Fuerte
+        - generic [ref=f2e31]: Ejemplo
+      - generic [ref=f2e32]:
+        - button "Notificaciones" [ref=f2e33]
+        - button "Perfil de usuario" [ref=f2e38]:
+          - generic [ref=f2e39]: A
+  - main [ref=f2e40]:
+    - generic [ref=f2e495]:
+      - generic [ref=f2e496]:
+        - generic [ref=f2e497]:
+          - generic [ref=f2e498]: Rendimiento Atlético
+          - generic [ref=f2e501]: Actualizado hoy
+        - generic [ref=f2e502]:
+          - heading "Progreso" [level=1] [ref=f2e503]
+          - generic [ref=f2e504]: "Racha: 5 días"
+        - generic [ref=f2e507]:
+          - button "Semana" [ref=f2e508] [cursor=pointer]
+          - button "Mes" [ref=f2e509] [cursor=pointer]
+          - button "3 Meses" [ref=f2e510] [cursor=pointer]
+          - button "Año" [ref=f2e511] [cursor=pointer]
+      - generic [ref=f2e513]:
+        - generic [ref=f2e514]:
+          - generic [ref=f2e515]: Estado Óptimo
+          - paragraph [ref=f2e519]: Carga semanal superada
+          - paragraph [ref=f2e520]: Estás en el top 5% de regularidad en tu categoría.
+        - img "Atleta enfocado ajustando zapatillas en gimnasio" [ref=f2e522]
+      - generic [ref=f2e523]:
+        - generic [ref=f2e524]:
+          - generic [ref=f2e525]:
+            - generic [ref=f2e526]: Volumen Levantado
+            - generic [ref=f2e535]: 7 sesiones
+          - generic [ref=f2e540]:
+            - generic [ref=f2e541]:
+              - generic [ref=f2e542]: "51.316"
+              - generic [ref=f2e543]: kg
+            - generic [ref=f2e544]: este septiembre
+        - generic [ref=f2e547]:
+          - generic [ref=f2e548]: Sesiones
+          - generic [ref=f2e553]:
+            - generic [ref=f2e554]: "7"
+            - generic [ref=f2e555]: 75% del objetivo
+          - generic [ref=f2e556]: Cumplimiento semanal
+        - generic [ref=f2e557]:
+          - generic [ref=f2e558]: Tiempo Total
+          - generic [ref=f2e564]:
+            - generic [ref=f2e565]: 6h 8m
+            - generic [ref=f2e566]: "Media: 53 min / entreno"
+          - generic [ref=f2e567]: Durante septiembre
+      - generic [ref=f2e568]:
+        - generic [ref=f2e569]:
+          - generic [ref=f2e570]:
+            - generic [ref=f2e571]: Distribución Semanal
+            - heading "Tonelaje por Semana" [level=2] [ref=f2e572]
+          - generic [ref=f2e573]: Carga real
+        - generic [ref=f2e577]:
+          - generic [ref=f2e578] [cursor=pointer]: S1
+          - generic [ref=f2e582] [cursor=pointer]: S2
+          - generic [ref=f2e586] [cursor=pointer]: S3
+          - generic [ref=f2e590] [cursor=pointer]: S4
+        - generic [ref=f2e594]:
+          - generic [ref=f2e595]: Semana 2
+          - generic [ref=f2e599]: 28.713 kg
+      - generic [ref=f2e600]:
+        - generic [ref=f2e601]:
+          - generic [ref=f2e606]:
+            - heading "Constancia Mensual" [level=2] [ref=f2e607]
+            - generic [ref=f2e608]: "Septiembre: 7 días activos"
+          - generic [ref=f2e609]: 75% Éxito
+        - generic [ref=f2e610]:
+          - generic [ref=f2e611]: L
+          - generic [ref=f2e612]: M
+          - generic [ref=f2e613]: X
+          - generic [ref=f2e614]: J
+          - generic [ref=f2e615]: V
+          - generic [ref=f2e616]: S
+          - generic [ref=f2e617]: D
+        - generic [ref=f2e618]:
+          - generic [ref=f2e619]: "31"
+          - button "1" [ref=f2e620] [cursor=pointer]
+          - button "2" [ref=f2e622] [cursor=pointer]
+          - button "3" [ref=f2e623] [cursor=pointer]
+          - button "4" [ref=f2e625] [cursor=pointer]
+          - button "5" [ref=f2e626] [cursor=pointer]
+          - button "6" [ref=f2e628] [cursor=pointer]
+          - button "7" [ref=f2e630] [cursor=pointer]
+          - button "8" [ref=f2e632] [cursor=pointer]
+          - button "9" [ref=f2e634] [cursor=pointer]
+          - button "10" [ref=f2e635] [cursor=pointer]
+          - button "11" [ref=f2e636] [cursor=pointer]
+          - button "12" [ref=f2e637] [cursor=pointer]
+          - button "13" [ref=f2e638] [cursor=pointer]
+          - button "14" [ref=f2e639] [cursor=pointer]
+          - button "15" [ref=f2e640] [cursor=pointer]
+          - button "16" [ref=f2e641] [cursor=pointer]
+          - button "17" [ref=f2e642] [cursor=pointer]
+          - button "18" [ref=f2e643] [cursor=pointer]
+          - button "19" [ref=f2e644] [cursor=pointer]
+          - button "20" [ref=f2e645] [cursor=pointer]
+          - button "21" [ref=f2e646] [cursor=pointer]
+          - button "22" [ref=f2e647] [cursor=pointer]
+          - button "23" [ref=f2e648] [cursor=pointer]
+          - button "24" [ref=f2e649] [cursor=pointer]
+          - button "25" [ref=f2e650] [cursor=pointer]
+          - button "26" [ref=f2e651] [cursor=pointer]
+          - button "27" [ref=f2e652] [cursor=pointer]
+          - button "28" [ref=f2e653] [cursor=pointer]
+          - button "29" [ref=f2e654] [cursor=pointer]
+          - button "30" [ref=f2e655] [cursor=pointer]
+          - generic [ref=f2e656]: "1"
+          - generic [ref=f2e657]: "2"
+          - generic [ref=f2e658]: "3"
+          - generic [ref=f2e659]: "4"
+      - generic [ref=f2e660]:
+        - heading "Récords Personales (1 repetición máxima)" [level=2] [ref=f2e668]
+        - generic [ref=f2e669]:
+          - generic [ref=f2e670]:
+            - generic [ref=f2e680]:
+              - generic [ref=f2e681]:
+                - generic [ref=f2e682]: Press de Banca
+                - generic [ref=f2e683]: Récord nuevo
+              - generic [ref=f2e690]: Récord superado hace 4 días (+2.5 kg)
+            - generic [ref=f2e691]:
+              - generic [ref=f2e692]:
+                - generic [ref=f2e693]: "105"
+                - generic [ref=f2e694]: kg
+              - generic [ref=f2e695]: 1 rep máx
+          - generic [ref=f2e696]:
+            - generic [ref=f2e712]:
+              - generic [ref=f2e713]: Sentadilla Profunda
+              - generic [ref=f2e714]: "Último test: hace 2 semanas"
+            - generic [ref=f2e715]:
+              - generic [ref=f2e716]:
+                - generic [ref=f2e717]: "140"
+                - generic [ref=f2e718]: kg
+              - generic [ref=f2e719]: 1 rep máx
+          - generic [ref=f2e720]:
+            - generic [ref=f2e725]:
+              - generic [ref=f2e726]: Peso Muerto Convencional
+              - generic [ref=f2e727]: "Último test: hace 1 mes"
+            - generic [ref=f2e728]:
+              - generic [ref=f2e729]:
+                - generic [ref=f2e730]: "175"
+                - generic [ref=f2e731]: kg
+              - generic [ref=f2e732]: 1 rep máx
+          - generic [ref=f2e733]:
+            - generic [ref=f2e739]:
+              - generic [ref=f2e740]: Press Militar
+              - generic [ref=f2e741]: "Último test: hace 3 semanas"
+            - generic [ref=f2e742]:
+              - generic [ref=f2e743]:
+                - generic [ref=f2e744]: "65"
+                - generic [ref=f2e745]: kg
+              - generic [ref=f2e746]: 1 rep máx
+      - generic [ref=f2e747]:
+        - generic [ref=f2e748]:
+          - generic [ref=f2e755]:
+            - heading "Peso Corporal" [level=2] [ref=f2e756]
+            - text: Definición controlada
+          - generic [ref=f2e757]: "-0.4 kg"
+        - generic [ref=f2e762]:
+          - generic [ref=f2e763]:
+            - generic [ref=f2e764]: "78.2"
+            - generic [ref=f2e765]: kg
+          - generic [ref=f2e766]: Últimos 30 días
+        - generic [ref=f2e774]:
+          - generic [ref=f2e779]:
+            - generic [ref=f2e780]: Grasa Estimada
+            - generic [ref=f2e781]: —
+          - generic [ref=f2e789]:
+            - generic [ref=f2e790]: Masa Magra
+            - generic [ref=f2e791]: —
+      - button "Exportar Informe de Rendimiento (.PDF)" [ref=f2e793] [cursor=pointer]
+  - navigation [ref=f2e219]:
+    - generic [ref=f2e220]:
+      - button "Hoy" [ref=f2e221]
+      - button "Entrenar" [ref=f2e229]
+      - button "Rutinas" [ref=f2e239]
+      - button "Progreso" [active] [ref=f2e243]

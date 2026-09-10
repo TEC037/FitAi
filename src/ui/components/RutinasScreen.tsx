@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Routine } from '../types';
 import { useUiData } from '../data/store';
+import { Icon } from './Icon';
 
 interface RutinasScreenProps {
   onStartRoutine: (routine: Routine) => void;
@@ -23,8 +24,8 @@ export const RutinasScreen: React.FC<RutinasScreenProps> = ({
   const categories = [
     { id: 'all', label: 'Todas' },
     { id: 'fuerza', label: 'Fuerza & Hipertrofia' },
-    { id: 'cardio', label: 'Cardio / HIIT' },
-    { id: 'ppl', label: 'PPL (Push Pull Legs)' },
+    { id: 'cardio', label: 'Cardio / Intervalos' },
+    { id: 'ppl', label: 'Empuje · Tirón · Pierna' },
     { id: 'movilidad', label: 'Movilidad' },
   ];
 
@@ -68,9 +69,7 @@ export const RutinasScreen: React.FC<RutinasScreenProps> = ({
       <div className="flex flex-col w-full max-w-2xl mx-auto pb-32 pt-10 min-h-screen">
         <section className="px-4 flex flex-col items-center text-center gap-3">
           <div className="w-20 h-20 rounded-full bg-[#272a31] flex items-center justify-center text-[#c4c9ac]">
-            <span className="material-symbols-outlined text-[40px]">
-              fitness_center
-            </span>
+            <Icon name="fitness_center" size={40} />
           </div>
           <h3 className="font-headline text-xl text-white font-bold">
             Tu plan aún no tiene rutinas
@@ -96,7 +95,7 @@ export const RutinasScreen: React.FC<RutinasScreenProps> = ({
             type="button"
             className="pointer-events-auto w-full py-3.5 px-6 rounded-full bg-[#c3f400] text-[#161e00] font-headline text-sm sm:text-base font-bold shadow-[0_4px_24px_rgba(195,244,0,0.38)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 hover:brightness-105 cursor-pointer"
           >
-            <span className="material-symbols-outlined text-[24px]">add_circle</span>
+            <Icon name="add_circle" size={24} />
             <span>Crear Rutina Personalizada</span>
           </button>
         </div>
@@ -116,7 +115,7 @@ export const RutinasScreen: React.FC<RutinasScreenProps> = ({
       <section className="px-4 flex flex-col gap-3">
         <div className="relative w-full">
           <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#c4c9ac]">
-            <span className="material-symbols-outlined text-[20px]">search</span>
+            <Icon name="search" size={20} />
           </div>
           <input
             id="search-routines-input"
@@ -133,7 +132,7 @@ export const RutinasScreen: React.FC<RutinasScreenProps> = ({
               onClick={() => setSearchQuery('')}
               className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#c4c9ac] hover:text-white transition-colors cursor-pointer"
             >
-              <span className="material-symbols-outlined text-[18px]">close</span>
+              <Icon name="close" size={18} />
             </button>
           )}
         </div>
@@ -174,12 +173,7 @@ export const RutinasScreen: React.FC<RutinasScreenProps> = ({
 
             <div className="absolute top-3 left-3">
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#c3f400] text-[#161e00] font-headline text-[10px] uppercase tracking-wider font-bold shadow-sm">
-                <span
-                  className="material-symbols-outlined text-[13px]"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  local_fire_department
-                </span>
+                <Icon name="local_fire_department" size={13} />
                 Más Popular
               </span>
             </div>
@@ -194,12 +188,7 @@ export const RutinasScreen: React.FC<RutinasScreenProps> = ({
                   bookmarked ? 'text-[#c3f400]' : 'text-white hover:text-[#c3f400]'
                 }`}
               >
-                <span
-                  className="material-symbols-outlined text-[18px]"
-                  style={bookmarked ? { fontVariationSettings: "'FILL' 1" } : {}}
-                >
-                  bookmark
-                </span>
+                <Icon name="bookmark" size={18} />
               </button>
             </div>
           </div>
@@ -215,17 +204,13 @@ export const RutinasScreen: React.FC<RutinasScreenProps> = ({
             <div className="flex items-center justify-between mt-2 pt-2 bg-[#0b0e14]/60 rounded-xl px-3 py-2 border border-white/[0.04]">
               <div className="flex items-center gap-3 sm:gap-4">
                 <div className="flex items-center gap-1 text-[#c4c9ac]">
-                  <span className="material-symbols-outlined text-[16px] text-[#c3f400]">
-                    timer
-                  </span>
+                  <Icon name="timer" size={16} className="text-[#c3f400]" />
                   <span className="font-headline text-xs text-white font-semibold">
                     {featuredRoutine.durationMinutes} min/sesión
                   </span>
                 </div>
                 <div className="flex items-center gap-1 text-[#c4c9ac]">
-                  <span className="material-symbols-outlined text-[16px] text-[#4ae176]">
-                    calendar_month
-                  </span>
+                  <Icon name="calendar_month" size={16} className="text-[#4ae176]" />
                   <span className="font-headline text-xs text-white font-semibold">
                     {featuredRoutine.daysPerWeek ?? 4} días/sem
                   </span>
@@ -239,9 +224,7 @@ export const RutinasScreen: React.FC<RutinasScreenProps> = ({
                 className="flex items-center gap-1 text-[#c3f400] font-headline text-xs font-bold hover:underline cursor-pointer"
               >
                 <span>Iniciar</span>
-                <span className="material-symbols-outlined text-[16px]">
-                  arrow_forward
-                </span>
+                <Icon name="arrow_forward" size={16} />
               </button>
             </div>
           </div>
@@ -268,7 +251,7 @@ export const RutinasScreen: React.FC<RutinasScreenProps> = ({
           type="button"
           className="flex items-center gap-1 text-[#c4c9ac] hover:text-white transition-colors font-headline text-xs font-semibold cursor-pointer"
         >
-          <span className="material-symbols-outlined text-[18px]">swap_vert</span>
+          <Icon name="swap_vert" size={18} />
           <span>
             {sortOrder === 'asc' ? 'Duración ↑' : sortOrder === 'desc' ? 'Duración ↓' : 'Dificultad'}
           </span>
@@ -306,12 +289,10 @@ export const RutinasScreen: React.FC<RutinasScreenProps> = ({
                         : 'text-[#4ae176]'
                     }`}
                   >
-                    <span
-                      className="material-symbols-outlined text-[13px]"
-                      style={{ fontVariationSettings: "'FILL' 1" }}
-                    >
-                      {routine.difficulty === 'Extrema' ? 'whatshot' : 'bolt'}
-                    </span>
+<Icon
+                      name={routine.difficulty === 'Extrema' ? 'whatshot' : 'bolt'}
+                      size={13}
+                    />
                     {routine.difficulty}
                   </span>
                 </div>
@@ -326,24 +307,18 @@ export const RutinasScreen: React.FC<RutinasScreenProps> = ({
                 type="button"
                 className="w-8 h-8 rounded-full flex items-center justify-center text-[#c4c9ac] hover:text-white hover:bg-[#272a31] transition-colors cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[20px]">
-                  more_vert
-                </span>
+                <Icon name="more_vert" size={20} />
               </button>
             </div>
 
             <div className="mt-3 flex items-center justify-between text-[#c4c9ac]">
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1 font-body text-xs">
-                  <span className="material-symbols-outlined text-[16px]">
-                    fitness_center
-                  </span>
+                  <Icon name="fitness_center" size={16} />
                   <span>{routine.exercisesCount} ejercicios</span>
                 </div>
                 <div className="flex items-center gap-1 font-body text-xs">
-                  <span className="material-symbols-outlined text-[16px]">
-                    schedule
-                  </span>
+                  <Icon name="schedule" size={16} />
                   <span>{routine.durationMinutes} min</span>
                 </div>
               </div>
@@ -355,9 +330,7 @@ export const RutinasScreen: React.FC<RutinasScreenProps> = ({
                     key={i}
                     className="w-6 h-6 rounded-md bg-[#272a31] flex items-center justify-center text-[#c4c9ac] group-hover:text-[#c3f400] transition-colors"
                   >
-                    <span className="material-symbols-outlined text-[14px]">
-                      {icon}
-                    </span>
+                    <Icon name={icon} size={14} />
                   </span>
                 ))}
               </div>
@@ -404,9 +377,7 @@ export const RutinasScreen: React.FC<RutinasScreenProps> = ({
             className="px-4 py-12 flex flex-col items-center justify-center text-center bg-[#1d2026] rounded-2xl border border-white/[0.04]"
           >
             <div className="w-16 h-16 rounded-full bg-[#272a31] flex items-center justify-center text-[#c4c9ac] mb-3">
-              <span className="material-symbols-outlined text-[32px]">
-                manage_search
-              </span>
+              <Icon name="manage_search" size={32} />
             </div>
             <h5 className="font-headline text-base text-white font-bold">
               No se encontraron rutinas
@@ -437,7 +408,7 @@ export const RutinasScreen: React.FC<RutinasScreenProps> = ({
           type="button"
           className="pointer-events-auto w-full py-3.5 px-6 rounded-full bg-[#c3f400] text-[#161e00] font-headline text-sm sm:text-base font-bold shadow-[0_4px_24px_rgba(195,244,0,0.38)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 hover:brightness-105 cursor-pointer"
         >
-          <span className="material-symbols-outlined text-[24px]">add_circle</span>
+          <Icon name="add_circle" size={24} />
           <span>Crear Rutina Personalizada</span>
         </button>
       </div>

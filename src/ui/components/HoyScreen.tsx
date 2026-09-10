@@ -1,5 +1,6 @@
 import React from 'react';
 import { useUiData } from '../data/store';
+import { Icon } from './Icon';
 
 interface HoyScreenProps {
   onStartWorkout: () => void;
@@ -74,12 +75,7 @@ export const HoyScreen: React.FC<HoyScreenProps> = ({
             <span className="font-headline text-[10px] text-[#c4c9ac] uppercase tracking-wider font-bold">
               Hoy
             </span>
-            <span
-              className="material-symbols-outlined text-[18px] text-[#c3f400]"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              local_fire_department
-            </span>
+            <Icon name="local_fire_department" size={18} className="text-[#c3f400]" />
           </div>
           <div className="flex flex-col">
             <span className="font-headline text-lg text-white font-bold tracking-tight">
@@ -97,9 +93,7 @@ export const HoyScreen: React.FC<HoyScreenProps> = ({
             <span className="font-headline text-[10px] text-[#c4c9ac] uppercase tracking-wider font-bold">
               Semana
             </span>
-            <span className="material-symbols-outlined text-[18px] text-[#7bd0ff]">
-              timer
-            </span>
+            <Icon name="timer" size={18} className="text-[#7bd0ff]" />
           </div>
           <div className="flex flex-col">
             <span className="font-headline text-lg text-white font-bold tracking-tight">
@@ -120,7 +114,7 @@ export const HoyScreen: React.FC<HoyScreenProps> = ({
         <div className="relative p-4 sm:p-5 flex flex-col gap-3.5">
           <div className="flex items-center justify-between">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#c3f400]/15 text-[#c3f400] font-headline text-[11px] font-semibold tracking-wider uppercase border border-[#c3f400]/20">
-              <span className="material-symbols-outlined text-[15px]">bolt</span>
+<Icon name="bolt" size={15} />
               Siguiente Sesión
             </span>
             <span className="font-headline text-xs text-[#c4c9ac]">
@@ -134,16 +128,12 @@ export const HoyScreen: React.FC<HoyScreenProps> = ({
             </h2>
             <div className="flex items-center flex-wrap gap-2 text-xs text-[#c4c9ac]">
               <span className="flex items-center gap-1 text-white font-medium">
-                <span className="material-symbols-outlined text-[16px] text-[#c3f400]">
-                  schedule
-                </span>
+                <Icon name="schedule" size={16} className="text-[#c3f400]" />
                 {session.durationLabel}
               </span>
               <span>•</span>
               <span className="flex items-center gap-1">
-                <span className="material-symbols-outlined text-[16px]">
-                  fitness_center
-                </span>
+                <Icon name="fitness_center" size={16} />
                 {session.exercisesCount} ejercicios
               </span>
               <span>•</span>
@@ -175,12 +165,7 @@ export const HoyScreen: React.FC<HoyScreenProps> = ({
             type="button"
             className="w-full h-13 py-3 rounded-full bg-[#c3f400] text-[#161e00] font-headline text-base font-bold flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(195,244,0,0.35)] hover:brightness-105 active:scale-[0.98] transition-all cursor-pointer"
           >
-            <span
-              className="material-symbols-outlined text-[24px]"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              play_arrow
-            </span>
+            <Icon name="play_arrow" size={24} />
             <span>Comenzar Entrenamiento Ahora</span>
           </button>
         </div>
@@ -189,7 +174,7 @@ export const HoyScreen: React.FC<HoyScreenProps> = ({
       <section className="relative overflow-hidden rounded-2xl bg-[#1d2026] border border-white/[0.06] shadow-md">
         <div className="p-4 sm:p-5 flex flex-col gap-3">
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#c4c9ac]/15 text-[#c4c9ac] font-headline text-[11px] font-semibold tracking-wider uppercase border border-white/[0.08]">
-            <span className="material-symbols-outlined text-[15px]">bolt</span>
+            <Icon name="bolt" size={15} />
             Siguiente Sesión
           </span>
           <div className="flex flex-col gap-1">
@@ -209,9 +194,7 @@ export const HoyScreen: React.FC<HoyScreenProps> = ({
       <section className="flex flex-col gap-3 p-4 rounded-xl bg-[#1d2026] border border-white/[0.05] shadow-md">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[20px] text-[#c3f400]">
-              event_available
-            </span>
+            <Icon name="event_available" size={20} className="text-[#c3f400]" />
             <h3 className="font-headline text-base text-white font-bold">
               Consistencia Semanal
             </h3>
@@ -249,13 +232,9 @@ export const HoyScreen: React.FC<HoyScreenProps> = ({
                 }`}
               >
                 {item.completed ? (
-                  <span className="material-symbols-outlined text-[16px] font-bold">
-                    check
-                  </span>
+                  <Icon name="check" size={16} />
                 ) : item.isToday ? (
-                  <span className="material-symbols-outlined text-[16px] font-bold">
-                    fitness_center
-                  </span>
+                  <Icon name="fitness_center" size={16} />
                 ) : (
                   <span className="w-2 h-2 rounded-full bg-[#444933]"></span>
                 )}
@@ -291,9 +270,7 @@ export const HoyScreen: React.FC<HoyScreenProps> = ({
                   className="w-11 h-11 rounded-lg bg-[#272a31] flex items-center justify-center"
                   style={{ color: item.color }}
                 >
-                  <span className="material-symbols-outlined text-[22px]">
-                    {item.icon}
-                  </span>
+                  <Icon name={item.icon} size={22} />
                 </div>
                 <div className="flex flex-col">
                   <span className="font-headline text-sm text-white font-semibold">
@@ -309,9 +286,7 @@ export const HoyScreen: React.FC<HoyScreenProps> = ({
                   <span
                     className="px-2 py-0.5 rounded-full bg-[#4ae176]/15 text-[#4ae176] font-headline text-[10px] font-bold flex items-center gap-1 border border-[#4ae176]/20"
                   >
-                    <span className="material-symbols-outlined text-[13px]">
-                      emoji_events
-                    </span>
+                    <Icon name="emoji_events" size={13} />
                     {item.tag}
                   </span>
                 ) : (
@@ -341,9 +316,7 @@ export const HoyScreen: React.FC<HoyScreenProps> = ({
             className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-[#1d2026] hover:bg-[#272a31] border border-white/[0.05] transition-all active:scale-95 text-center cursor-pointer group"
           >
             <div className="w-10 h-10 rounded-full bg-[#272a31] group-hover:bg-[#101319] flex items-center justify-center text-[#c3f400] transition-colors">
-              <span className="material-symbols-outlined text-[20px]">
-                monitor_weight
-              </span>
+              <Icon name="monitor_weight" size={20} />
             </div>
             <span className="font-headline text-xs text-[#e1e2eb] font-semibold leading-tight">
               Registrar Peso
@@ -357,9 +330,7 @@ export const HoyScreen: React.FC<HoyScreenProps> = ({
             className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-[#1d2026] hover:bg-[#272a31] border border-white/[0.05] transition-all active:scale-95 text-center cursor-pointer group"
           >
             <div className="w-10 h-10 rounded-full bg-[#272a31] group-hover:bg-[#101319] flex items-center justify-center text-[#4ae176] transition-colors">
-              <span className="material-symbols-outlined text-[20px]">
-                restaurant
-              </span>
+              <Icon name="restaurant" size={20} />
             </div>
             <span className="font-headline text-xs text-[#e1e2eb] font-semibold leading-tight">
               Comida Rápida
@@ -373,9 +344,7 @@ export const HoyScreen: React.FC<HoyScreenProps> = ({
             className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-[#1d2026] hover:bg-[#272a31] border border-white/[0.05] transition-all active:scale-95 text-center cursor-pointer group"
           >
             <div className="w-10 h-10 rounded-full bg-[#272a31] group-hover:bg-[#101319] flex items-center justify-center text-[#7bd0ff] transition-colors">
-              <span className="material-symbols-outlined text-[20px]">
-                sticky_note_2
-              </span>
+              <Icon name="sticky_note_2" size={20} />
             </div>
             <span className="font-headline text-xs text-[#e1e2eb] font-semibold leading-tight">
               Notas Coach

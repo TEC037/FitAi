@@ -1,0 +1,5 @@
+[    1524ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5174/node_modules/.vite/deps/react-dom_client.js?v=264840fd:14335
+[    2196ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://localhost:5174/:0
+[    9464ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://qwdfqyattichetaiwlbk.supabase.co/auth/v1/token?grant_type=password:0
+[   60761ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5174/node_modules/.vite/deps/react-dom_client.js?v=264840fd:14335
+[   61036ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://localhost:5174/:0

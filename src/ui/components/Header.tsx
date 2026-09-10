@@ -1,5 +1,6 @@
 import React from 'react';
 import { useUiData } from '../data/store';
+import { Icon } from './Icon';
 
 interface HeaderProps {
   onOpenNotifications: () => void;
@@ -43,7 +44,7 @@ export const Header: React.FC<HeaderProps> = ({
           </span>
           {isDemoMode && (
             <span className="ml-1 px-1.5 py-0.5 rounded-md bg-[#c3f400]/15 border border-[#c3f400]/25 text-[#c3f400] font-headline text-[9px] font-bold uppercase tracking-wider">
-              Demo
+              Ejemplo
             </span>
           )}
         </div>
@@ -56,7 +57,7 @@ export const Header: React.FC<HeaderProps> = ({
             aria-label="Notificaciones"
             className="w-10 h-10 flex items-center justify-center rounded-full text-[#c4c9ac] hover:text-white hover:bg-[#1d2026] transition-colors relative"
           >
-            <span className="material-symbols-outlined text-[22px]">notifications</span>
+            <Icon name="notifications" size={22} />
             {hasUnreadNotifications && (
               <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#c3f400] ring-2 ring-[#101319] shadow-[0_0_6px_#c3f400]"></span>
             )}

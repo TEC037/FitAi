@@ -1,0 +1,97 @@
+- generic [ref=f2e23]:
+  - banner [ref=f2e24]:
+    - generic [ref=f2e25]:
+      - generic [ref=f2e26]:
+        - generic [ref=f2e30]: Punto Fuerte
+        - generic [ref=f2e31]: Ejemplo
+      - generic [ref=f2e32]:
+        - button "Notificaciones" [ref=f2e33]
+        - button "Perfil de usuario" [ref=f2e38]:
+          - generic [ref=f2e39]: A
+  - main [ref=f2e40]:
+    - generic [ref=f2e41]:
+      - generic [ref=f2e42]:
+        - generic [ref=f2e43]:
+          - generic [ref=f2e44]: Listo para entrenar
+          - generic [ref=f2e46]: Fase Hipertrofia
+        - heading "¡A por ello, Atleta!" [level=1] [ref=f2e47]
+        - paragraph [ref=f2e48]:
+          - generic [ref=f2e49]: Semana en curso
+          - generic [ref=f2e51]: "Día: Fuerza & Pecho"
+      - generic [ref=f2e52]:
+        - generic [ref=f2e53]:
+          - generic [ref=f2e54]:
+            - generic [ref=f2e55]: Racha
+            - generic [ref=f2e56]: 🔥
+          - generic [ref=f2e57]:
+            - generic [ref=f2e58]: 5 Días
+            - generic [ref=f2e59]: Imparable
+        - generic [ref=f2e60]:
+          - generic [ref=f2e61]: Hoy
+          - generic [ref=f2e65]:
+            - generic [ref=f2e66]: "504"
+            - generic [ref=f2e67]: kcal quemadas
+        - generic [ref=f2e68]:
+          - generic [ref=f2e69]: Semana
+          - generic [ref=f2e74]:
+            - generic [ref=f2e75]: 2h 33m
+            - generic [ref=f2e76]: 75% del objetivo
+      - generic [ref=f2e78]:
+        - generic [ref=f2e79]:
+          - generic [ref=f2e80]: Siguiente Sesión
+          - generic [ref=f2e83]: Hoy • 18:30
+        - generic [ref=f2e84]:
+          - 'heading "Torso Potencia: Pecho & Espalda" [level=2] [ref=f2e85]'
+          - generic [ref=f2e86]:
+            - generic [ref=f2e87]: 55 min
+            - generic [ref=f2e91]: •
+            - generic [ref=f2e92]: 6 ejercicios
+            - generic [ref=f2e99]: •
+            - generic [ref=f2e100]: Intermedio
+        - generic [ref=f2e101]:
+          - img "Atleta entrenando fuerza en gimnasio oscuro" [ref=f2e102]
+          - paragraph [ref=f2e104]: "Objetivo de hoy: Sobrecarga progresiva en Press Banca"
+        - button "Comenzar Entrenamiento Ahora" [ref=f2e106] [cursor=pointer]
+      - generic [ref=f2e110]:
+        - generic [ref=f2e111]:
+          - heading "Consistencia Semanal" [level=3] [ref=f2e116]
+          - generic [ref=f2e117]: 3 / 7 DÍAS
+        - generic [ref=f2e118]:
+          - 'generic "L: Entrenado" [ref=f2e119]': L
+          - 'generic "M: Entrenado" [ref=f2e124]': M
+          - 'generic "X: Entrenado" [ref=f2e129]': X
+          - 'generic "J: Descanso" [ref=f2e134]': J
+          - 'generic "V: Descanso" [ref=f2e138]': V
+          - 'generic "S: Descanso" [ref=f2e142]': S
+          - 'generic "D: Descanso" [ref=f2e146]': D
+      - generic [ref=f2e150]:
+        - generic [ref=f2e151]:
+          - heading "Actividad Reciente" [level=3] [ref=f2e152]
+          - button "Ver historial" [ref=f2e153]
+        - generic [ref=f2e154]:
+          - generic [ref=f2e155]:
+            - generic [ref=f2e164]:
+              - generic [ref=f2e165]: "Torso Potencia: Pecho & Espalda"
+              - generic [ref=f2e166]: Hoy • 53 min • 504 kcal
+            - generic [ref=f2e167]:
+              - generic [ref=f2e168]: Completado
+              - generic [ref=f2e175]: 9,1k kg vol
+          - generic [ref=f2e176]:
+            - generic [ref=f2e185]:
+              - generic [ref=f2e186]: "Empuje: Pecho & Tríceps"
+              - generic [ref=f2e187]: Ayer • 53 min • 504 kcal
+            - generic [ref=f2e188]:
+              - generic [ref=f2e189]: Completado
+              - generic [ref=f2e196]: 5,5k kg vol
+      - generic [ref=f2e197]:
+        - generic [ref=f2e198]: Acciones Rápidas
+        - generic [ref=f2e199]:
+          - button "Registrar Peso" [ref=f2e200] [cursor=pointer]
+          - button "Comida Rápida" [ref=f2e207] [cursor=pointer]
+          - button "Notas Coach" [ref=f2e213] [cursor=pointer]
+  - navigation [ref=f2e219]:
+    - generic [ref=f2e220]:
+      - button "Hoy" [ref=f2e221]
+      - button "Entrenar" [ref=f2e229]
+      - button "Rutinas" [ref=f2e239]
+      - button "Progreso" [ref=f2e243]

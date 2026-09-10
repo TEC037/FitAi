@@ -3,6 +3,7 @@ import confetti from 'canvas-confetti';
 import { Exercise, ExerciseSet } from '../types';
 import { useUiData } from '../data/store';
 import { ExerciseImage } from './ExerciseImage';
+import { Icon } from './Icon';
 
 interface EntrenarScreenProps {
   onFinishWorkout: (summary: { durationSeconds: number; volumeKg: number; setsCompleted: number }) => void;
@@ -197,7 +198,7 @@ export const EntrenarScreen: React.FC<EntrenarScreenProps> = ({
       {exercises.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
           <span className="w-16 h-16 rounded-full bg-[#1d2026] border border-white/[0.06] flex items-center justify-center text-[#c4c9ac]">
-            <span className="material-symbols-outlined text-[32px]">fitness_center</span>
+            <Icon name="fitness_center" size={32} />
           </span>
           <div className="flex flex-col gap-1">
             <h2 className="font-headline text-lg text-white font-bold">
@@ -234,14 +235,12 @@ export const EntrenarScreen: React.FC<EntrenarScreenProps> = ({
             title={isSessionPaused ? 'Reanudar cronómetro' : 'Pausar cronómetro'}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#272a31] border border-white/[0.08] shadow-[0_0_14px_rgba(195,244,0,0.18)] hover:bg-[#32353c] transition-all cursor-pointer"
           >
-            <span
-              className={`material-symbols-outlined text-[18px] text-[#c3f400] ${
-                !isSessionPaused ? 'animate-spin' : ''
-              }`}
+            <Icon
+              name="timelapse"
+              size={18}
+              className={`text-[#c3f400] ${!isSessionPaused ? 'animate-spin' : ''}`}
               style={{ animationDuration: '8s' }}
-            >
-              timelapse
-            </span>
+            />
             <span className="font-headline text-sm text-[#c3f400] tabular-nums font-bold">
               {formatTime(sessionSeconds)}
             </span>
@@ -262,9 +261,7 @@ export const EntrenarScreen: React.FC<EntrenarScreenProps> = ({
       <div className="relative overflow-hidden rounded-2xl bg-[#272a31] p-4 shadow-lg flex flex-col gap-3 border border-white/[0.08]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-[18px] text-[#c3f400]">
-              snooze
-            </span>
+            <Icon name="snooze" size={18} className="text-[#c3f400]" />
             <span className="font-headline text-xs uppercase text-[#c4c9ac] font-bold tracking-wider">
               Tiempo de Descanso
             </span>
@@ -322,12 +319,7 @@ export const EntrenarScreen: React.FC<EntrenarScreenProps> = ({
               </span>
               {currentExercise.pr && (
                 <span className="flex items-center gap-1 text-[#4ae176] font-headline text-xs font-semibold">
-                  <span
-                    className="material-symbols-outlined text-[13px]"
-                    style={{ fontVariationSettings: "'FILL' 1" }}
-                  >
-                    workspace_premium
-                  </span>
+                  <Icon name="workspace_premium" size={13} />
                   {currentExercise.pr}
                 </span>
               )}
@@ -346,9 +338,7 @@ export const EntrenarScreen: React.FC<EntrenarScreenProps> = ({
             title="Ver demostración animada"
             className="w-10 h-10 rounded-full bg-[#272a31] hover:bg-[#32353c] flex items-center justify-center text-[#c4c9ac] hover:text-[#c3f400] transition-colors border border-white/[0.06] cursor-pointer"
           >
-            <span className="material-symbols-outlined text-[20px]">
-              videocam
-            </span>
+            <Icon name="videocam" size={20} />
           </button>
         </div>
 
@@ -442,9 +432,7 @@ export const EntrenarScreen: React.FC<EntrenarScreenProps> = ({
                       title="Marcar serie completada"
                       className="w-12 h-12 rounded-full bg-[#c3f400] text-[#161e00] flex items-center justify-center shadow-[0_0_16px_rgba(195,244,0,0.45)] hover:scale-105 active:scale-95 transition-all cursor-pointer font-bold"
                     >
-                      <span className="material-symbols-outlined text-[28px] font-bold">
-                        done
-                      </span>
+                      <Icon name="done" size={28} />
                     </button>
                   </div>
                 </div>
@@ -474,12 +462,7 @@ export const EntrenarScreen: React.FC<EntrenarScreenProps> = ({
                       title="Serie completada. Clic para desmarcar"
                       className="w-9 h-9 rounded-full bg-[#00b954] text-white flex items-center justify-center shadow-[0_0_10px_rgba(0,185,84,0.3)] hover:opacity-90 active:scale-95 transition-all cursor-pointer"
                     >
-                      <span
-                        className="material-symbols-outlined text-[20px]"
-                        style={{ fontVariationSettings: "'FILL' 1" }}
-                      >
-                        check
-                      </span>
+<Icon name="check" size={20} />
                     </button>
                   </div>
                 </div>
@@ -508,9 +491,7 @@ export const EntrenarScreen: React.FC<EntrenarScreenProps> = ({
                     title="Clic para marcar serie"
                     className="w-9 h-9 rounded-full bg-[#32353c] text-[#8e9379] hover:text-[#c3f400] flex items-center justify-center cursor-pointer transition-colors"
                   >
-                    <span className="material-symbols-outlined text-[18px]">
-                      radio_button_unchecked
-                    </span>
+                    <Icon name="radio_button_unchecked" size={18} />
                   </button>
                 </div>
               </div>
@@ -525,16 +506,14 @@ export const EntrenarScreen: React.FC<EntrenarScreenProps> = ({
             onClick={handleAddSet}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#272a31] hover:bg-[#32353c] text-[#c4c9ac] hover:text-white font-headline text-xs font-semibold transition-colors active:scale-95 cursor-pointer"
           >
-            <span className="material-symbols-outlined text-[18px]">add</span>
+            <Icon name="add" size={18} />
             Añadir Serie
           </button>
 
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#191c22] text-[#c4c9ac]">
-            <span className="material-symbols-outlined text-[16px] text-[#c3f400]">
-              bolt
-            </span>
+            <Icon name="bolt" size={16} className="text-[#c3f400]" />
             <span className="font-headline text-xs font-medium">
-              Objetivo RPE: {currentExercise.rpe ?? 8.5}
+              Esfuerzo objetivo: {currentExercise.rpe ?? 8.5}
             </span>
           </div>
         </div>
@@ -544,9 +523,7 @@ export const EntrenarScreen: React.FC<EntrenarScreenProps> = ({
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[20px] text-[#c4c9ac]">
-              queue_play_next
-            </span>
+            <Icon name="queue_play_next" size={20} className="text-[#c4c9ac]" />
             <h3 className="font-headline text-base text-white font-bold">
               Siguientes Ejercicios
             </h3>
@@ -593,9 +570,7 @@ export const EntrenarScreen: React.FC<EntrenarScreenProps> = ({
                   <span className="text-xs text-[#c3f400] opacity-0 group-hover:opacity-100 transition-opacity font-headline font-semibold">
                     Entrenar ahora
                   </span>
-                  <span className="material-symbols-outlined text-[20px]">
-                    drag_indicator
-                  </span>
+                  <Icon name="drag_indicator" size={20} />
                 </div>
               </button>
             );

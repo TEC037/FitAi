@@ -35,7 +35,7 @@ const FREE_FALLBACK_MODELS = [
 
 function buildCoachSystemPrompt(ctx: CoachContext): string {
   return [
-    'Eres FitAI Coach, un entrenador personal científico y en español.',
+    'Eres Punto Fuerte, un entrenador personal científico y en español.',
     'Da respuestas breves y específicas, con la seguridad como prioridad.',
     'Contexto del usuario:',
     `- ${ctx.userWeight} kg, ${ctx.daysPerWeek} días/semana, objetivo ${ctx.primaryGoal}, nivel ${ctx.experience}, nombre ${ctx.name}.`,

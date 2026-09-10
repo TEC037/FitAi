@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useApp } from '../../../context/useApp';
+import { Icon } from '../Icon';
 
 interface CoachNotesModalProps {
   isOpen: boolean;
@@ -29,9 +30,7 @@ export const CoachNotesModal: React.FC<CoachNotesModalProps> = ({ isOpen, onClos
       <div className="w-full max-w-md rounded-2xl bg-[#1d2026] p-5 border border-white/[0.1] shadow-2xl flex flex-col gap-4 max-h-[85vh]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#7bd0ff] text-[22px]">
-              smart_toy
-            </span>
+            <Icon name="smart_toy" size={22} className="text-[#7bd0ff]" />
             <div>
               <h3 className="font-headline text-lg text-white font-bold">
                 Coach IA
@@ -46,7 +45,7 @@ export const CoachNotesModal: React.FC<CoachNotesModalProps> = ({ isOpen, onClos
             aria-label="Cerrar chat del coach"
             className="w-8 h-8 rounded-full flex items-center justify-center text-[#c4c9ac] hover:text-white hover:bg-[#272a31]"
           >
-            <span className="material-symbols-outlined text-[18px]">close</span>
+            <Icon name="close" size={18} />
           </button>
         </div>
 
@@ -111,7 +110,7 @@ export const CoachNotesModal: React.FC<CoachNotesModalProps> = ({ isOpen, onClos
             aria-label="Enviar mensaje"
             className="w-11 h-11 shrink-0 rounded-full bg-[#c3f400] text-[#171a1f] flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
           >
-            <span className="material-symbols-outlined text-[20px]">send</span>
+            <Icon name="send" size={20} />
           </button>
         </div>
 

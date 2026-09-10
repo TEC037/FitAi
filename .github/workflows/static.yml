@@ -1,4 +1,4 @@
-name: Deploy FitAI to GitHub Pages
+name: Deploy Punto Fuerte to GitHub Pages
 
 on:
   push:

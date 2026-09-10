@@ -1,4 +1,4 @@
--- FitAI Coach — Schema inicial (Supabase Postgres)
+-- Punto Fuerte — Schema inicial (Supabase Postgres)
 -- Ejecutar en Supabase > SQL Editor, o via `supabase db push`.
 
 -- 1) Perfiles públicos por usuario

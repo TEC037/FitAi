@@ -40,7 +40,7 @@ export interface Exercise {
   technicalCue: string;
   fullInstructions: string[];
   commonMistakes: string[];
-  equipment: string;
+  equipment: string | string[];
   difficulty: ExperienceLevel;
   iconType: 'barbell' | 'dumbbell' | 'bodyweight' | 'cable' | 'machine';
   datasetId?: string;

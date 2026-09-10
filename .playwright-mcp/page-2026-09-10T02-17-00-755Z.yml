@@ -1,0 +1,140 @@
+- generic [ref=e26]:
+  - banner [ref=e27]:
+    - generic [ref=e28]:
+      - generic [ref=e29]:
+        - generic [ref=e33]: Punto Fuerte
+        - generic [ref=e34]: Ejemplo
+      - generic [ref=e35]:
+        - button "Notificaciones" [ref=e36]:
+          - generic [ref=e37]: notifications
+        - button "Perfil de usuario" [ref=e39]:
+          - generic [ref=e40]: A
+  - main [ref=e41]:
+    - generic [ref=e42]:
+      - generic [ref=e43]:
+        - generic [ref=e44]:
+          - generic [ref=e45]: Listo para entrenar
+          - generic [ref=e47]: Fase Hipertrofia
+        - heading "¡A por ello, Atleta!" [level=1] [ref=e48]
+        - paragraph [ref=e49]:
+          - generic [ref=e50]: Semana en curso
+          - generic [ref=e52]: "Día: Fuerza & Pecho"
+      - generic [ref=e53]:
+        - generic [ref=e54]:
+          - generic [ref=e55]:
+            - generic [ref=e56]: Racha
+            - generic [ref=e57]: 🔥
+          - generic [ref=e58]:
+            - generic [ref=e59]: 5 Días
+            - generic [ref=e60]: Imparable
+        - generic [ref=e61]:
+          - generic [ref=e62]:
+            - generic [ref=e63]: Hoy
+            - generic [ref=e64]: local_fire_department
+          - generic [ref=e65]:
+            - generic [ref=e66]: "504"
+            - generic [ref=e67]: kcal quemadas
+        - generic [ref=e68]:
+          - generic [ref=e69]:
+            - generic [ref=e70]: Semana
+            - generic [ref=e71]: timer
+          - generic [ref=e72]:
+            - generic [ref=e73]: 2h 33m
+            - generic [ref=e74]: 75% del objetivo
+      - generic [ref=e76]:
+        - generic [ref=e77]:
+          - generic [ref=e78]:
+            - generic [ref=e79]: bolt
+            - text: Siguiente Sesión
+          - generic [ref=e80]: Hoy • 18:30
+        - generic [ref=e81]:
+          - 'heading "Torso Potencia: Pecho & Espalda" [level=2] [ref=e82]'
+          - generic [ref=e83]:
+            - generic [ref=e84]:
+              - generic [ref=e85]: schedule
+              - text: 55 min
+            - generic [ref=e86]: •
+            - generic [ref=e87]:
+              - generic [ref=e88]: fitness_center
+              - text: 6 ejercicios
+            - generic [ref=e89]: •
+            - generic [ref=e90]: Intermedio
+        - generic [ref=e91]:
+          - img "Atleta entrenando fuerza en gimnasio oscuro" [ref=e92]
+          - paragraph [ref=e94]: "Objetivo de hoy: Sobrecarga progresiva en Press Banca"
+        - button "play_arrow Comenzar Entrenamiento Ahora" [ref=e96] [cursor=pointer]:
+          - generic [ref=e97]: play_arrow
+          - generic [ref=e98]: Comenzar Entrenamiento Ahora
+      - generic [ref=e99]:
+        - generic [ref=e100]:
+          - generic [ref=e101]:
+            - generic [ref=e102]: event_available
+            - heading "Consistencia Semanal" [level=3] [ref=e103]
+          - generic [ref=e104]: 3 / 7 DÍAS
+        - generic [ref=e105]:
+          - 'generic "L: Entrenado" [ref=e106]':
+            - generic [ref=e107]: L
+            - generic [ref=e108]: check
+          - 'generic "M: Entrenado" [ref=e110]':
+            - generic [ref=e111]: M
+            - generic [ref=e112]: check
+          - 'generic "X: Entrenado" [ref=e114]':
+            - generic [ref=e115]: X
+            - generic [ref=e116]: check
+          - 'generic "J: Descanso" [ref=e118]': J
+          - 'generic "V: Descanso" [ref=e122]': V
+          - 'generic "S: Descanso" [ref=e126]': S
+          - 'generic "D: Descanso" [ref=e130]': D
+      - generic [ref=e134]:
+        - generic [ref=e135]:
+          - heading "Actividad Reciente" [level=3] [ref=e136]
+          - button "Ver historial" [ref=e137]
+        - generic [ref=e138]:
+          - generic [ref=e139]:
+            - generic [ref=e140]:
+              - generic [ref=e141]: fitness_center
+              - generic [ref=e143]:
+                - generic [ref=e144]: "Torso Potencia: Pecho & Espalda"
+                - generic [ref=e145]: Hoy • 53 min • 504 kcal
+            - generic [ref=e146]:
+              - generic [ref=e147]:
+                - generic [ref=e148]: emoji_events
+                - text: Completado
+              - generic [ref=e149]: 9,1k kg vol
+          - generic [ref=e150]:
+            - generic [ref=e151]:
+              - generic [ref=e152]: fitness_center
+              - generic [ref=e154]:
+                - generic [ref=e155]: "Empuje: Pecho & Tríceps"
+                - generic [ref=e156]: Ayer • 53 min • 504 kcal
+            - generic [ref=e157]:
+              - generic [ref=e158]:
+                - generic [ref=e159]: emoji_events
+                - text: Completado
+              - generic [ref=e160]: 5,5k kg vol
+      - generic [ref=e161]:
+        - generic [ref=e162]: Acciones Rápidas
+        - generic [ref=e163]:
+          - button "monitor_weight Registrar Peso" [ref=e164] [cursor=pointer]:
+            - generic [ref=e165]: monitor_weight
+            - generic [ref=e167]: Registrar Peso
+          - button "restaurant Comida Rápida" [ref=e168] [cursor=pointer]:
+            - generic [ref=e169]: restaurant
+            - generic [ref=e171]: Comida Rápida
+          - button "sticky_note_2 Notas Coach" [ref=e172] [cursor=pointer]:
+            - generic [ref=e173]: sticky_note_2
+            - generic [ref=e175]: Notas Coach
+  - navigation [ref=e176]:
+    - generic [ref=e177]:
+      - button "space_dashboard Hoy" [ref=e178]:
+        - generic [ref=e179]: space_dashboard
+        - generic [ref=e181]: Hoy
+      - button "fitness_center Entrenar" [ref=e182]:
+        - generic [ref=e183]: fitness_center
+        - generic [ref=e186]: Entrenar
+      - button "format_list_bulleted Rutinas" [ref=e187]:
+        - generic [ref=e188]: format_list_bulleted
+        - generic [ref=e190]: Rutinas
+      - button "insights Progreso" [ref=e191]:
+        - generic [ref=e192]: insights
+        - generic [ref=e194]: Progreso

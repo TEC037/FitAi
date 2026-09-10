@@ -1,4 +1,4 @@
-# FitAI Coach
+# Punto Fuerte
 
 Plataforma SPA (prototipo) de entrenamiento fitness con **Coaching IA** y **biometría alométrica** (leyes de escala biológica de Kleiber M^3/4, dinámica cardíaca M^-1/4 y fuerza isométrica M^2/3).
 

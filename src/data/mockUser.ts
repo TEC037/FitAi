@@ -1,9 +1,9 @@
 import { UserProfile } from '../types';
 
 export const INITIAL_USER: UserProfile = {
-  id: 'usr_carlos_01',
-  name: 'Carlos Ramírez',
-  email: 'carlos.ramirez@fitai.example',
+  id: 'usr_ejemplo_01',
+  name: 'Atleta Ejemplo',
+  email: 'atleta@ejemplo.puntofuerte',
   age: 28,
   gender: 'Masculino',
   height: 178,

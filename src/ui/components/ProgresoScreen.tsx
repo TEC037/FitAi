@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { useUiData } from '../data/store';
+import { Icon } from './Icon';
 
 interface ProgresoScreenProps {
   onExportPdf: () => void;
-  onOpenNewPrModal: () => void;
 }
 
 export const ProgresoScreen: React.FC<ProgresoScreenProps> = ({
   onExportPdf,
-  onOpenNewPrModal,
 }) => {
   const { profile, personalRecords, weeklyVolumes, monthCalendarDays } = useUiData();
   const currentWeight = profile.weight;
@@ -53,12 +52,7 @@ export const ProgresoScreen: React.FC<ProgresoScreenProps> = ({
             Progreso
           </h1>
           <span className="font-headline text-xs sm:text-sm text-[#4ae176] flex items-center gap-1 font-semibold">
-            <span
-              className="material-symbols-outlined text-[16px]"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              local_fire_department
-            </span>
+            <Icon name="local_fire_department" size={16} />
             Racha: {profile.currentStreakDays} días
           </span>
         </div>
@@ -91,7 +85,7 @@ export const ProgresoScreen: React.FC<ProgresoScreenProps> = ({
         <div className="flex items-start justify-between relative z-10 gap-3">
           <div className="flex flex-col gap-1">
             <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#1d2026] text-[#c3f400] w-max border border-white/[0.06]">
-              <span className="material-symbols-outlined text-[14px]">bolt</span>
+              <Icon name="bolt" size={14} />
               <span className="font-headline text-[10px] font-bold uppercase tracking-wider">
                 Estado Óptimo
               </span>
@@ -121,18 +115,14 @@ export const ProgresoScreen: React.FC<ProgresoScreenProps> = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-[#272a31] flex items-center justify-center text-[#c3f400]">
-                <span className="material-symbols-outlined text-[20px]">
-                  fitness_center
-                </span>
+                <Icon name="fitness_center" size={20} />
               </div>
               <span className="font-headline text-xs text-[#c4c9ac] font-medium">
                 Volumen Levantado
               </span>
             </div>
             <div className="flex items-center gap-1 bg-[#272a31] px-2 py-0.5 rounded-full text-[#4ae176]">
-              <span className="material-symbols-outlined text-[14px]">
-                trending_up
-              </span>
+              <Icon name="trending_up" size={14} />
               <span className="font-headline text-[11px] font-bold">
                 {profile.monthlySessions} sesiones
               </span>
@@ -166,7 +156,7 @@ export const ProgresoScreen: React.FC<ProgresoScreenProps> = ({
               Sesiones
             </span>
             <div className="w-6 h-6 rounded-full bg-[#00b954] flex items-center justify-center text-white">
-              <span className="material-symbols-outlined text-[14px]">check</span>
+              <Icon name="check" size={14} />
             </div>
           </div>
           <div className="flex flex-col mt-1">
@@ -189,7 +179,7 @@ export const ProgresoScreen: React.FC<ProgresoScreenProps> = ({
               Tiempo Total
             </span>
             <div className="w-6 h-6 rounded-full bg-[#272a31] flex items-center justify-center text-[#e1e2eb]">
-              <span className="material-symbols-outlined text-[14px]">schedule</span>
+              <Icon name="schedule" size={14} />
             </div>
           </div>
           <div className="flex flex-col mt-1">
@@ -282,9 +272,7 @@ export const ProgresoScreen: React.FC<ProgresoScreenProps> = ({
         {/* Active Chart Metric Drawer */}
         <div className="flex items-center justify-between bg-[#272a31] p-3 rounded-xl transition-all border border-white/[0.04]">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#c3f400] text-[18px]">
-              insights
-            </span>
+            <Icon name="insights" size={18} className="text-[#c3f400]" />
             <span className="font-headline text-xs sm:text-sm text-white font-medium">
               {selectedBar.label}
             </span>
@@ -300,9 +288,7 @@ export const ProgresoScreen: React.FC<ProgresoScreenProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-[#272a31] flex items-center justify-center text-[#4ae176]">
-              <span className="material-symbols-outlined text-[18px]">
-                calendar_month
-              </span>
+              <Icon name="calendar_month" size={18} />
             </div>
             <div>
               <h2 className="font-headline text-base sm:text-lg text-white font-bold">
@@ -392,22 +378,11 @@ export const ProgresoScreen: React.FC<ProgresoScreenProps> = ({
 
       {/* Personal Records (1RM) Section */}
       <section className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#c3f400] text-[22px]">
-              trophy
-            </span>
-            <h2 className="font-headline text-base sm:text-lg text-white font-bold">
-              Récords Personales (1RM)
-            </h2>
-          </div>
-          <button
-            onClick={onOpenNewPrModal}
-            className="font-headline text-xs uppercase tracking-wider text-[#c3f400] font-bold hover:underline cursor-pointer flex items-center gap-1"
-          >
-            <span className="material-symbols-outlined text-[14px]">add</span>
-            Nuevo PR
-          </button>
+        <div className="flex items-center gap-2">
+          <Icon name="trophy" size={22} className="text-[#c3f400]" />
+          <h2 className="font-headline text-base sm:text-lg text-white font-bold">
+            Récords Personales (1 repetición máxima)
+          </h2>
         </div>
 
         {/* PR Cards List */}
@@ -422,9 +397,7 @@ export const ProgresoScreen: React.FC<ProgresoScreenProps> = ({
                   <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#c3f400]"></div>
                   <div className="flex items-center gap-3 pl-1">
                     <div className="w-10 h-10 rounded-lg bg-[#1d2026] flex items-center justify-center text-[#c3f400] border border-white/[0.06]">
-                      <span className="material-symbols-outlined text-[20px]">
-                        {pr.iconName}
-                      </span>
+                      <Icon name={pr.iconName} size={20} />
                     </div>
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
@@ -432,10 +405,8 @@ export const ProgresoScreen: React.FC<ProgresoScreenProps> = ({
                           {pr.exercise}
                         </span>
                         <span className="px-2 py-0.5 rounded-full bg-[#c3f400] text-[#161e00] font-headline text-[10px] font-bold flex items-center gap-1">
-                          <span className="material-symbols-outlined text-[12px]">
-                            emoji_events
-                          </span>{' '}
-                          PR Nuevo
+                          <Icon name="emoji_events" size={12} />{' '}
+                          Récord nuevo
                         </span>
                       </div>
                       <span className="font-body text-xs text-[#4ae176]">
@@ -468,9 +439,7 @@ export const ProgresoScreen: React.FC<ProgresoScreenProps> = ({
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-[#272a31] flex items-center justify-center text-white">
-                    <span className="material-symbols-outlined text-[20px]">
-                      {pr.iconName}
-                    </span>
+                    <Icon name={pr.iconName} size={20} />
                   </div>
                   <div className="flex flex-col">
                     <span className="font-headline text-sm sm:text-base text-white font-semibold">
@@ -506,9 +475,7 @@ export const ProgresoScreen: React.FC<ProgresoScreenProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-[#272a31] flex items-center justify-center text-[#7bd0ff]">
-              <span className="material-symbols-outlined text-[18px]">
-                monitor_weight
-              </span>
+              <Icon name="monitor_weight" size={18} />
             </div>
             <div>
               <h2 className="font-headline text-base sm:text-lg text-white font-bold">
@@ -522,9 +489,10 @@ export const ProgresoScreen: React.FC<ProgresoScreenProps> = ({
           <div className="flex items-center gap-1 bg-[#272a31] px-2.5 py-1 rounded-full text-[#4ae176]">
             {profile.weightDelta !== null && profile.weightDelta !== 0 ? (
               <>
-                <span className="material-symbols-outlined text-[14px]">
-                  {profile.weightDelta > 0 ? 'arrow_upward' : 'arrow_downward'}
-                </span>
+                <Icon
+                  name={profile.weightDelta > 0 ? 'arrow_upward' : 'arrow_downward'}
+                  size={14}
+                />
                 <span className="font-headline text-xs font-bold">
                   {profile.weightDelta > 0 ? '+' : ''}
                   {profile.weightDelta} kg
@@ -584,9 +552,7 @@ export const ProgresoScreen: React.FC<ProgresoScreenProps> = ({
         {/* Quick Micro Badges */}
         <div className="grid grid-cols-2 gap-2 pt-1 border-t border-white/[0.04]">
           <div className="flex items-center gap-2 bg-[#191c22] p-2.5 rounded-xl border border-white/[0.03]">
-            <span className="material-symbols-outlined text-[#c4c9ac] text-[18px]">
-              water_drop
-            </span>
+            <Icon name="water_drop" size={18} className="text-[#c4c9ac]" />
             <div className="flex flex-col">
               <span className="font-headline text-[10px] text-[#c4c9ac]">
                 Grasa Estimada
@@ -598,9 +564,7 @@ export const ProgresoScreen: React.FC<ProgresoScreenProps> = ({
           </div>
 
           <div className="flex items-center gap-2 bg-[#191c22] p-2.5 rounded-xl border border-white/[0.03]">
-            <span className="material-symbols-outlined text-[#c4c9ac] text-[18px]">
-              accessibility_new
-            </span>
+            <Icon name="accessibility_new" size={18} className="text-[#c4c9ac]" />
             <div className="flex flex-col">
               <span className="font-headline text-[10px] text-[#c4c9ac]">
                 Masa Magra
@@ -621,7 +585,7 @@ export const ProgresoScreen: React.FC<ProgresoScreenProps> = ({
           type="button"
           className="w-full py-3.5 px-4 rounded-full bg-[#272a31] hover:bg-[#32353c] text-white font-headline text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 shadow-sm active:scale-98 transition-all cursor-pointer border border-white/[0.08]"
         >
-          <span className="material-symbols-outlined text-[18px]">share</span>
+          <Icon name="share" size={18} />
           Exportar Informe de Rendimiento (.PDF)
         </button>
       </div>

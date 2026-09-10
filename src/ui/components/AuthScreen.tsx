@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useUiData } from '../data/store';
+import { Icon } from './Icon';
 
 type AuthMode = 'login' | 'register' | 'recovery';
 
@@ -64,7 +65,9 @@ export const AuthScreen: React.FC = () => {
     setError(null);
     setIsSubmitting(true);
     try {
-      await ui.loginDemo();
+      // La demo vive aislada en /demo; navegamos a esa edición sin simular
+      // una cuenta real ni golpear Supabase.
+      window.location.assign('./demo');
     } finally {
       setIsSubmitting(false);
     }
@@ -123,16 +126,14 @@ export const AuthScreen: React.FC = () => {
 
         {error && (
           <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-[#2a1414] border border-[#ff6b6b]/25 text-[#ff9b9b] font-body text-xs">
-            <span className="material-symbols-outlined text-[16px] mt-0.5">error</span>
+            <Icon name="error" size={16} className="mt-0.5" />
             <span>{error}</span>
           </div>
         )}
 
         {info && (
           <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-[#13241a] border border-[#4ae176]/25 text-[#7ae0a0] font-body text-xs">
-            <span className="material-symbols-outlined text-[16px] mt-0.5">
-              check_circle
-            </span>
+            <Icon name="check_circle" size={16} className="mt-0.5" />
             <span>{info}</span>
           </div>
         )}
@@ -202,10 +203,8 @@ export const AuthScreen: React.FC = () => {
             disabled={isSubmitting}
             className="w-full py-3 rounded-full bg-[#272a31] hover:bg-[#32353c] text-white font-headline text-sm font-semibold transition-colors disabled:opacity-50 cursor-pointer border border-white/[0.06] flex items-center justify-center gap-2"
           >
-            <span className="material-symbols-outlined text-[18px] text-[#c3f400]">
-              science
-            </span>
-            Explorar con cuenta demo
+            <Icon name="science" size={18} className="text-[#c3f400]" />
+            Explorar ejemplo
           </button>
         )}
       </div>

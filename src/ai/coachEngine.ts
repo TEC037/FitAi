@@ -1,5 +1,5 @@
 /**
- * Motor de conocimientos del Coach IA de FitAI.
+ * Motor de conocimientos del Coach IA de Punto Fuerte.
  *
  * Motor de reglas puro y sin dependencias de React que genera respuestas en
  * español para el asistente. Se usa de forma compartida entre:

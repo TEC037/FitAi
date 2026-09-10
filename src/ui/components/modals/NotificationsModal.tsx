@@ -1,4 +1,5 @@
 import React from 'react';
+import { Icon } from '../Icon';
 
 interface NotificationsModalProps {
   isOpen: boolean;
@@ -45,9 +46,7 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
       <div className="w-full max-w-sm rounded-2xl bg-[#1d2026] p-5 border border-white/[0.1] shadow-2xl flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#c3f400] text-[22px]">
-              notifications
-            </span>
+            <Icon name="notifications" size={22} className="text-[#c3f400]" />
             <h3 className="font-headline text-lg text-white font-bold">
               Notificaciones
             </h3>
@@ -56,7 +55,7 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
             onClick={onClose}
             className="w-8 h-8 rounded-full flex items-center justify-center text-[#c4c9ac] hover:text-white hover:bg-[#272a31]"
           >
-            <span className="material-symbols-outlined text-[18px]">close</span>
+            <Icon name="close" size={18} />
           </button>
         </div>
 
@@ -70,9 +69,7 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                 className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
                 style={{ backgroundColor: `${n.color}20`, color: n.color }}
               >
-                <span className="material-symbols-outlined text-[18px]">
-                  {n.icon}
-                </span>
+                <Icon name={n.icon} size={18} />
               </div>
               <div className="flex flex-col min-w-0">
                 <span className="font-headline text-xs font-bold text-white">

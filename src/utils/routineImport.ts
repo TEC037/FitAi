@@ -160,7 +160,7 @@ export function parseRoutineText(
     if (!line) continue;
 
     if (!foundHeader) {
-      if (/^Mi Rutina FitAI/i.test(line) || /^=+$/.test(line)) {
+      if (/^Mi Rutina (FitAI|Punto Fuerte)/i.test(line) || /^=+$/.test(line)) {
         foundHeader = true;
         continue;
       }

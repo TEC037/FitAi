@@ -1,0 +1,173 @@
+- generic [ref=e26]:
+  - banner [ref=e27]:
+    - generic [ref=e28]:
+      - generic [ref=e29]:
+        - generic [ref=e33]: Punto Fuerte
+        - generic [ref=e34]: Ejemplo
+      - generic [ref=e35]:
+        - button "Notificaciones" [ref=e36]:
+          - generic [ref=e37]: notifications
+        - button "Perfil de usuario" [ref=e39]:
+          - generic [ref=e40]: A
+  - main [ref=e41]:
+    - generic [ref=e195]:
+      - generic [ref=e196]:
+        - generic [ref=e197]:
+          - generic: search
+          - textbox "Buscar por ejercicio, músculo o rutina..." [ref=e198]
+        - generic [ref=e199]:
+          - button "Todas" [ref=e200] [cursor=pointer]
+          - button "Fuerza & Hipertrofia" [ref=e201] [cursor=pointer]
+          - button "Cardio / Intervalos" [ref=e202] [cursor=pointer]
+          - button "Empuje · Tirón · Pierna" [ref=e203] [cursor=pointer]
+          - button "Movilidad" [ref=e204] [cursor=pointer]
+      - generic [ref=e206]:
+        - generic [ref=e207]:
+          - generic [ref=e210]:
+            - generic [ref=e211]: local_fire_department
+            - text: Más Popular
+          - button "Guardar rutina destacada" [ref=e213] [cursor=pointer]:
+            - generic [ref=e214]: bookmark
+        - generic [ref=e215]:
+          - heading "Hipertrofia Avanzada 4 Días" [level=2] [ref=e216]
+          - paragraph [ref=e217]: Plan estructurado en bloques de sobrecarga progresiva y congestión metabólica.
+          - generic [ref=e218]:
+            - generic [ref=e219]:
+              - generic [ref=e220]:
+                - generic [ref=e221]: timer
+                - generic [ref=e222]: 60 min/sesión
+              - generic [ref=e223]:
+                - generic [ref=e224]: calendar_month
+                - generic [ref=e225]: 4 días/sem
+            - button "Iniciar arrow_forward" [ref=e226] [cursor=pointer]:
+              - generic [ref=e227]: Iniciar
+              - generic [ref=e228]: arrow_forward
+      - generic [ref=e229]:
+        - generic [ref=e230]:
+          - heading "Rutinas Disponibles" [level=3] [ref=e231]
+          - generic [ref=e232]: "4"
+        - button "swap_vert Dificultad" [ref=e233] [cursor=pointer]:
+          - generic [ref=e234]: swap_vert
+          - generic [ref=e235]: Dificultad
+      - generic [ref=e236]:
+        - article [ref=e237]:
+          - generic [ref=e238]:
+            - generic [ref=e239]:
+              - generic [ref=e240]:
+                - generic [ref=e241]: FUERZA
+                - generic [ref=e242]:
+                  - generic [ref=e243]: bolt
+                  - text: Alta
+              - heading "Push - Pecho, Hombro, Tríceps" [level=4] [ref=e244]
+            - button "Opciones de rutina" [ref=e245] [cursor=pointer]:
+              - generic [ref=e246]: more_vert
+          - generic [ref=e247]:
+            - generic [ref=e248]:
+              - generic [ref=e249]:
+                - generic [ref=e250]: fitness_center
+                - generic [ref=e251]: 6 ejercicios
+              - generic [ref=e252]:
+                - generic [ref=e253]: schedule
+                - generic [ref=e254]: 50 min
+            - generic [ref=e255]:
+              - generic [ref=e256]: shield
+              - generic [ref=e258]: sports_martial_arts
+              - generic [ref=e260]: accessibility_new
+          - generic [ref=e262]:
+            - generic [ref=e263]: "Última vez: hace 2 días"
+            - button "Comenzar" [ref=e266] [cursor=pointer]
+        - article [ref=e267]:
+          - generic [ref=e268]:
+            - generic [ref=e269]:
+              - generic [ref=e270]:
+                - generic [ref=e271]: HIPERTROFIA
+                - generic [ref=e272]:
+                  - generic [ref=e273]: bolt
+                  - text: Alta
+              - heading "Pull - Espalda, Deltoides Post, Bíceps" [level=4] [ref=e274]
+            - button "Opciones de rutina" [ref=e275] [cursor=pointer]:
+              - generic [ref=e276]: more_vert
+          - generic [ref=e277]:
+            - generic [ref=e278]:
+              - generic [ref=e279]:
+                - generic [ref=e280]: fitness_center
+                - generic [ref=e281]: 6 ejercicios
+              - generic [ref=e282]:
+                - generic [ref=e283]: schedule
+                - generic [ref=e284]: 55 min
+            - generic [ref=e285]:
+              - generic [ref=e286]: expand
+              - generic [ref=e288]: reorder
+              - generic [ref=e290]: sports_mma
+          - generic [ref=e292]:
+            - generic [ref=e293]: Próxima en cola
+            - button "Comenzar" [ref=e296] [cursor=pointer]
+        - article [ref=e297]:
+          - generic [ref=e298]:
+            - generic [ref=e299]:
+              - generic [ref=e300]:
+                - generic [ref=e301]: VOLUMEN
+                - generic [ref=e302]:
+                  - generic [ref=e303]: whatshot
+                  - text: Extrema
+              - heading "Legs - Cuádriceps & Femoral Enfocado" [level=4] [ref=e304]
+            - button "Opciones de rutina" [ref=e305] [cursor=pointer]:
+              - generic [ref=e306]: more_vert
+          - generic [ref=e307]:
+            - generic [ref=e308]:
+              - generic [ref=e309]:
+                - generic [ref=e310]: fitness_center
+                - generic [ref=e311]: 5 ejercicios
+              - generic [ref=e312]:
+                - generic [ref=e313]: schedule
+                - generic [ref=e314]: 60 min
+            - generic [ref=e315]:
+              - generic [ref=e316]: directions_run
+              - generic [ref=e318]: downhill_skiing
+              - generic [ref=e320]: skateboarding
+          - generic [ref=e322]:
+            - generic [ref=e323]: "Récord previo: 140kg Prensa"
+            - button "Comenzar" [ref=e326] [cursor=pointer]
+        - article [ref=e327]:
+          - generic [ref=e328]:
+            - generic [ref=e329]:
+              - generic [ref=e330]:
+                - generic [ref=e331]: FUNCIONAL
+                - generic [ref=e332]:
+                  - generic [ref=e333]: bolt
+                  - text: Moderada
+              - heading "Full Body Acondicionamiento & Core" [level=4] [ref=e334]
+            - button "Opciones de rutina" [ref=e335] [cursor=pointer]:
+              - generic [ref=e336]: more_vert
+          - generic [ref=e337]:
+            - generic [ref=e338]:
+              - generic [ref=e339]:
+                - generic [ref=e340]: fitness_center
+                - generic [ref=e341]: 7 ejercicios
+              - generic [ref=e342]:
+                - generic [ref=e343]: schedule
+                - generic [ref=e344]: 40 min
+            - generic [ref=e345]:
+              - generic [ref=e346]: hdr_strong
+              - generic [ref=e348]: electric_bolt
+              - generic [ref=e350]: favorite
+          - generic [ref=e352]:
+            - generic [ref=e353]: Ideal para descarga activa
+            - button "Comenzar" [ref=e356] [cursor=pointer]
+      - button "add_circle Crear Rutina Personalizada" [ref=e357] [cursor=pointer]:
+        - generic [ref=e358]: add_circle
+        - generic [ref=e359]: Crear Rutina Personalizada
+  - navigation [ref=e176]:
+    - generic [ref=e177]:
+      - button "space_dashboard Hoy" [ref=e178]:
+        - generic [ref=e179]: space_dashboard
+        - generic [ref=e181]: Hoy
+      - button "fitness_center Entrenar" [ref=e182]:
+        - generic [ref=e183]: fitness_center
+        - generic [ref=e186]: Entrenar
+      - button "format_list_bulleted Rutinas" [active] [ref=e187]:
+        - generic [ref=e188]: format_list_bulleted
+        - generic [ref=e190]: Rutinas
+      - button "insights Progreso" [ref=e191]:
+        - generic [ref=e192]: insights
+        - generic [ref=e194]: Progreso

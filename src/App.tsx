@@ -4,10 +4,10 @@ import { TabType, Routine, Exercise } from './ui/types';
 import { UiDataProvider, useUiData } from './ui/data/store';
 import { Header } from './ui/components/Header';
 import { BottomNav } from './ui/components/BottomNav';
-import { HoyScreen } from './ui/components/HoyScreen';
-import { EntrenarScreen } from './ui/components/EntrenarScreen';
+import { EjerciciosScreen } from './ui/components/EjerciciosScreen';
 import { RutinasScreen } from './ui/components/RutinasScreen';
-import { ProgresoScreen } from './ui/components/ProgresoScreen';
+import { EntrenarScreen } from './ui/components/EntrenarScreen';
+import { AjustesScreen } from './ui/components/AjustesScreen';
 import { AuthScreen } from './ui/components/AuthScreen';
 
 // Modals
@@ -24,11 +24,12 @@ import { ProfileModal } from './ui/components/modals/ProfileModal';
 
 function AppShell() {
   const ui = useUiData();
-  const [currentTab, setCurrentTab] = useState<TabType>('hoy');
+  const [currentTab, setCurrentTab] = useState<TabType>('ejercicios');
 
   // Shared App State
   const [weight, setWeight] = useState<number>(ui.profile.weight);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState<boolean>(true);
+  const [favorites, setFavorites] = useState<string[]>(['bench-press', '0001']);
 
   // Modal Visibility States
   const [isWeightModalOpen, setIsWeightModalOpen] = useState(false);
@@ -50,16 +51,21 @@ function AppShell() {
     setsCompleted: 7,
   });
 
-  // Start a workout from anywhere
-  const handleStartWorkout = () => {
-    ui.startWorkoutRoutine(ui.nextSession?.routineDay);
-    setCurrentTab('entrenar');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleToggleFavorite = (exerciseId: string) => {
+    setFavorites((prev) =>
+      prev.includes(exerciseId) ? prev.filter((id) => id !== exerciseId) : [...prev, exerciseId]
+    );
   };
 
   const handleStartRoutine = (routine: Routine) => {
     ui.startWorkoutRoutine(routine.dayNumber);
-    setCurrentTab('entrenar');
+    setCurrentTab('entrenamiento');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSelectExerciseFromCatalog = () => {
+    ui.startWorkoutRoutine(ui.nextSession?.routineDay);
+    setCurrentTab('entrenamiento');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -77,8 +83,8 @@ function AppShell() {
     // Add burned calories to today's total
     const extraCalories = Math.round((finishSummary.durationSeconds / 60) * 8.5);
     ui.addExtraCalories(extraCalories);
-    // Switch to progress screen to see results
-    setCurrentTab('progreso');
+    // Switch to ajustes screen to see results
+    setCurrentTab('ajustes');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -129,35 +135,35 @@ function AppShell() {
 
       {/* Main Screen Content */}
       <main className="flex-1 w-full pt-16 pb-20 overflow-x-hidden">
-        {currentTab === 'hoy' && (
-          <HoyScreen
-            onStartWorkout={handleStartWorkout}
-            onOpenWeightModal={() => setIsWeightModalOpen(true)}
-            onOpenMealModal={() => setIsMealModalOpen(true)}
-            onOpenCoachNotes={() => setIsCoachNotesOpen(true)}
-            onOpenHistory={() => setIsHistoryOpen(true)}
-            todayCalories={ui.todayCalories}
+        {currentTab === 'ejercicios' && (
+          <EjerciciosScreen
+            onSelectExercise={handleSelectExerciseFromCatalog}
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
           />
         )}
 
-        {currentTab === 'entrenar' && (
-          <EntrenarScreen
-            onFinishWorkout={handleFinishWorkout}
-            onOpenVideoModal={handleOpenVideo}
-          />
-        )}
-
-        {currentTab === 'rutinas' && (
+        {currentTab === 'rutina' && (
           <RutinasScreen
             onStartRoutine={handleStartRoutine}
             onCreateRoutineOpen={() => setIsCreateRoutineOpen(true)}
           />
         )}
 
-        {currentTab === 'progreso' && (
-          <ProgresoScreen
+        {currentTab === 'entrenamiento' && (
+          <EntrenarScreen
+            onFinishWorkout={handleFinishWorkout}
+            onOpenVideoModal={handleOpenVideo}
+          />
+        )}
+
+        {currentTab === 'ajustes' && (
+          <AjustesScreen
             onExportPdf={() => setIsExportPdfOpen(true)}
-            onOpenNewPrModal={() => setIsCreateRoutineOpen(true)}
+            onOpenWeightModal={() => setIsWeightModalOpen(true)}
+            onOpenProfile={() => setIsProfileOpen(true)}
+            onOpenNotifications={() => setIsNotificationsOpen(true)}
+            onOpenHistory={() => setIsHistoryOpen(true)}
           />
         )}
       </main>
@@ -231,9 +237,9 @@ function AppShell() {
   );
 }
 
-export default function App() {
+export default function App({ demoEdition = false }: { demoEdition?: boolean }) {
   return (
-    <AppProvider>
+    <AppProvider demoEdition={demoEdition}>
       <UiDataProvider>
         <AppShell />
       </UiDataProvider>

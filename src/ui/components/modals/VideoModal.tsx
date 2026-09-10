@@ -1,6 +1,7 @@
 import React from 'react';
 import { Exercise } from '../../types';
 import { ExerciseImage } from '../ExerciseImage';
+import { Icon } from '../Icon';
 
 interface VideoModalProps {
   isOpen: boolean;
@@ -16,9 +17,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose, exercis
       <div className="w-full max-w-md rounded-2xl bg-[#1d2026] p-5 border border-white/[0.1] shadow-2xl flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="material-symbols-outlined text-[#c3f400] text-[22px]">
-              videocam
-            </span>
+            <Icon name="videocam" size={22} className="text-[#c3f400]" />
             <h3 className="font-headline text-base sm:text-lg text-white font-bold truncate">
               {exercise.name}
             </h3>
@@ -27,7 +26,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose, exercis
             onClick={onClose}
             className="w-8 h-8 rounded-full flex items-center justify-center text-[#c4c9ac] hover:text-white hover:bg-[#272a31] shrink-0"
           >
-            <span className="material-symbols-outlined text-[18px]">close</span>
+            <Icon name="close" size={18} />
           </button>
         </div>
 

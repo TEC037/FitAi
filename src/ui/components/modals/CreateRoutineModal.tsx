@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Routine } from '../../types';
+import { Icon } from '../Icon';
 
 interface CreateRoutineModalProps {
   isOpen: boolean;
@@ -47,9 +48,7 @@ export const CreateRoutineModal: React.FC<CreateRoutineModalProps> = ({
       <div className="w-full max-w-md rounded-2xl bg-[#1d2026] p-5 border border-white/[0.1] shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#c3f400] text-[22px]">
-              add_circle
-            </span>
+            <Icon name="add_circle" size={22} className="text-[#c3f400]" />
             <h3 className="font-headline text-lg text-white font-bold">
               Crear Rutina Personalizada
             </h3>
@@ -58,7 +57,7 @@ export const CreateRoutineModal: React.FC<CreateRoutineModalProps> = ({
             onClick={onClose}
             className="w-8 h-8 rounded-full flex items-center justify-center text-[#c4c9ac] hover:text-white hover:bg-[#272a31]"
           >
-            <span className="material-symbols-outlined text-[18px]">close</span>
+            <Icon name="close" size={18} />
           </button>
         </div>
 
@@ -88,8 +87,8 @@ export const CreateRoutineModal: React.FC<CreateRoutineModalProps> = ({
                 className="w-full mt-1.5 px-3 py-2 bg-[#101319] rounded-xl text-xs text-white border border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#c3f400]"
               >
                 <option value="fuerza">Fuerza & Hipertrofia</option>
-                <option value="cardio">Cardio / HIIT</option>
-                <option value="ppl">PPL</option>
+                <option value="cardio">Cardio / Intervalos</option>
+                <option value="ppl">Empuje / Tirón / Pierna</option>
                 <option value="movilidad">Movilidad</option>
               </select>
             </div>

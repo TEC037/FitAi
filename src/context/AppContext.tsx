@@ -25,6 +25,7 @@ import {
   COMPLIANCE_INCREMENT_PER_WORKOUT,
   DEFAULT_AVERAGE_RPE,
   DEFAULT_REST_SECONDS,
+  DEMO_STORAGE_KEYS,
   FALLBACK_TOTAL_SETS,
   FALLBACK_TOTAL_VOLUME_KG,
   FRESH_START_COMPLIANCE,
@@ -145,9 +146,9 @@ export interface PersistedWorkoutState {
   isRestTimerActive: boolean;
 }
 
-function loadWorkoutSnapshot(): PersistedWorkoutState | null {
+function loadWorkoutSnapshot(key: string): PersistedWorkoutState | null {
   try {
-    const saved = localStorage.getItem(STORAGE_KEYS.WORKOUT);
+    const saved = localStorage.getItem(key);
     return saved ? (JSON.parse(saved) as PersistedWorkoutState) : null;
   } catch {
     return null;
@@ -175,30 +176,48 @@ function parseScreen(raw: string): AppScreen {
   return 'routine';
 }
 
-export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = usePersistedState<UserProfile>(STORAGE_KEYS.USER, INITIAL_USER);
+export const AppProvider: React.FC<{
+  children: React.ReactNode;
+  demoEdition?: boolean;
+}> = ({ children, demoEdition = false }) => {
+  // La edición demo (/demo) usa sus propias claves de almacenamiento y arranca
+  // directamente con los seeds de "Atleta Ejemplo". Nunca toca las claves de
+  // una cuenta real ni escribe en Supabase (activeUserId permanece null).
+  const S = demoEdition ? DEMO_STORAGE_KEYS : STORAGE_KEYS;
+
+  const [user, setUser] = usePersistedState<UserProfile>(S.USER, INITIAL_USER);
   const [isAuthenticated, setIsAuthenticated] = usePersistedState<boolean>(
-    STORAGE_KEYS.AUTH,
-    false
+    S.AUTH,
+    demoEdition
   );
-  const [isHydrating, setIsHydrating] = useState<boolean>(isSupabaseEnabled);
+  const [isHydrating, setIsHydrating] = useState<boolean>(isSupabaseEnabled && !demoEdition);
   const [isDemoUser, setIsDemoUser] = usePersistedState<boolean>(
-    STORAGE_KEYS.DEMO,
-    false
+    S.DEMO,
+    demoEdition
   );
   const [currentScreen, setCurrentScreen] = usePersistedState<AppScreen>(
-    STORAGE_KEYS.SCREEN,
-    'landing',
+    S.SCREEN,
+    demoEdition ? 'routine' : 'landing',
     { parse: parseScreen }
   );
-  const [routines, setRoutines] = usePersistedState<DailyRoutine[]>(STORAGE_KEYS.ROUTINES, []);
+  const [routines, setRoutines] = usePersistedState<DailyRoutine[]>(
+    S.ROUTINES,
+    demoEdition ? MOCK_ROUTINES : []
+  );
   const [selectedDay, setSelectedDay] = useState<number>(1);
-  const [history, setHistory] = usePersistedState<WorkoutSessionLog[]>(STORAGE_KEYS.HISTORY, []);
-  const [personalRecords, setPersonalRecords] = useState<PersonalRecord[]>([]);
-  const [weightHistory, setWeightHistory] = useState<{ date: string; weight: number }[]>([]);
+  const [history, setHistory] = usePersistedState<WorkoutSessionLog[]>(
+    S.HISTORY,
+    demoEdition ? MOCK_HISTORY : []
+  );
+  const [personalRecords, setPersonalRecords] = useState<PersonalRecord[]>(
+    demoEdition ? MOCK_PRS : []
+  );
+  const [weightHistory, setWeightHistory] = useState<{ date: string; weight: number }[]>(
+    demoEdition ? MOCK_WEIGHT_HISTORY : []
+  );
   const [chatMessages, setChatMessages] = usePersistedState<ChatMessage[]>(
-    STORAGE_KEYS.CHAT,
-    []
+    S.CHAT,
+    demoEdition ? INITIAL_CHAT_MESSAGES : []
   );
   const [isCoachTyping, setIsCoachTyping] = useState<boolean>(false);
 
@@ -207,7 +226,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Active workout state (persistido para recuperar sesiones en curso tras recarga).
   // El snapshot se lee UNA sola vez; los estados iniciales comparten la misma lectura.
-  const [workoutSnapshot] = useState<PersistedWorkoutState | null>(() => loadWorkoutSnapshot());
+  const [workoutSnapshot] = useState<PersistedWorkoutState | null>(() =>
+    loadWorkoutSnapshot(S.WORKOUT)
+  );
 
   const [isWorkoutActive, setIsWorkoutActive] = useState<boolean>(() => {
     const s = workoutSnapshot;
@@ -265,7 +286,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       restTimerDeadline: isRestTimerActive ? Date.now() + restTimerSeconds * 1000 : 0,
       isRestTimerActive,
     };
-    localStorage.setItem(STORAGE_KEYS.WORKOUT, JSON.stringify(snapshot));
+    localStorage.setItem(S.WORKOUT, JSON.stringify(snapshot));
   }, [
     isWorkoutActive,
     activeRoutine,
@@ -328,7 +349,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [setUser, setRoutines, setHistory, setChatMessages, setCurrentScreen, setIsAuthenticated, setIsDemoUser]);
 
   useEffect(() => {
-    if (!isSupabaseEnabled) {
+    if (demoEdition || !isSupabaseEnabled) {
       return;
     }
 
@@ -485,9 +506,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setChatMessages(INITIAL_CHAT_MESSAGES);
     setRoutines(MOCK_ROUTINES);
     setIsDemoUser(true);
-    localStorage.removeItem(STORAGE_KEYS.ROUTINES);
-    localStorage.removeItem(STORAGE_KEYS.CHAT);
-    localStorage.removeItem(STORAGE_KEYS.WORKOUT);
+    localStorage.removeItem(S.ROUTINES);
+    localStorage.removeItem(S.CHAT);
+    localStorage.removeItem(S.WORKOUT);
     setIsWorkoutActive(false);
     setActiveRoutine(null);
     setWorkoutElapsedTime(0);
@@ -751,9 +772,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         'Has movido un volumen extraordinario (>10 toneladas), excelente estímulo hipertrófico.';
     } else if (averageRpe >= 8.5) {
       feedback +=
-        'La intensidad fue elevada (RPE > 8.5). Asegura al menos 2g/kg de proteína hoy y descanso de calidad.';
+        'La intensidad fue elevada (esfuerzo percibido > 8.5). Asegura al menos 2 gramos de proteína por kilo de peso corporal hoy y descanso de calidad.';
     } else {
-      feedback += 'Sesión limpia y controlada con RPE adecuado para asimilar la técnica y fatiga.';
+      feedback += 'Sesión limpia y controlada con esfuerzo percibido adecuado para asimilar la técnica y fatiga.';
     }
 
     const newSession: WorkoutSessionLog = {

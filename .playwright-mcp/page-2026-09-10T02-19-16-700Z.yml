@@ -1,0 +1,144 @@
+- generic [ref=e26]:
+  - banner [ref=e27]:
+    - generic [ref=e28]:
+      - generic [ref=e29]:
+        - generic [ref=e33]: Punto Fuerte
+        - generic [ref=e34]: Ejemplo
+      - generic [ref=e35]:
+        - button "Notificaciones" [ref=e36]:
+          - generic [ref=e37]: notifications
+        - button "Perfil de usuario" [ref=e39]:
+          - generic [ref=e40]: A
+  - main [ref=e41]:
+    - generic [ref=e605]:
+      - generic [ref=e606]:
+        - generic [ref=e607]:
+          - generic [ref=e608]: En Vivo
+          - heading "Torso Potencia" [level=1] [ref=e611]
+        - generic [ref=e612]:
+          - button "timelapse 34:13" [ref=e613] [cursor=pointer]:
+            - generic [ref=e614]: timelapse
+            - generic [ref=e615]: 34:13
+          - button "Finalizar" [ref=e616] [cursor=pointer]
+      - generic [ref=e617]:
+        - generic [ref=e618]:
+          - generic [ref=e619]:
+            - generic [ref=e620]: snooze
+            - generic [ref=e621]: Tiempo de Descanso
+          - generic [ref=e622]: Serie 2 → Serie 3
+        - generic [ref=e623]:
+          - generic [ref=e624]:
+            - generic [ref=e625]: 01:10
+            - generic [ref=e626]: seg
+          - generic [ref=e627]:
+            - button "+30s" [ref=e628] [cursor=pointer]
+            - button "Saltar" [ref=e629] [cursor=pointer]
+      - generic [ref=e632]:
+        - generic [ref=e633]:
+          - generic [ref=e634]:
+            - generic [ref=e635]:
+              - generic [ref=e636]: Ejercicio 1 de 4
+              - generic [ref=e637]:
+                - generic [ref=e638]: workspace_premium
+                - text: Récord 95kg
+            - heading "Press de Banca con Barra" [level=2] [ref=e639]
+            - paragraph [ref=e640]: "Enfoque: Pecho, Tríceps, Deltoides Anterior"
+          - button "videocam" [ref=e641] [cursor=pointer]
+        - generic [ref=e644]:
+          - img "Press de Banca con Barra" [ref=e645]
+          - generic: © Gym visual — https://gymvisual.com/
+        - generic [ref=e646]:
+          - generic [ref=e647]:
+            - generic [ref=e648]: Set
+            - generic [ref=e649]: Peso
+            - generic [ref=e650]: Reps
+            - generic [ref=e651]: Estado
+          - generic [ref=e652]:
+            - generic [ref=e653]: "1"
+            - generic [ref=e654]: 60 kg
+            - generic [ref=e655]: "12"
+            - button "check" [ref=e657] [cursor=pointer]
+          - generic [ref=e659]:
+            - generic [ref=e660]: "2"
+            - generic [ref=e661]: 75 kg
+            - generic [ref=e662]: "10"
+            - button "check" [ref=e664] [cursor=pointer]
+          - generic [ref=e666]:
+            - generic [ref=e667]:
+              - generic [ref=e668]: "3"
+              - generic [ref=e669]: Activa
+            - generic [ref=e670]:
+              - generic [ref=e671]: PESO
+              - spinbutton [ref=e673]: "82.5"
+              - generic [ref=e674]: kg
+            - generic [ref=e675]:
+              - generic [ref=e676]: REPS
+              - spinbutton [ref=e678]: "8"
+              - generic [ref=e679]: meta 8
+            - button "done" [ref=e681] [cursor=pointer]
+          - generic [ref=e683]:
+            - generic [ref=e684]: "4"
+            - generic [ref=e685]: 85 kg
+            - generic [ref=e686]: "6"
+            - button "radio_button_unchecked" [ref=e688] [cursor=pointer]
+        - generic [ref=e690]:
+          - button "add Añadir Serie" [ref=e691] [cursor=pointer]:
+            - generic [ref=e692]: add
+            - text: Añadir Serie
+          - generic [ref=e693]:
+            - generic [ref=e694]: bolt
+            - generic [ref=e695]: "Esfuerzo objetivo: 8.5"
+      - generic [ref=e696]:
+        - generic [ref=e697]:
+          - generic [ref=e698]:
+            - generic [ref=e699]: queue_play_next
+            - heading "Siguientes Ejercicios" [level=3] [ref=e700]
+          - generic [ref=e701]: 3 pendientes
+        - generic [ref=e702]:
+          - button "Dominadas con Lastre 2 Dominadas con Lastre 4 series • Dorsal, Bíceps Entrenar ahora drag_indicator" [ref=e703] [cursor=pointer]:
+            - generic [ref=e704]:
+              - generic [ref=e705]:
+                - img "Dominadas con Lastre" [ref=e707]
+                - generic [ref=e708]: "2"
+              - generic [ref=e709]:
+                - generic [ref=e710]: Dominadas con Lastre
+                - generic [ref=e711]: 4 series • Dorsal, Bíceps
+            - generic [ref=e712]:
+              - generic [ref=e713]: Entrenar ahora
+              - generic [ref=e714]: drag_indicator
+          - button "Press Inclinado con Mancuernas 3 Press Inclinado con Mancuernas 3 series • Pecho Superior Entrenar ahora drag_indicator" [ref=e715] [cursor=pointer]:
+            - generic [ref=e716]:
+              - generic [ref=e717]:
+                - img "Press Inclinado con Mancuernas" [ref=e719]
+                - generic [ref=e720]: "3"
+              - generic [ref=e721]:
+                - generic [ref=e722]: Press Inclinado con Mancuernas
+                - generic [ref=e723]: 3 series • Pecho Superior
+            - generic [ref=e724]:
+              - generic [ref=e725]: Entrenar ahora
+              - generic [ref=e726]: drag_indicator
+          - button "Remo con Barra T 4 Remo con Barra T 4 series • Espalda Media Entrenar ahora drag_indicator" [ref=e727] [cursor=pointer]:
+            - generic [ref=e728]:
+              - generic [ref=e729]:
+                - img "Remo con Barra T" [ref=e731]
+                - generic [ref=e732]: "4"
+              - generic [ref=e733]:
+                - generic [ref=e734]: Remo con Barra T
+                - generic [ref=e735]: 4 series • Espalda Media
+            - generic [ref=e736]:
+              - generic [ref=e737]: Entrenar ahora
+              - generic [ref=e738]: drag_indicator
+  - navigation [ref=e176]:
+    - generic [ref=e177]:
+      - button "space_dashboard Hoy" [ref=e178]:
+        - generic [ref=e179]: space_dashboard
+        - generic [ref=e181]: Hoy
+      - button "fitness_center Entrenar" [active] [ref=e182]:
+        - generic [ref=e183]: fitness_center
+        - generic [ref=e186]: Entrenar
+      - button "format_list_bulleted Rutinas" [ref=e187]:
+        - generic [ref=e188]: format_list_bulleted
+        - generic [ref=e190]: Rutinas
+      - button "insights Progreso" [ref=e191]:
+        - generic [ref=e192]: insights
+        - generic [ref=e194]: Progreso

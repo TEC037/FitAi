@@ -1,0 +1,101 @@
+- generic [ref=f2e23]:
+  - banner [ref=f2e24]:
+    - generic [ref=f2e25]:
+      - generic [ref=f2e26]:
+        - generic [ref=f2e30]: Punto Fuerte
+        - generic [ref=f2e31]: Ejemplo
+      - generic [ref=f2e32]:
+        - button "Notificaciones" [ref=f2e33]
+        - button "Perfil de usuario" [ref=f2e38]:
+          - generic [ref=f2e39]: A
+  - main [ref=f2e40]:
+    - generic [ref=f2e248]:
+      - generic [ref=f2e249]:
+        - textbox "Buscar por ejercicio, músculo o rutina..." [ref=f2e251]
+        - generic [ref=f2e252]:
+          - button "Todas" [ref=f2e253] [cursor=pointer]
+          - button "Fuerza & Hipertrofia" [ref=f2e254] [cursor=pointer]
+          - button "Cardio / Intervalos" [ref=f2e255] [cursor=pointer]
+          - button "Empuje · Tirón · Pierna" [ref=f2e256] [cursor=pointer]
+          - button "Movilidad" [ref=f2e257] [cursor=pointer]
+      - generic [ref=f2e259]:
+        - generic [ref=f2e260]:
+          - generic [ref=f2e262]: Más Popular
+          - button "Guardar rutina destacada" [ref=f2e267] [cursor=pointer]
+        - generic [ref=f2e270]:
+          - heading "Hipertrofia Avanzada 4 Días" [level=2] [ref=f2e271]
+          - paragraph [ref=f2e272]: Plan estructurado en bloques de sobrecarga progresiva y congestión metabólica.
+          - generic [ref=f2e273]:
+            - generic [ref=f2e274]:
+              - generic [ref=f2e275]: 60 min/sesión
+              - generic [ref=f2e280]: 4 días/sem
+            - button "Iniciar" [ref=f2e284] [cursor=pointer]
+      - generic [ref=f2e288]:
+        - generic [ref=f2e289]:
+          - heading "Rutinas Disponibles" [level=3] [ref=f2e290]
+          - generic [ref=f2e291]: "4"
+        - button "Dificultad" [ref=f2e292] [cursor=pointer]
+      - generic [ref=f2e296]:
+        - article [ref=f2e297]:
+          - generic [ref=f2e298]:
+            - generic [ref=f2e299]:
+              - generic [ref=f2e300]:
+                - generic [ref=f2e301]: FUERZA
+                - generic [ref=f2e302]: Alta
+              - heading "Push - Pecho, Hombro, Tríceps" [level=4] [ref=f2e305]
+            - button "Opciones de rutina" [ref=f2e306] [cursor=pointer]
+          - generic [ref=f2e312]:
+            - generic [ref=f2e313]: 6 ejercicios
+            - generic [ref=f2e321]: 50 min
+          - generic [ref=f2e340]:
+            - generic [ref=f2e341]: "Última vez: hace 2 días"
+            - button "Comenzar" [ref=f2e344] [cursor=pointer]
+        - article [ref=f2e345]:
+          - generic [ref=f2e346]:
+            - generic [ref=f2e347]:
+              - generic [ref=f2e348]:
+                - generic [ref=f2e349]: HIPERTROFIA
+                - generic [ref=f2e350]: Alta
+              - heading "Pull - Espalda, Deltoides Post, Bíceps" [level=4] [ref=f2e353]
+            - button "Opciones de rutina" [ref=f2e354] [cursor=pointer]
+          - generic [ref=f2e360]:
+            - generic [ref=f2e361]: 6 ejercicios
+            - generic [ref=f2e369]: 55 min
+          - generic [ref=f2e384]:
+            - generic [ref=f2e385]: Próxima en cola
+            - button "Comenzar" [ref=f2e388] [cursor=pointer]
+        - article [ref=f2e389]:
+          - generic [ref=f2e390]:
+            - generic [ref=f2e391]:
+              - generic [ref=f2e392]:
+                - generic [ref=f2e393]: VOLUMEN
+                - generic [ref=f2e394]: Extrema
+              - heading "Legs - Cuádriceps & Femoral Enfocado" [level=4] [ref=f2e397]
+            - button "Opciones de rutina" [ref=f2e398] [cursor=pointer]
+          - generic [ref=f2e404]:
+            - generic [ref=f2e405]: 5 ejercicios
+            - generic [ref=f2e413]: 60 min
+          - generic [ref=f2e442]:
+            - generic [ref=f2e443]: "Récord previo: 140kg Prensa"
+            - button "Comenzar" [ref=f2e446] [cursor=pointer]
+        - article [ref=f2e447]:
+          - generic [ref=f2e448]:
+            - generic [ref=f2e449]:
+              - generic [ref=f2e450]:
+                - generic [ref=f2e451]: FUNCIONAL
+                - generic [ref=f2e452]: Moderada
+              - heading "Full Body Acondicionamiento & Core" [level=4] [ref=f2e455]
+            - button "Opciones de rutina" [ref=f2e456] [cursor=pointer]
+          - generic [ref=f2e462]:
+            - generic [ref=f2e463]: 7 ejercicios
+            - generic [ref=f2e471]: 40 min
+          - generic [ref=f2e486]:
+            - generic [ref=f2e487]: Ideal para descarga activa
+            - button "Comenzar" [ref=f2e490] [cursor=pointer]
+      - button "Crear Rutina Personalizada" [ref=f2e491] [cursor=pointer]
+  - navigation [ref=f2e219]:
+    - generic [ref=f2e220]:
+      - button "Hoy" [ref=f2e221]
+      - button "Entrenar" [ref=f2e229]
+      - button "Rutinas" [active] [ref=f2e239]
+      - button "Progreso" [ref=f2e243]

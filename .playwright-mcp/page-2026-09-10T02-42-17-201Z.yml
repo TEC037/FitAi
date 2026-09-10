@@ -1,0 +1,117 @@
+- generic [ref=f2e23]:
+  - banner [ref=f2e24]:
+    - generic [ref=f2e25]:
+      - generic [ref=f2e26]:
+        - generic [ref=f2e30]: Punto Fuerte
+        - generic [ref=f2e31]: Ejemplo
+      - generic [ref=f2e32]:
+        - button "Notificaciones" [ref=f2e33]
+        - button "Perfil de usuario" [ref=f2e38]:
+          - generic [ref=f2e39]: A
+  - main [ref=f2e40]:
+    - generic [ref=f2e800]:
+      - generic [ref=f2e801]:
+        - generic [ref=f2e802]:
+          - generic [ref=f2e803]: En Vivo
+          - heading "Torso Potencia" [level=1] [ref=f2e806]
+        - generic [ref=f2e807]:
+          - button "34:13" [ref=f2e808] [cursor=pointer]
+          - button "Finalizar" [ref=f2e814] [cursor=pointer]
+      - generic [ref=f2e815]:
+        - generic [ref=f2e816]:
+          - generic [ref=f2e817]: Tiempo de Descanso
+          - generic [ref=f2e822]: Serie 2 → Serie 3
+        - generic [ref=f2e823]:
+          - generic [ref=f2e824]:
+            - generic [ref=f2e825]: 01:10
+            - generic [ref=f2e826]: seg
+          - generic [ref=f2e827]:
+            - button "+30s" [ref=f2e828] [cursor=pointer]
+            - button "Saltar" [ref=f2e829] [cursor=pointer]
+      - generic [ref=f2e832]:
+        - generic [ref=f2e833]:
+          - generic [ref=f2e834]:
+            - generic [ref=f2e835]:
+              - generic [ref=f2e836]: Ejercicio 1 de 4
+              - generic [ref=f2e837]: Récord 95kg
+            - heading "Press de Banca con Barra" [level=2] [ref=f2e841]
+            - paragraph [ref=f2e842]: "Enfoque: Pecho, Tríceps, Deltoides Anterior"
+          - button "Ver demostración animada" [ref=f2e843] [cursor=pointer]
+        - generic [ref=f2e848]:
+          - img "Press de Banca con Barra" [ref=f2e849]
+          - generic: © Gym visual — https://gymvisual.com/
+        - generic [ref=f2e850]:
+          - generic [ref=f2e851]:
+            - generic [ref=f2e852]: Set
+            - generic [ref=f2e853]: Peso
+            - generic [ref=f2e854]: Reps
+            - generic [ref=f2e855]: Estado
+          - generic [ref=f2e856]:
+            - generic [ref=f2e857]: "1"
+            - generic [ref=f2e858]: 60 kg
+            - generic [ref=f2e859]: "12"
+            - button "Serie completada. Clic para desmarcar" [ref=f2e861] [cursor=pointer]
+          - generic [ref=f2e864]:
+            - generic [ref=f2e865]: "2"
+            - generic [ref=f2e866]: 75 kg
+            - generic [ref=f2e867]: "10"
+            - button "Serie completada. Clic para desmarcar" [ref=f2e869] [cursor=pointer]
+          - generic [ref=f2e872]:
+            - generic [ref=f2e873]:
+              - generic [ref=f2e874]: "3"
+              - generic [ref=f2e875]: Activa
+            - generic [ref=f2e876]:
+              - generic [ref=f2e877]: PESO
+              - spinbutton [ref=f2e879]: "82.5"
+              - generic [ref=f2e880]: kg
+            - generic [ref=f2e881]:
+              - generic [ref=f2e882]: REPS
+              - spinbutton [ref=f2e884]: "8"
+              - generic [ref=f2e885]: meta 8
+            - button "Marcar serie completada" [ref=f2e887] [cursor=pointer]
+          - generic [ref=f2e890]:
+            - generic [ref=f2e891]: "4"
+            - generic [ref=f2e892]: 85 kg
+            - generic [ref=f2e893]: "6"
+            - button "Clic para marcar serie" [ref=f2e895] [cursor=pointer]
+        - generic [ref=f2e898]:
+          - button "Añadir Serie" [ref=f2e899] [cursor=pointer]
+          - generic [ref=f2e901]: "Esfuerzo objetivo: 8.5"
+      - generic [ref=f2e905]:
+        - generic [ref=f2e906]:
+          - heading "Siguientes Ejercicios" [level=3] [ref=f2e909]
+          - generic [ref=f2e910]: 3 pendientes
+        - generic [ref=f2e911]:
+          - button "Dominadas con Lastre 2 Dominadas con Lastre 4 series • Dorsal, Bíceps Entrenar ahora" [ref=f2e912] [cursor=pointer]:
+            - generic [ref=f2e913]:
+              - generic [ref=f2e914]:
+                - img "Dominadas con Lastre" [ref=f2e916]
+                - generic [ref=f2e917]: "2"
+              - generic [ref=f2e918]:
+                - generic [ref=f2e919]: Dominadas con Lastre
+                - generic [ref=f2e920]: 4 series • Dorsal, Bíceps
+            - generic [ref=f2e921]: Entrenar ahora
+          - button "Press Inclinado con Mancuernas 3 Press Inclinado con Mancuernas 3 series • Pecho Superior Entrenar ahora" [ref=f2e930] [cursor=pointer]:
+            - generic [ref=f2e931]:
+              - generic [ref=f2e932]:
+                - img "Press Inclinado con Mancuernas" [ref=f2e934]
+                - generic [ref=f2e935]: "3"
+              - generic [ref=f2e936]:
+                - generic [ref=f2e937]: Press Inclinado con Mancuernas
+                - generic [ref=f2e938]: 3 series • Pecho Superior
+            - generic [ref=f2e939]: Entrenar ahora
+          - button "Remo con Barra T 4 Remo con Barra T 4 series • Espalda Media Entrenar ahora" [ref=f2e948] [cursor=pointer]:
+            - generic [ref=f2e949]:
+              - generic [ref=f2e950]:
+                - img "Remo con Barra T" [ref=f2e952]
+                - generic [ref=f2e953]: "4"
+              - generic [ref=f2e954]:
+                - generic [ref=f2e955]: Remo con Barra T
+                - generic [ref=f2e956]: 4 series • Espalda Media
+            - generic [ref=f2e957]: Entrenar ahora
+  - navigation [ref=f2e219]:
+    - generic [ref=f2e220]:
+      - button "Hoy" [ref=f2e221]
+      - button "Entrenar" [active] [ref=f2e229]
+      - button "Rutinas" [ref=f2e239]
+      - button "Progreso" [ref=f2e243]

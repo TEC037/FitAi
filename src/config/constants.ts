@@ -1,4 +1,4 @@
-// Constantes de dominio (FitAI Coach)
+// Constantes de dominio (Punto Fuerte)
 
 // Valores por defecto de sesión
 export const DEFAULT_REST_SECONDS = 90;
@@ -28,6 +28,19 @@ export const STORAGE_KEYS = {
   WORKOUT: 'fitai_workout_v2',
   DEMO: 'fitai_demo_v2',
 } as const;
+
+// Claves de la edición demo (/demo): aisladas de las de una cuenta real para
+// que la demo nunca lea ni escriba datos del usuario auténtico.
+export const DEMO_STORAGE_KEYS: Record<keyof typeof STORAGE_KEYS, string> = {
+  USER: 'fitai_demo_user',
+  AUTH: 'fitai_demo_auth',
+  HISTORY: 'fitai_demo_history',
+  SCREEN: 'fitai_demo_screen',
+  ROUTINES: 'fitai_demo_routines',
+  CHAT: 'fitai_demo_chat',
+  WORKOUT: 'fitai_demo_workout',
+  DEMO: 'fitai_demo_flag',
+};
 
 // Supabase (Auth + base de datos)
 // Lectura con guarda: el módulo también se bundlea en Cloudflare Pages

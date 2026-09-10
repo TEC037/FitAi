@@ -25,7 +25,7 @@ function readFitaiUserProfile(): Partial<{ name: string; weight: number }> | nul
 const fitaiUser = readFitaiUserProfile();
 
 export const USER_PROFILE = {
-  name: fitaiUser?.name ? fitaiUser.name.split(' ')[0] : 'Carlos',
+  name: fitaiUser?.name ? fitaiUser.name.split(' ')[0] : 'Atleta',
   avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBPpN59-1Yeayz7bwY1P0HAI0ScIdzTU4QNmzL1emPq81gn_fHpqo6Ki_fvQB2s7BjhMFJ4sibMM2Q-5PfRCpDrF3hkrLRs9KDYURnkrirORWUc533Y8Y1YpKGAU7COzcgiCeduP7b1PkU14tijQRsxgKU3cj9f3u6HYt_FRMELSzXGBXgwvpJlIaRzjBjxpxVr_suPbHumLMWY_6mZekDa3w21I7IrZyi9wG0Kr0oJHYxB0uvM2WESTg',
   status: 'Listo para entrenar',
   phase: 'Fase Hipertrofia',
@@ -123,7 +123,7 @@ export const ACTIVE_EXERCISES: Exercise[] = [
     id: 'bench-press',
     name: 'Press de Banca con Barra',
     targetMuscles: 'Pecho, Tríceps, Deltoides Anterior',
-    pr: 'PR 95kg',
+    pr: 'Récord 95kg',
     rpe: 8.5,
     gifUrl:
       'https://cdn.jsdelivr.net/gh/hasaneyldrm/exercises-dataset@main/videos/0025-EIeI8Vf.gif',
@@ -141,7 +141,7 @@ export const ACTIVE_EXERCISES: Exercise[] = [
     id: 'pullups-weighted',
     name: 'Dominadas con Lastre',
     targetMuscles: 'Dorsal, Bíceps',
-    pr: 'PR +25kg',
+    pr: 'Récord +25kg',
     rpe: 8.0,
     gifUrl:
       'https://cdn.jsdelivr.net/gh/hasaneyldrm/exercises-dataset@main/videos/0841-HMzLjXx.gif',
@@ -159,7 +159,7 @@ export const ACTIVE_EXERCISES: Exercise[] = [
     id: 'incline-db-press',
     name: 'Press Inclinado con Mancuernas',
     targetMuscles: 'Pecho Superior',
-    pr: 'PR 36kg/lado',
+    pr: 'Récord 36kg/lado',
     rpe: 8.5,
     gifUrl:
       'https://cdn.jsdelivr.net/gh/hasaneyldrm/exercises-dataset@main/videos/0314-ns0SIbU.gif',
@@ -176,7 +176,7 @@ export const ACTIVE_EXERCISES: Exercise[] = [
     id: 't-bar-row',
     name: 'Remo con Barra T',
     targetMuscles: 'Espalda Media',
-    pr: 'PR 70kg',
+    pr: 'Récord 70kg',
     rpe: 8.0,
     gifUrl:
       'https://cdn.jsdelivr.net/gh/hasaneyldrm/exercises-dataset@main/videos/0027-eZyBC3j.gif',

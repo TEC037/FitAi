@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Icon } from '../Icon';
 
 interface WeightModalProps {
   isOpen: boolean;
@@ -22,9 +23,7 @@ export const WeightModal: React.FC<WeightModalProps> = ({
       <div className="w-full max-w-sm rounded-2xl bg-[#1d2026] p-5 border border-white/[0.1] shadow-2xl flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#c3f400] text-[22px]">
-              monitor_weight
-            </span>
+            <Icon name="monitor_weight" size={22} className="text-[#c3f400]" />
             <h3 className="font-headline text-lg text-white font-bold">
               Registrar Peso
             </h3>
@@ -33,7 +32,7 @@ export const WeightModal: React.FC<WeightModalProps> = ({
             onClick={onClose}
             className="w-8 h-8 rounded-full flex items-center justify-center text-[#c4c9ac] hover:text-white hover:bg-[#272a31]"
           >
-            <span className="material-symbols-outlined text-[18px]">close</span>
+            <Icon name="close" size={18} />
           </button>
         </div>
 

@@ -1,4 +1,4 @@
--- FitAI Coach — Rutinas personalizadas creadas en la UI (Ola 1 kaizen, H3)
+-- Punto Fuerte — Rutinas personalizadas creadas en la UI
 -- Ejecutar en Supabase > SQL Editor, o via `supabase db push`.
 
 -- 1) Rutinas custom (payload completo de la UI en JSONB; columnas auxiliares
