@@ -84,4 +84,19 @@ Cliente (VITE_SERVERLESS_URL)  ──POST { q, w, days, goal, xp, n }──▶  
 
 ## Despliegue
 
-Cloudflare Pages (como se ha venido haciendo): build de la SPA con `dist/` como output y las funciones de `functions/` como Pages Functions. Se configuran las variables de entorno del proyecto (`VITE_*`) en el panel de Cloudflare. El flujo GitHub Pages vía `.github/workflows/static.yml` sigue disponible para previews estáticos sin Supabase.
+### Cloudflare Pages (recomendado)
+
+Conecta este repositorio directamente a **Cloudflare Pages** y usa estos valores:
+
+| Ajuste | Valor |
+|---|---|
+| Framework preset | Vite |
+| Build command | `npm run build` |
+| Build output directory | `dist` |
+| Node.js | `22` |
+
+Las funciones de `functions/api/` se publican automáticamente como Pages Functions; no deben copiarse dentro de `dist`. Configura `VITE_SERVERLESS_URL=/api/coach` en las variables de producción de Pages para que el frontend use el endpoint del mismo dominio. El endpoint de salud es `/api/health` y el perfil alométrico está disponible en `POST /api/allometric`.
+
+La URL `fitai.l3onardo9208.workers.dev` que se venía usando corresponde a un Worker estático que actualmente resuelve las rutas desconocidas con `index.html`; por eso `/api/health` devuelve HTML y `/api/coach` puede responder `405`. Para activar las funciones serverless hay que desplegar este repositorio como **Cloudflare Pages**, o configurar explícitamente un Worker con esas rutas; subir únicamente `dist/` no publica `functions/`.
+
+El flujo GitHub Pages vía `.github/workflows/static.yml` sigue disponible para previews estáticos sin Supabase, pero GitHub Pages no ejecuta las Pages Functions.
