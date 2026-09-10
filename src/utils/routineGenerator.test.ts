@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { generateRoutineFromSurvey, SurveyAnswers } from './routineGenerator';
+import { DatasetExercise } from '../types';
 
 function baseAnswers(overrides: Partial<SurveyAnswers> = {}): SurveyAnswers {
   return {
@@ -15,7 +16,7 @@ function baseAnswers(overrides: Partial<SurveyAnswers> = {}): SurveyAnswers {
   };
 }
 
-const NO_DATABASE: any[] = [];
+const NO_DATABASE: DatasetExercise[] = [];
 
 describe('generateRoutineFromSurvey', () => {
   it('genera la división para 3 días con volumen de hipertrofia', () => {

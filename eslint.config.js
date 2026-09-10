@@ -24,4 +24,12 @@ export default tseslint.config(
       'react-hooks/set-state-in-effect': 'warn',
     },
   },
+  {
+    files: ['**/*.test.{ts,tsx}'],
+    rules: {
+      // Los mocks de SDK en las pruebas requieren objetos parciales dinámicos;
+      // el código de producción mantiene la regla estricta.
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
+  },
 );
