@@ -40,7 +40,15 @@
 }
 
 @layer base {
-  html, body {
+  /*
+   * Estilos base scopeados para no interferir con la app host:
+   * - En la edición standalone, FitAi avisa con `html.dark` (ver index.html).
+   * - Cuando se embebe como módulo en un host (p.ej. Kaizen OS), el contenedor
+   *   raíz lleva la clase `.punto-fuerte-app` y los estilos quedan aislados.
+   */
+  html.dark,
+  html.dark body,
+  .punto-fuerte-app {
     width: 100%;
     margin: 0;
     padding: 0;
@@ -48,8 +56,21 @@
     color: #e1e2eb;
     font-family: "Lexend", sans-serif;
   }
-  
-  h1, h2, h3, h4, h5, h6, .font-space {
+
+  html.dark h1,
+  html.dark h2,
+  html.dark h3,
+  html.dark h4,
+  html.dark h5,
+  html.dark h6,
+  html.dark .font-space,
+  .punto-fuerte-app h1,
+  .punto-fuerte-app h2,
+  .punto-fuerte-app h3,
+  .punto-fuerte-app h4,
+  .punto-fuerte-app h5,
+  .punto-fuerte-app h6,
+  .punto-fuerte-app .font-space {
     font-family: "Space Grotesk", sans-serif;
   }
 }

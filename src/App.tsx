@@ -80,6 +80,10 @@ function AppShell() {
 
   const handleConfirmFinishWorkout = () => {
     setIsFinishWorkoutOpen(false);
+    // Avisa al host (p.ej. Kaizen OS) para otorgar puntos Kaizen si está embebida.
+    window.dispatchEvent(
+      new CustomEvent('punto-fuerte:workout-completed', { detail: finishSummary })
+    );
     // Add burned calories to today's total
     const extraCalories = Math.round((finishSummary.durationSeconds / 60) * 8.5);
     ui.addExtraCalories(extraCalories);
@@ -125,7 +129,7 @@ function AppShell() {
   }
 
   return (
-    <div className="min-h-screen bg-[#101319] text-[#e1e2eb] flex flex-col antialiased">
+    <div className="punto-fuerte-app min-h-screen bg-[#101319] text-[#e1e2eb] flex flex-col antialiased">
       {/* Fixed Global Header */}
       <Header
         onOpenNotifications={() => setIsNotificationsOpen(true)}
