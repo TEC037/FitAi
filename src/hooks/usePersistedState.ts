@@ -39,7 +39,9 @@ export function usePersistedState<T>(
     try {
       const saved = localStorage.getItem(key);
       if (saved === null) return resolveDefault(defaultValue);
-      return parseRef.current(saved);
+      // El inicializador debe usar directamente el parser recibido: leer una
+      // ref durante el render está prohibido por las reglas de React 19.
+      return parse(saved);
     } catch {
       return resolveDefault(defaultValue);
     }

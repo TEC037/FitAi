@@ -59,8 +59,11 @@ export async function handle(request: Request, env?: CoachLlmEnv | null): Promis
   const goal: FitnessGoal = VALID_GOALS.includes(b.goal as FitnessGoal)
     ? (b.goal as FitnessGoal)
     : 'hipertrofia';
-  const experience: ExperienceLevel = VALID_EXPERIENCE.includes(b.experience as ExperienceLevel)
-    ? (b.experience as ExperienceLevel)
+  // El cliente compacto usa `xp`; `experience` se conserva como alias para
+  // consumidores externos y versiones anteriores del endpoint.
+  const rawExperience = b.xp ?? b.experience;
+  const experience: ExperienceLevel = VALID_EXPERIENCE.includes(rawExperience as ExperienceLevel)
+    ? (rawExperience as ExperienceLevel)
     : 'intermedio';
   const name = typeof b.n === 'string' && b.n.trim() ? b.n.trim().slice(0, 40) : 'Atleta';
 
